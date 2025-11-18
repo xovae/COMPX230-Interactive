@@ -6,15 +6,44 @@
 
 <h1>WRAMP Registers</h1>
 
+<InputFile OnChange="LoadSREC"/>
+
+<button @onclick="Step">Step</button>
+<button @onclick="Run">Run</button>
+<button @onclick="Pause">Pause</button>
+
 @code { 
     RexBoard board = new RexBoard(); 
+    bool running = false;
 
-    void StepCPU() {
-        board.Tick();
-        board.CPU.mGpRegisters[(RegisterFile.GpRegister)1]++;
+    async Task LoadSREC(InputFileChangeEventArgs e) {
+        using Stream stream = e.File.OpenReadStream();
+        await board.LoadSrecAsync(stream);        
+    }
+
+    void Step()
+    {
+        while(!board.Tick());
+        StateHasChanged();
+    }
+
+    async Task Run()
+    {
+        if (running == false) {
+            running = true;
+            while (running)
+            {
+                board.Tick();
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(10);
+            }
+        }
+    }
+
+    void Pause()
+    {
+        running = false;
     }
 }
-
-<button class="btn btn-primary" @onclick="StepCPU">Step</button>
 
 <Registers CPU="@board.CPU" />

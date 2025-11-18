@@ -153,17 +153,17 @@ namespace RexSimulator.Hardware
         /// </summary>
         /// <param name="stream">The stream to read the .srec from.</param>
         /// <returns>The number of words loaded.</returns>
-        public uint LoadSrec(Stream stream)
+        public async Task<uint> LoadSrecAsync(Stream stream)
         {
             StreamReader reader = new StreamReader(stream);
+            string line;
             uint wordsLoaded = 0;
 
             //Note: All hex values are big endian.
 
             //Read records
-            while (!reader.EndOfStream)
+            while ((line = await reader.ReadLineAsync()) != null)
             {
-                string line = reader.ReadLine();
                 int index = 0;
                 int checksum = 0;
 
