@@ -1,7 +1,20 @@
 ﻿@page "/"
+@using RexSimulator.Hardware
+@using RexSimulator.Hardware.Wramp
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>WRAMP Registers</h1>
 
-Welcome to your new app.
+@code { 
+    RexBoard board = new RexBoard(); 
+
+    void StepCPU() {
+        board.Tick();
+        board.CPU.mGpRegisters[(RegisterFile.GpRegister)1]++;
+    }
+}
+
+<button class="btn btn-primary" @onclick="StepCPU">Step</button>
+
+<Registers CPU="@board.CPU" />

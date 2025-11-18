@@ -541,6 +541,48 @@
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets": {}
         }
+      },
+      "SoftwareDriven.Blockly.Blazor/1.7.10": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "8.0.11",
+          "Microsoft.AspNetCore.Components.Web": "8.0.11",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
+          "SoftwareDriven.Blockly.Code": "1.7.8"
+        },
+        "compile": {
+          "lib/net8.0/SoftwareDriven.Blockly.Blazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/SoftwareDriven.Blockly.Blazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "resource": {
+          "lib/net8.0/de/SoftwareDriven.Blockly.Blazor.resources.dll": {
+            "locale": "de"
+          }
+        },
+        "build": {
+          "buildTransitive/SoftwareDriven.Blockly.Blazor.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/SoftwareDriven.Blockly.Blazor.props": {}
+        }
+      },
+      "SoftwareDriven.Blockly.Code/1.7.8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2"
+        },
+        "compile": {
+          "lib/net8.0/SoftwareDriven.Blockly.Code.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/SoftwareDriven.Blockly.Code.dll": {}
+        }
       }
     },
     "net10.0/browser-wasm": {
@@ -1082,6 +1124,48 @@
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets": {}
+        }
+      },
+      "SoftwareDriven.Blockly.Blazor/1.7.10": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "8.0.11",
+          "Microsoft.AspNetCore.Components.Web": "8.0.11",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
+          "SoftwareDriven.Blockly.Code": "1.7.8"
+        },
+        "compile": {
+          "lib/net8.0/SoftwareDriven.Blockly.Blazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/SoftwareDriven.Blockly.Blazor.dll": {
+            "related": ".xml"
+          }
+        },
+        "resource": {
+          "lib/net8.0/de/SoftwareDriven.Blockly.Blazor.resources.dll": {
+            "locale": "de"
+          }
+        },
+        "build": {
+          "buildTransitive/SoftwareDriven.Blockly.Blazor.props": {}
+        },
+        "buildMultiTargeting": {
+          "buildMultiTargeting/SoftwareDriven.Blockly.Blazor.props": {}
+        }
+      },
+      "SoftwareDriven.Blockly.Code/1.7.8": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2"
+        },
+        "compile": {
+          "lib/net8.0/SoftwareDriven.Blockly.Code.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/SoftwareDriven.Blockly.Code.dll": {}
         }
       }
     }
@@ -2034,13 +2118,12 @@
       ]
     },
     "Microsoft.NET.ILLink.Tasks/10.0.0": {
-      "sha512": "kICGrGYEzCNI3wPzfEXcwNHgTvlvVn9yJDhSdRK+oZQy4jvYH529u7O0xf5ocQKzOMjfS07+3z9PKRIjrFMJDA==",
+      "sha512": "VYCtdJ9pb8fdxRbV5dBmLsKp/1wUrvwo+sXiEDzDnSb+L+PLI23cwa4+soLjEqzQ1U1gRrCTQfOlFXT8w7COcA==",
       "type": "package",
       "path": "microsoft.net.illink.tasks/10.0.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "Icon.png",
         "Sdk/Sdk.props",
         "THIRD-PARTY-NOTICES.TXT",
@@ -2064,22 +2147,6 @@
         "tools/net/illink.deps.json",
         "tools/net/illink.dll",
         "tools/net/illink.runtimeconfig.json",
-        "tools/netframework/ILLink.Tasks.dll",
-        "tools/netframework/ILLink.Tasks.dll.config",
-        "tools/netframework/Mono.Cecil.Mdb.dll",
-        "tools/netframework/Mono.Cecil.Pdb.dll",
-        "tools/netframework/Mono.Cecil.Rocks.dll",
-        "tools/netframework/Mono.Cecil.dll",
-        "tools/netframework/Sdk/Sdk.props",
-        "tools/netframework/System.Buffers.dll",
-        "tools/netframework/System.Collections.Immutable.dll",
-        "tools/netframework/System.Memory.dll",
-        "tools/netframework/System.Numerics.Vectors.dll",
-        "tools/netframework/System.Reflection.Metadata.dll",
-        "tools/netframework/System.Runtime.CompilerServices.Unsafe.dll",
-        "tools/netframework/build/Microsoft.NET.ILLink.Analyzers.props",
-        "tools/netframework/build/Microsoft.NET.ILLink.Tasks.props",
-        "tools/netframework/build/Microsoft.NET.ILLink.targets",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -2123,6 +2190,39 @@
         "tools/net472/Microsoft.NET.Sdk.WebAssembly.Pack.Tasks.dll",
         "tools/net472/Microsoft.NET.WebAssembly.Webcil.dll"
       ]
+    },
+    "SoftwareDriven.Blockly.Blazor/1.7.10": {
+      "sha512": "+SXtAuxiY1Wustci7FxXHaGsK7V8So22IxrsoinSMboxqo0Ne372PUAk6kvoOOJuZbntalTCDtX8IOl6aVQ8UA==",
+      "type": "package",
+      "path": "softwaredriven.blockly.blazor/1.7.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+        "build/Microsoft.AspNetCore.StaticWebAssets.props",
+        "build/SoftwareDriven.Blockly.Blazor.props",
+        "buildMultiTargeting/SoftwareDriven.Blockly.Blazor.props",
+        "buildTransitive/SoftwareDriven.Blockly.Blazor.props",
+        "lib/net8.0/SoftwareDriven.Blockly.Blazor.dll",
+        "lib/net8.0/SoftwareDriven.Blockly.Blazor.xml",
+        "lib/net8.0/de/SoftwareDriven.Blockly.Blazor.resources.dll",
+        "softwaredriven.blockly.blazor.1.7.10.nupkg.sha512",
+        "softwaredriven.blockly.blazor.nuspec",
+        "staticwebassets/js/index.bundle.js",
+        "staticwebassets/js/index.bundle.js.LICENSE.txt"
+      ]
+    },
+    "SoftwareDriven.Blockly.Code/1.7.8": {
+      "sha512": "jpFYJ7hAojLcmUAnCFrUbwElIWeIIm8c/K9iZ4epRkOBFSYnbkWyaci3fSoBy1KI+0etI3LrsgVK6uIsqg81tA==",
+      "type": "package",
+      "path": "softwaredriven.blockly.code/1.7.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net8.0/SoftwareDriven.Blockly.Code.dll",
+        "softwaredriven.blockly.code.1.7.8.nupkg.sha512",
+        "softwaredriven.blockly.code.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -2132,28 +2232,30 @@
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 10.0.0",
       "Microsoft.DotNet.HotReload.WebAssembly.Browser >= 10.0.100",
       "Microsoft.NET.ILLink.Tasks >= 10.0.0",
-      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.0"
+      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.0",
+      "SoftwareDriven.Blockly.Blazor >= 1.7.10"
     ]
   },
   "packageFolders": {
-    "/home/jamie/.nuget/packages/": {}
+    "/home/jb469/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/jamie/Documents/COMPX230-Interactive/BlazorApp/BlazorApp.csproj",
+      "projectUniqueName": "/home/jb469/Documents/COMPX230-Interactive/BlazorApp/BlazorApp.csproj",
       "projectName": "BlazorApp",
-      "projectPath": "/home/jamie/Documents/COMPX230-Interactive/BlazorApp/BlazorApp.csproj",
-      "packagesPath": "/home/jamie/.nuget/packages/",
-      "outputPath": "/home/jamie/Documents/COMPX230-Interactive/BlazorApp/obj/",
+      "projectPath": "/home/jb469/Documents/COMPX230-Interactive/BlazorApp/BlazorApp.csproj",
+      "packagesPath": "/home/jb469/.nuget/packages/",
+      "outputPath": "/home/jb469/Documents/COMPX230-Interactive/BlazorApp/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/jamie/.nuget/NuGet/NuGet.Config"
+        "/home/jb469/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2209,6 +2311,10 @@
             "target": "Package",
             "version": "[10.0.0, )",
             "autoReferenced": true
+          },
+          "SoftwareDriven.Blockly.Blazor": {
+            "target": "Package",
+            "version": "[1.7.10, )"
           }
         },
         "imports": [
@@ -2233,7 +2339,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/jamie/.dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

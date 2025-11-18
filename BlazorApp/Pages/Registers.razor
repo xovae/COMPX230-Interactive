@@ -1,0 +1,32 @@
+@page "/wsim"
+@using RexSimulator.Hardware
+@using System.ComponentModel
+@using RexSimulator.Hardware.Wramp
+
+@code {
+    [Parameter]
+    public SimpleWrampCpu CPU { get; set; }
+} 
+
+@if (CPU != null) {
+    <table>
+        <thead>
+            <tr>
+                <th>Register</th>
+                <th>Hex</th>
+                <th>Unsigned</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 1; i <= 13; i++) {
+                uint val = CPU.mGpRegisters[(RegisterFile.GpRegister)i];
+
+                <tr>
+                    <td>$@i</td>
+                    <td>@("0x" + val.ToString("X8"))</td>
+                    <td>@val</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
