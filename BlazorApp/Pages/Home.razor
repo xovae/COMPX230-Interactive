@@ -1,32 +1,57 @@
 ﻿@page "/"
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
 
-<h1>WRAMP Registers</h1>
+<h1>WRAMP Sim</h1>
 
-<InputFile OnChange="LoadSREC"/>
+<h2>Upload Source</h2>
+<InputFile OnChange="Compile"/>
 
+<h2>Controls</h2>
 <button @onclick="Step">Step</button>
 <button @onclick="Run">Run</button>
 <button @onclick="Pause">Pause</button>
+
+<h2>Registers</h2>
+<Registers CPU="@board.CPU" />
 
 @code { 
     RexBoard board = new RexBoard(); 
     bool running = false;
 
-    async Task LoadSREC(InputFileChangeEventArgs e) {
-        using Stream stream = e.File.OpenReadStream();
-        await board.LoadSrecAsync(stream);        
+    //Take a .s file from the user and compile it to an SREC for use in the wsim
+    async Task Compile(InputFileChangeEventArgs e) {
+        //Get the file from the InputFile element, and extract it's name and size.
+        IBrowserFile file = e.File;
+        byte[] fileBytes = new byte[file.Size];
+        string fileName = file.Name;
+
+        //Read the entire file as bytes
+        using Stream stream = file.OpenReadStream();
+        await stream.ReadAsync(fileBytes, 0, (int)file.Size);
+
+        //Import app.js
+        IJSObjectReference module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./wrampToolchain/app.js");
+
+        //Compile the .s file and retrieve the resulting .srec file as bytes
+        byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", fileName, fileBytes);
+        
+        //Open a new memory stream, and pass to wsim for execution
+        MemoryStream ms = new MemoryStream(srecBytes);
+        await board.LoadSrecAsync(ms);
     }
 
+    //Executes a single instruction
     void Step()
     {
         while(!board.Tick());
         StateHasChanged();
     }
 
+    //Continuously executes instructions
     async Task Run()
     {
         if (running == false) {
@@ -40,10 +65,9 @@
         }
     }
 
+    //Pause execution of instructions
     void Pause()
     {
         running = false;
     }
 }
-
-<Registers CPU="@board.CPU" />

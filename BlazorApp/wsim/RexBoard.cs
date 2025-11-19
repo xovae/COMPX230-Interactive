@@ -156,7 +156,7 @@ namespace RexSimulator.Hardware
         public async Task<uint> LoadSrecAsync(Stream stream)
         {
             StreamReader reader = new StreamReader(stream);
-            string line;
+            string? line;
             uint wordsLoaded = 0;
 
             //Note: All hex values are big endian.

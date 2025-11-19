@@ -1,0 +1,1 @@
+/home/jb469/Downloads/emsdk-main/upstream/emscripten/em++ -sEXPORTED_FUNCTIONS=[_wlink] -sEXPORTED_RUNTIME_METHODS=[ccall,cwrap,FS] -sINVOKE_RUN=0 -sNO_EXIT_RUNTIME=1 -sMODULARIZE=1 -sEXPORT_NAME=WLinkModule -sEXPORT_ES6=1 @CMakeFiles/wlink.dir/objects1.rsp -o wlink.js 

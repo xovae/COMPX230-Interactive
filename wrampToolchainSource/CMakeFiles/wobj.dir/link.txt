@@ -1,0 +1,1 @@
+/home/jb469/Downloads/emsdk-main/upstream/emscripten/em++ @CMakeFiles/wobj.dir/objects1.rsp -o wobj.js 
