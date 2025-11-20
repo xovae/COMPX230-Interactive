@@ -32,6 +32,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/GPRegisters.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvR1BSZWdpc3RlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -40,12 +44,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90Rm91bmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/RAM.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUkFNLnJhem9y
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/ParallelRegisters.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFyYWxsZWxSZWdpc3RlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Registers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVnaXN0ZXJzLnJhem9y
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/RAM.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUkFNLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/_Imports.razor]

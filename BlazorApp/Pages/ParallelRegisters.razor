@@ -1,0 +1,36 @@
+@using RexSimulator.Hardware
+@using RexSimulator.Hardware.Rex
+@using RexSimulator.Hardware.Wramp
+@using System.Security.Permissions
+
+@code {
+    [Parameter]
+    required public MemoryDevice parallelMemory { get; set; }
+
+
+} 
+
+@* Prints out the parallel registers in decimal, hex, and binary *@
+@if (parallelMemory != null) {
+    <table>
+        <thead>
+            <tr>
+                <th>Address</th>
+                <th>Decimal</th>
+                <th>Hex</th>
+                <th>Binary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < parallelMemory.Size; i++) {
+                uint address = (uint)(i + parallelMemory.BaseAddress);
+                <tr>
+                    <td>@(address.ToString("X8"))</td>
+                    <td>@parallelMemory[address]</td>
+                    <td>@parallelMemory[address].ToString("X8")</td>
+                    <td>@Convert.ToString(parallelMemory[address], 2).PadLeft(32, '0')</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

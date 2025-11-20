@@ -7,14 +7,15 @@
     required public SimpleWrampCpu CPU { get; set; }
 } 
 
-@* Prints out the GPIO registers $1-$13 in hex and unsigned integers *@
+@* Prints out the GPIO registers $1-$13 in decimal, hex, and binary *@
 @if (CPU != null) {
     <table>
         <thead>
             <tr>
                 <th>Register</th>
+                <th>Decimal</th>
                 <th>Hex</th>
-                <th>Unsigned</th>
+                <th>Binary</th>
             </tr>
         </thead>
         <tbody>
@@ -30,8 +31,9 @@
                     else {
                         <td>$@i</td>
                     }
-                    <td>@("0x" + val.ToString("X8"))</td>
                     <td>@val</td>
+                    <td>@("0x" + val.ToString("X8"))</td>
+                    <td>@Convert.ToString(val, 2).PadLeft(32, '0')</td>
                 </tr>
             }
         </tbody>

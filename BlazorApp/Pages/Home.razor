@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
+@using System.ComponentModel
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
@@ -23,22 +24,34 @@
             <button @onclick="Step">Step</button>
             <button @onclick="Run">Run</button>
             <button @onclick="Pause">Pause</button>
+
+            @for (int i = 0; i < 16; i++) {
+                int pos = i;
+                int value = (int)Math.Pow(2, pos);
+                <button @onclick="() => toggleSwitch(pos)">Switch @pos</button>
+            }
         </div>    
 
         <div>
             <div id="tab">
-                <button class="tabLink" @onclick='e => openTab("Registers")'>Registers</button>
+                <button class="tabLink" @onclick='e => openTab("GPRegisters")'>GP Registers</button>
                 <button class="tabLink" @onclick='e => openTab("RAM")'>RAM</button>
+                <button class="tabLink" @onclick='e => openTab("ParallelRegisters")'>Parallel Registers</button>
             </div>
 
-            <div id="Registers" class="tabContent">
-                <h2>Registers</h2>
-                <Registers CPU="@board.CPU" />
+            <div id="GPRegisters" class="tabContent">
+                <h2>General Purpose Registers</h2>
+                <GPRegisters CPU="@board.CPU" />
             </div>
 
             <div id="RAM" class="tabContent">
                 <h2>RAM</h2>
                 <RAM CPU="@board.CPU" mDevice="@board.RAM" />
+            </div>
+
+            <div id="ParallelRegisters" class="tabContent">
+                <h2>Parallel Port Registers</h2>
+                <ParallelRegisters parallelMemory="@board.Parallel" />
             </div>
         </div>
     </div>
@@ -46,10 +59,12 @@
 
 @code { 
 
+    //Tab Switching
     async Task openTab(string tabName) {
         await JSRuntime.InvokeVoidAsync("openTab", tabName);
     }
-    
+
+    //WSIM Operation
     RexBoard board = new RexBoard();
     bool running = false;
 
@@ -100,5 +115,9 @@
     void Pause()
     {
         running = false;
+    }
+
+    void toggleSwitch(int pos) {
+        board.Parallel.Switches ^= (1u << pos);
     }
 }

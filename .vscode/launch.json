@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "C#: BlazorApp [Default Configuration]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/BlazorApp/BlazorApp.csproj"
+        }
+    ]
+}
