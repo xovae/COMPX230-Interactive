@@ -9,30 +9,37 @@
 
 <div id="body">
 
-    <div id="controls">
-        <h2>Upload Source</h2>
-        <InputFile OnChange="Compile"/>
-
-        <h2>Controls</h2>
-        <button @onclick="Step">Step</button>
-        <button @onclick="Run">Run</button>
-        <button @onclick="Pause">Pause</button>
+    <div id="blockly">
     </div>
 
-    <div id="info">
-        <div id="tab">
-            <button class="tabLink" @onclick='e => openTab("Registers")'>Registers</button>
-            <button class="tabLink" @onclick='e => openTab("RAM")'>RAM</button>
+    <div id="wsim">
+        <div>
+            <h2>Upload Source</h2>
+            <InputFile OnChange="Compile"/>
         </div>
 
-        <div id="Registers" class="tabContent">
-            <h2>Registers</h2>
-            <Registers CPU="@board.CPU" />
-        </div>
+        <div>
+            <h2>Controls</h2>
+            <button @onclick="Step">Step</button>
+            <button @onclick="Run">Run</button>
+            <button @onclick="Pause">Pause</button>
+        </div>    
 
-        <div id="RAM" class="tabContent">
-            <h2>RAM</h2>
-            <RAM CPU="@board.CPU" mDevice="@board.RAM" />
+        <div>
+            <div id="tab">
+                <button class="tabLink" @onclick='e => openTab("Registers")'>Registers</button>
+                <button class="tabLink" @onclick='e => openTab("RAM")'>RAM</button>
+            </div>
+
+            <div id="Registers" class="tabContent">
+                <h2>Registers</h2>
+                <Registers CPU="@board.CPU" />
+            </div>
+
+            <div id="RAM" class="tabContent">
+                <h2>RAM</h2>
+                <RAM CPU="@board.CPU" mDevice="@board.RAM" />
+            </div>
         </div>
     </div>
 </div>
