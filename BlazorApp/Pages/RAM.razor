@@ -1,0 +1,68 @@
+@using RexSimulator.Hardware
+@using RexSimulator.Hardware.Rex
+@using RexSimulator.Hardware.Wramp
+@using System.Linq
+@using System.Reflection.Metadata.Ecma335
+
+@code {
+    [Parameter]
+
+    required public MemoryDevice mDevice { get; set; }
+    
+    [Parameter]
+    
+    required public SimpleWrampCpu CPU { get; set; }
+
+    public class MemoryPos {
+        public string pointer;
+        public uint address;
+        public uint value;
+        public IR ir = new IR();
+        public MemoryPos(string pointer, uint address, uint value) {
+            this.pointer = pointer;
+            this.address = address;
+            this.value = value;
+            ir.Instruction = value;
+        }
+    }
+} 
+
+@* Prints out the contents of RAM, detailing address, value, and the disassembled instructions *@
+@if (mDevice != null) {
+    List<MemoryPos> mPos = new List<MemoryPos>();
+    @for (int i = 0; i < mDevice.Size; i++) {
+        if (i == CPU.PC) {
+            mPos.Add(new MemoryPos("$pc", (uint)i, mDevice[(uint)i]));            
+        }
+        else if (i == CPU.mGpRegisters[15]) {
+            mPos.Add(new MemoryPos("$ra", (uint)i, mDevice[(uint)i]));
+        }
+        else if (i == CPU.mGpRegisters[14]) {
+            mPos.Add(new MemoryPos("$sp", (uint)i, mDevice[(uint)i]));
+        }
+        else {
+            mPos.Add(new MemoryPos("", (uint)i, mDevice[(uint)i]));
+        }
+    }
+
+    <table id="ramTable">
+        <thead>
+            <tr>
+                <th>Pointer</th>
+                <th>Address</th>
+                <th>Value</th>
+                <th>Disassembly</th>
+            </tr>
+        </thead>
+        <tbody>
+            <Virtualize Items="mPos" Context="item">
+                <tr>
+                    <td>@item.pointer</td>
+                    <td>@item.address.ToString("X8")</td>
+                    <td>@item.value.ToString("X8")</td>
+                    <td>@item.ir.ToString()</td>
+                </tr>
+            </Virtualize>
+        </tbody>
+    </table>
+}

@@ -1,12 +1,13 @@
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
+@using System.Security.Permissions
 
 @code {
     [Parameter]
-    public SimpleWrampCpu CPU { get; set; }
+    required public SimpleWrampCpu CPU { get; set; }
 } 
 
-@* Prints out the GPIO registers $1-$13 in hex and unsigned integers*@
+@* Prints out the GPIO registers $1-$13 in hex and unsigned integers *@
 @if (CPU != null) {
     <table>
         <thead>
@@ -17,11 +18,18 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 1; i <= 13; i++) {
+            @for (int i = 1; i <= 15; i++) {
                 uint val = CPU.mGpRegisters[(RegisterFile.GpRegister)i];
-
                 <tr>
-                    <td>$@i</td>
+                    @if (i == 14) {
+                        <td>$@i ($sp)</td>
+                    }
+                    else if (i == 15) {
+                        <td>$@i ($ra)</td>
+                    }
+                    else {
+                        <td>$@i</td>
+                    }
                     <td>@("0x" + val.ToString("X8"))</td>
                     <td>@val</td>
                 </tr>
