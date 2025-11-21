@@ -18,11 +18,21 @@ html, body {
 }
 
 #wsim div {
-    padding-bottom: 20px
+    padding-bottom: 20px;
+}
+
+#switches {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    align-items: center;
+}
+
+#switches button {
+    width: fit-content;
 }
 
 #RAM {
-    height: 500px;
+    height: 300px;
     overflow-y: scroll;
 }
 
@@ -30,7 +40,7 @@ html, body {
     position: sticky;
     top: 0;
     background-color: white;
-    padding: 10px
+    padding: 10px;
 }
 
 .tab {

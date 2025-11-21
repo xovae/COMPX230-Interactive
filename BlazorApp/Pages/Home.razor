@@ -25,11 +25,20 @@
             <button @onclick="Run">Run</button>
             <button @onclick="Pause">Pause</button>
 
-            @for (int i = 0; i < 16; i++) {
-                int pos = i;
-                int value = (int)Math.Pow(2, pos);
-                <button @onclick="() => toggleSwitch(pos)">Switch @pos</button>
-            }
+            <div id="switches">
+                @for (int i = 0; i < 16; i++) {
+                    int pos = i;
+                    int value = (int)Math.Pow(2, pos);
+                    <button @onclick="() => toggleSwitch(pos)">Switch @pos</button>
+                }
+            </div>
+
+            <div id="buttons">
+                @for (int i = 0; i < 3; i++) {
+                    int pos = i;
+                    <button @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
+                }
+            </div>
         </div>    
 
         <div>
@@ -37,6 +46,7 @@
                 <button class="tabLink" @onclick='e => openTab("GPRegisters")'>GP Registers</button>
                 <button class="tabLink" @onclick='e => openTab("RAM")'>RAM</button>
                 <button class="tabLink" @onclick='e => openTab("ParallelRegisters")'>Parallel Registers</button>
+                <button class="tabLink" @onclick='e => openTab("SerialPort1")'>Serial Port 1</button>
             </div>
 
             <div id="GPRegisters" class="tabContent">
@@ -53,11 +63,16 @@
                 <h2>Parallel Port Registers</h2>
                 <ParallelRegisters parallelMemory="@board.Parallel" />
             </div>
+
+            <div id="SerialPort1" class="tabContent">
+                <h2>Serial Port 1</h2>
+                <SerialPort serial="@board.Serial1" />
+            </div>
         </div>
     </div>
 </div>
 
-@code { 
+@code {
 
     //Tab Switching
     async Task openTab(string tabName) {
@@ -65,11 +80,21 @@
     }
 
     //WSIM Operation
-    RexBoard board = new RexBoard();
+    RexBoard board;
+
+    protected override void OnInitialized()
+    {
+        board = new RexBoard();
+    }
+
     bool running = false;
 
     //Take a .s file from the user and compile it to an SREC for use in the wsim
     async Task Compile(InputFileChangeEventArgs e) {
+        //Reset board
+        board.Reset();
+        StateHasChanged();
+
         //Get the file from the InputFile element, and extract it's name and size.
         IBrowserFile file = e.File;
         byte[] fileBytes = new byte[file.Size];
@@ -119,5 +144,13 @@
 
     void toggleSwitch(int pos) {
         board.Parallel.Switches ^= (1u << pos);
+    }
+
+    void pressButton(int pos) {
+        board.Parallel.Buttons = (uint)1 << pos;
+    }
+
+    void releaseButton() {
+        board.Parallel.Buttons = 0;
     }
 }

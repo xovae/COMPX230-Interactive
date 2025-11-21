@@ -259,18 +259,15 @@ namespace RexSimulator.Hardware.Rex
             //Only transmit once the serialisation delay is over
             if (mClocksToTransmit > 0)
             {
-                if (--mClocksToTransmit == 0)
+                SerialDataTransmitted(this, new SerialEventArgs(Transmit));
+                mClocksToTransmit = 0;
+                if ((Control & 0x200u) != 0)
                 {
-                    if (SerialDataTransmitted != null)
-                        SerialDataTransmitted(this, new SerialEventArgs(Transmit));
-                    if ((Control & 0x200u) != 0)
-                    {
-                        uint oldIack = InterruptAck;
-                        Interrupt(true);
-                        InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
-                    }
-                    Status |= 0x00000002;
+                    uint oldIack = InterruptAck;
+                    Interrupt(true);
+                    InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
                 }
+                Status |= 0x00000002;
             }
 
             if (mClocksToReceive > 0)

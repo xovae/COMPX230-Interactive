@@ -1,0 +1,28 @@
+@using RexSimulator.Hardware.Rex
+@using System.Net.Sockets
+@using System.Text
+@code {
+    [Parameter]
+
+    required public SerialIO serial { get; set; }
+
+    private StringBuilder serialBuffer = new StringBuilder();
+    public string serialText => serialBuffer.ToString();
+
+    protected override void OnParametersSet()
+    {
+        serial.SerialDataTransmitted -= receive;
+        serial.SerialDataTransmitted += receive;
+    }
+
+    void receive(object? sender, SerialIO.SerialEventArgs e) {
+        char c = (char)e.Data;
+        serialBuffer.Append(c);
+        InvokeAsync(StateHasChanged);
+    }
+}
+
+<p>@serialText</p>
+
+
+
