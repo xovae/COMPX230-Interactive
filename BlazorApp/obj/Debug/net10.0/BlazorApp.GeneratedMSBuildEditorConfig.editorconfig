@@ -32,6 +32,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Blockly.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmxvY2tseS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/GPRegisters.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvR1BSZWdpc3RlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

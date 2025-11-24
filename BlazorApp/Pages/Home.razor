@@ -10,10 +10,11 @@
 
 <div id="body">
 
-    <div id="blockly">
+    <div>
+        <Blockly />
     </div>
 
-    <div id="wsim">
+    <div>
         <div>
             <h2>Upload Source</h2>
             <InputFile OnChange="Compile"/>
@@ -21,51 +22,55 @@
 
         <div>
             <h2>Controls</h2>
-            <button @onclick="Step">Step</button>
-            <button @onclick="Run">Run</button>
-            <button @onclick="Pause">Pause</button>
+            <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+            <button type="button" class="btn btn-success" @onclick="Run">Run</button>
+            <button type="button" class="btn btn-danger" @onclick="Pause">Pause</button>
 
             <div id="switches">
                 @for (int i = 0; i < 16; i++) {
                     int pos = i;
                     int value = (int)Math.Pow(2, pos);
-                    <button @onclick="() => toggleSwitch(pos)">Switch @pos</button>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="@pos" @onclick="() => toggleSwitch(pos)">
+                        <label class="form-check-label" for="@pos">Switch @pos</label>
+                    </div>
                 }
             </div>
 
             <div id="buttons">
                 @for (int i = 0; i < 3; i++) {
                     int pos = i;
-                    <button @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
+                    <button type="button" class="btn btn-primary" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
                 }
             </div>
         </div>    
 
-        <div>
-            <div id="tab">
-                <button class="tabLink" @onclick='e => openTab("GPRegisters")'>GP Registers</button>
-                <button class="tabLink" @onclick='e => openTab("RAM")'>RAM</button>
-                <button class="tabLink" @onclick='e => openTab("ParallelRegisters")'>Parallel Registers</button>
-                <button class="tabLink" @onclick='e => openTab("SerialPort1")'>Serial Port 1</button>
-            </div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
+            </li>
+        </ul>
 
-            <div id="GPRegisters" class="tabContent">
-                <h2>General Purpose Registers</h2>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
                 <GPRegisters CPU="@board.CPU" />
             </div>
-
-            <div id="RAM" class="tabContent">
-                <h2>RAM</h2>
+            <div class="tab-pane fade ram" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
                 <RAM CPU="@board.CPU" mDevice="@board.RAM" />
             </div>
-
-            <div id="ParallelRegisters" class="tabContent">
-                <h2>Parallel Port Registers</h2>
+            <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
                 <ParallelRegisters parallelMemory="@board.Parallel" />
             </div>
-
-            <div id="SerialPort1" class="tabContent">
-                <h2>Serial Port 1</h2>
+            <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
                 <SerialPort serial="@board.Serial1" />
             </div>
         </div>
@@ -73,11 +78,6 @@
 </div>
 
 @code {
-
-    //Tab Switching
-    async Task openTab(string tabName) {
-        await JSRuntime.InvokeVoidAsync("openTab", tabName);
-    }
 
     //WSIM Operation
     RexBoard board;
@@ -129,6 +129,7 @@
             running = true;
             while (running)
             {
+                Console.WriteLine(board.Serial1.Status);
                 board.Tick();
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(10);

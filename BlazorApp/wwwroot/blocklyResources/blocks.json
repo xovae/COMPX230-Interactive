@@ -1,0 +1,12 @@
+{
+    "type": "custom_block",
+    "message0": "move forward %1",
+    "args0": [
+        {
+            "type": "field_number",
+            "name": "FIELD_NAME"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null
+}
