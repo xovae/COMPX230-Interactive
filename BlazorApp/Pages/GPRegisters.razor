@@ -5,7 +5,7 @@
 @code {
     [Parameter]
     required public SimpleWrampCpu CPU { get; set; }
-} 
+}
 
 @* Prints out the GPIO registers $1-$13 in decimal, hex, and binary *@
 @if (CPU != null) {
@@ -19,16 +19,20 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 1; i <= 15; i++) {
+            @for (int i = 1; i <= 15; i++)
+            {
                 uint val = CPU.mGpRegisters[(RegisterFile.GpRegister)i];
                 <tr>
-                    @if (i == 14) {
+                    @if (i == 14)
+                    {
                         <td>$@i ($sp)</td>
                     }
-                    else if (i == 15) {
+                    else if (i == 15)
+                    {
                         <td>$@i ($ra)</td>
                     }
-                    else {
+                    else
+                    {
                         <td>$@i</td>
                     }
                     <td>@val</td>

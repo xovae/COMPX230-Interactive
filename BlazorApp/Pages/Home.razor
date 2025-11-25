@@ -10,7 +10,7 @@
 
 <div id="body">
 
-    <div>
+    <div id="blockly">
         <Blockly />
     </div>
 
@@ -43,7 +43,7 @@
                     <button type="button" class="btn btn-primary" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
                 }
             </div>
-        </div>    
+        </div>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -90,7 +90,8 @@
     bool running = false;
 
     //Take a .s file from the user and compile it to an SREC for use in the wsim
-    async Task Compile(InputFileChangeEventArgs e) {
+    async Task Compile(InputFileChangeEventArgs e)
+    {
         //Reset board
         board.Reset();
         StateHasChanged();
@@ -104,12 +105,9 @@
         using Stream stream = file.OpenReadStream();
         await stream.ReadAsync(fileBytes, 0, (int)file.Size);
 
-        //Import app.js
-        IJSObjectReference module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./wrampToolchain/app.js");
-
-        //Compile the .s file and retrieve the resulting .srec file as bytes
+        //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
         byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", fileName, fileBytes);
-        
+
         //Open a new memory stream, and pass to wsim for execution
         MemoryStream ms = new MemoryStream(srecBytes);
         await board.LoadSrecAsync(ms);
@@ -129,7 +127,6 @@
             running = true;
             while (running)
             {
-                Console.WriteLine(board.Serial1.Status);
                 board.Tick();
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(10);
@@ -143,15 +140,18 @@
         running = false;
     }
 
-    void toggleSwitch(int pos) {
+    void toggleSwitch(int pos)
+    {
         board.Parallel.Switches ^= (1u << pos);
     }
 
-    void pressButton(int pos) {
+    void pressButton(int pos)
+    {
         board.Parallel.Buttons = (uint)1 << pos;
     }
 
-    void releaseButton() {
+    void releaseButton()
+    {
         board.Parallel.Buttons = 0;
     }
 }

@@ -5,12 +5,12 @@ export async function assembleAndLink(fileName, content) {
     //Create instances of the JS wrappers for Wasm and WLink
     const WasmModuleInstance = await WasmModule();
     const WLinkModuleInstance = await WLinkModule();
-    
+
     //Delete the input file from the Wasm File System if it already exists
     try { WasmModuleInstance.FS.unlink(fileName); } catch(e) {}
     WasmModuleInstance.FS.writeFile(fileName, content);
 
-    //Assemble the provided .s file 
+    //Assemble the provided .s file
     WasmModuleInstance.ccall('wasm', 'void', ['string'], [fileName]);
 
     //Write the outputted .o file to the WLink FS
@@ -18,7 +18,7 @@ export async function assembleAndLink(fileName, content) {
     const objData = WasmModuleInstance.FS.readFile('output.o');
     try { WLinkModuleInstance.FS.unlink('output.o'); } catch(e) {}
     WLinkModuleInstance.FS.writeFile('output.o', objData);
-        
+
     //Link the provided .o file to produce an SREC
     WLinkModuleInstance.ccall('wlink', 'void', ['string'], ['output.o']);
 
@@ -26,3 +26,5 @@ export async function assembleAndLink(fileName, content) {
     const srecData = WLinkModuleInstance.FS.readFile('output.srec');
     return srecData;
 }
+
+window.assembleAndLink = assembleAndLink;

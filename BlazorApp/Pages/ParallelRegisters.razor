@@ -8,10 +8,11 @@
     required public MemoryDevice parallelMemory { get; set; }
 
 
-} 
+}
 
 @* Prints out the parallel registers in decimal, hex, and binary *@
-@if (parallelMemory != null) {
+@if (parallelMemory != null)
+{
     <table>
         <thead>
             <tr>
@@ -22,7 +23,8 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 0; i < parallelMemory.Size; i++) {
+            @for (int i = 0; i < parallelMemory.Size; i++)
+            {
                 uint address = (uint)(i + parallelMemory.BaseAddress);
                 <tr>
                     <td>@(address.ToString("X8"))</td>

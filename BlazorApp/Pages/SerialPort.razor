@@ -1,6 +1,9 @@
 @using RexSimulator.Hardware.Rex
 @using System.Net.Sockets
 @using System.Text
+
+<p>@serialText</p>
+
 @code {
     [Parameter]
 
@@ -15,14 +18,14 @@
         serial.SerialDataTransmitted += receive;
     }
 
-    void receive(object? sender, SerialIO.SerialEventArgs e) {
+    void receive(object? sender, SerialIO.SerialEventArgs e)
+    {
         char c = (char)e.Data;
         serialBuffer.Append(c);
         InvokeAsync(StateHasChanged);
     }
 }
 
-<p>@serialText</p>
 
 
 
