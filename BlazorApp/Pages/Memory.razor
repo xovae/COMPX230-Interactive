@@ -33,26 +33,30 @@
 @if (mDevice != null)
 {
     List<MemoryPos> mPos = new List<MemoryPos>();
-    @for (int i = 0; i < mDevice.Size; i++) {
-        if (i == CPU.PC)
+    @for (uint i = mDevice.BaseAddress; i < (mDevice.BaseAddress + mDevice.Size); i++)
+    {
+        if (mDevice.Name == "Memory (RAM)")
         {
-            mPos.Add(new MemoryPos("$pc", (uint)i, mDevice[(uint)i]));
+            if (i == CPU.PC)
+            {
+                mPos.Add(new MemoryPos("$pc", i, mDevice[i]));
+                continue;
+            }
+            else if (i == CPU.mGpRegisters[15])
+            {
+                mPos.Add(new MemoryPos("$ra", i, mDevice[i]));
+                continue;
+            }
+            else if (i == CPU.mGpRegisters[14])
+            {
+                mPos.Add(new MemoryPos("$sp", i, mDevice[i]));
+                continue;
+            }
         }
-        else if (i == CPU.mGpRegisters[15])
-        {
-            mPos.Add(new MemoryPos("$ra", (uint)i, mDevice[(uint)i]));
-        }
-        else if (i == CPU.mGpRegisters[14])
-        {
-            mPos.Add(new MemoryPos("$sp", (uint)i, mDevice[(uint)i]));
-        }
-        else
-        {
-            mPos.Add(new MemoryPos("", (uint)i, mDevice[(uint)i]));
-        }
+        mPos.Add(new MemoryPos("", i, mDevice[i]));
     }
 
-    <table id="ramTable">
+    <table id="mDeviceTable">
         <thead>
             <tr>
                 <th>Pointer</th>

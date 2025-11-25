@@ -24,12 +24,12 @@ html, body {
     margin: 10px;
 }
 
-.ram {
+.mDevice {
     height: 300px;
     overflow-y: scroll;
 }
 
-#ramTable th {
+#mDeviceTable th {
     position: sticky;
     top: 0;
     background-color: white;

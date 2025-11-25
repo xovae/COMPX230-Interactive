@@ -106,7 +106,7 @@ namespace RexSimulator.Hardware
         }
         public void AllowTicks()
         {
-            if (mTickEnabler != null) 
+            if (mTickEnabler != null)
             {
                 mTickEnabler.Set();
             }

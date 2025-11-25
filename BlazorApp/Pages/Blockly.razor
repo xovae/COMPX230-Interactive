@@ -1,11 +1,9 @@
-@using SoftwareDriven.Blockly.Blazor.Components
-@using SoftwareDriven.Blockly.Code.Editor
 @using System.Runtime.CompilerServices
 @using System.ComponentModel
 @inject HttpClient httpClient
 @inject IJSRuntime JSRuntime
-@*
-<Workspace @ref="workspaceRef" Toolbox="@toolbox" BlocksJson="@blocks"/> *@
+
+@* <Workspace @ref="workspaceRef" Toolbox="@toolbox" BlocksJson="@blocks"/> *@
 
 <div id="blocklyDiv">
 </div>
@@ -13,21 +11,21 @@
 <button @onclick="export">Export</button>
 
 @code {
-    Toolbox toolbox = new Toolbox();
-    Workspace workspaceRef;
+    @* Toolbox toolbox = new Toolbox();
+    Workspace workspaceRef; *@
     protected override async Task OnInitializedAsync()
     {
-        toolbox.AddBlock("controls_if");
-        toolbox.AddBlock("custom_block");
+        @* toolbox.AddBlock("controls_if");
+        toolbox.AddBlock("custom_block"); *@
     }
 
     async Task export()
     {
         @* string xml = await workspaceRef.Export(false);
         Console.WriteLine(xml); *@
-        IJSObjectReference module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./blocklyResources/wrampGenerator.js");
+        @* IJSObjectReference module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./blocklyResources/wrampGenerator.js");
         string code = await module.InvokeAsync<string>("workspaceToCode", workspaceRef);
-        Console.WriteLine(code);
+        Console.WriteLine(code); *@
     }
 
     string blocks =

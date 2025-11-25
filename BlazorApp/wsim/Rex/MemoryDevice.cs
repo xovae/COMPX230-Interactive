@@ -77,7 +77,7 @@ namespace RexSimulator.Hardware.Rex
 
             mAddressBus = addressBus;
             mDataBus = dataBus;
-            
+
             mName = name;
 
             mAddressBus.Changed += new EventHandler<Bus.BusChangedEventArgs>(mAddressBus_Updated);

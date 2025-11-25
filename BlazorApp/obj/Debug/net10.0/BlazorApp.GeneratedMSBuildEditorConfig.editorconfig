@@ -44,16 +44,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Memory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWVtb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/NotFound.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90Rm91bmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/ParallelRegisters.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFyYWxsZWxSZWdpc3RlcnMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/RAM.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUkFNLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/SerialPort.razor]

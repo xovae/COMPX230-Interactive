@@ -13,7 +13,6 @@
     <SourceRoot Include="/home/jb469/.nuget/packages/" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <Import Project="$(NuGetPackageRoot)softwaredriven.blockly.blazor/1.7.10/buildTransitive/SoftwareDriven.Blockly.Blazor.props" Condition="Exists('$(NuGetPackageRoot)softwaredriven.blockly.blazor/1.7.10/buildTransitive/SoftwareDriven.Blockly.Blazor.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.net.sdk.webassembly.pack/10.0.0/build/Microsoft.NET.Sdk.WebAssembly.Pack.props" Condition="Exists('$(NuGetPackageRoot)microsoft.net.sdk.webassembly.pack/10.0.0/build/Microsoft.NET.Sdk.WebAssembly.Pack.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.net.illink.tasks/10.0.0/build/Microsoft.NET.ILLink.Tasks.props" Condition="Exists('$(NuGetPackageRoot)microsoft.net.illink.tasks/10.0.0/build/Microsoft.NET.ILLink.Tasks.props')" />
     <Import Project="$(NuGetPackageRoot)microsoft.dotnet.hotreload.webassembly.browser/10.0.100/buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props" Condition="Exists('$(NuGetPackageRoot)microsoft.dotnet.hotreload.webassembly.browser/10.0.100/buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props')" />
