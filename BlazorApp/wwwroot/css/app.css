@@ -8,8 +8,8 @@ html, body {
     gap: 20px;
 }
 
-#blockly {
-    height: 600px;
+#blocklyDiv {
+    height: 800px;
 }
 
 #switches {

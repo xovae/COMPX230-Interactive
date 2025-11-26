@@ -1,14 +1,17 @@
 export const wrampGenerator = new Blockly.CodeGenerator('WRAMP');
 
-const Order = {
-  ATOMIC: 0,
-};
-
 wrampGenerator.forBlock['custom_block'] = function(block, generator) {
   const register1 = block.getFieldValue('register1');
   const register2 = block.getFieldValue('register2');
   const immediate = block.getFieldValue('immediate');
-  return [`addi, ${register1}, ${register2}, ${immediate}`, Order.ATOMIC];
+  return `addi $${register1}, $${register2}, ${immediate}`;
+}
+
+wrampGenerator.forBlock['custom_block2'] = function(block, generator) {
+  const register1 = block.getFieldValue('register1');
+  const register2 = block.getFieldValue('register2');
+  const uimmediate = block.getFieldValue('uimmediate');
+  return `addui $${register1}, $${register2}, ${uimmediate}`;
 }
 
 wrampGenerator.scrub_ = function(block, code, thisOnly) {
@@ -20,6 +23,4 @@ wrampGenerator.scrub_ = function(block, code, thisOnly) {
   return code;
 };
 
-export function workspaceToCode(workspace) {
-  return wrampGenerator.workspaceToCode(blocklyWorkspace);
-}
+window.wrampGenerator = wrampGenerator;

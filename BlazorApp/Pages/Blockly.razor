@@ -1,47 +1,23 @@
 @using System.Runtime.CompilerServices
 @using System.ComponentModel
-@inject HttpClient httpClient
 @inject IJSRuntime JSRuntime
 
-@* <Workspace @ref="workspaceRef" Toolbox="@toolbox" BlocksJson="@blocks"/> *@
-
-<div id="blocklyDiv">
-</div>
+<div id="blocklyDiv"></div>
 
 <button @onclick="export">Export</button>
 
 @code {
-    @* Toolbox toolbox = new Toolbox();
-    Workspace workspaceRef; *@
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        @* toolbox.AddBlock("controls_if");
-        toolbox.AddBlock("custom_block"); *@
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initBlockly");
+        }
     }
 
     async Task export()
     {
-        @* string xml = await workspaceRef.Export(false);
-        Console.WriteLine(xml); *@
-        @* IJSObjectReference module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./blocklyResources/wrampGenerator.js");
-        string code = await module.InvokeAsync<string>("workspaceToCode", workspaceRef);
-        Console.WriteLine(code); *@
+        await JSRuntime.InvokeVoidAsync("generateCode");
     }
-
-    string blocks =
-    @"[
-        {
-            ""kind"": ""block"",
-            ""type"": ""custom_block"",
-            ""message0"": ""addi %1 %2 %3"",
-            ""args0"":
-            [
-                {""type"": ""field_number"", ""name"": ""register1""},
-                {""type"": ""field_number"", ""name"": ""register2""},
-                {""type"": ""field_number"", ""name"": ""immediate""}
-            ],
-            ""previousStatement"": null,
-            ""nextStatement"": null
-        }
-    ]";
 }
