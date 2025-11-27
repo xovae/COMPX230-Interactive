@@ -7,6 +7,8 @@
 <button @onclick="export">Export</button>
 
 @code {
+    [Parameter]
+    public EventCallback<string> onExportClicked { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -18,6 +20,17 @@
 
     async Task export()
     {
-        await JSRuntime.InvokeVoidAsync("generateCode");
+        string code = await JSRuntime.InvokeAsync<string>("generateCode");
+
+        if (code.Contains("main:"))
+        {
+            code = ".text\n.global main\n" + code;
+            await onExportClicked.InvokeAsync(code);
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "No main label added!");
+        }
+
     }
 }

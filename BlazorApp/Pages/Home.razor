@@ -2,6 +2,8 @@
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
 @using System.ComponentModel
+@using System.Security.Permissions
+@using System.Text
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
@@ -11,15 +13,10 @@
 <div id="body">
 
     <div id="blockly">
-        <Blockly />
+        <Blockly onExportClicked="Compile" />
     </div>
 
     <div>
-        <div>
-            <h2>Upload Source</h2>
-            <InputFile OnChange="Compile"/>
-        </div>
-
         <div>
             <h2>Upload SREC</h2>
             <InputFile OnChange="LoadSREC"/>
@@ -57,9 +54,9 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
             </li>
-            <li class="nav-item" role="presentation">
+            @* <li class="nav-item" role="presentation">
                 <button class="nav-link" id="rom-tab" data-bs-toggle="tab" data-bs-target="#rom-tab-pane" type="button" role="tab" aria-controls="rom-tab-pane" aria-selected="false">ROM</button>
-            </li>
+            </li> *@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
             </li>
@@ -75,9 +72,9 @@
             <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
                 <Memory CPU="@board.CPU" mDevice="@board.RAM" />
             </div>
-            <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
+            @* <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
                 <Memory CPU="@board.CPU" mDevice="@board.ROM" />
-            </div>
+            </div> *@
             <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
                 <ParallelRegisters parallelMemory="@board.Parallel" />
             </div>
@@ -106,23 +103,19 @@
     }
 
     //Take a .s file from the user and compile it to an SREC for use in the wsim
-    async Task Compile(InputFileChangeEventArgs e)
+    async Task Compile(string code)
     {
         //Reset board
         board.Reset();
+        running = false;
+
+
         StateHasChanged();
 
-        //Get the file from the InputFile element, and extract it's name and size.
-        IBrowserFile file = e.File;
-        byte[] fileBytes = new byte[file.Size];
-        string fileName = file.Name;
-
-        //Read the entire file as bytes
-        using Stream stream = file.OpenReadStream();
-        await stream.ReadAsync(fileBytes, 0, (int)file.Size);
+        byte[] codeBytes = Encoding.UTF8.GetBytes(code);
 
         //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
-        byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", fileName, fileBytes);
+        byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
 
         //Open a new memory stream, and pass to wsim for execution
         MemoryStream ms = new MemoryStream(srecBytes);
