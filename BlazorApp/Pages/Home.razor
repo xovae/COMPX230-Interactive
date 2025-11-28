@@ -70,7 +70,7 @@
                 <GPRegisters CPU="@board.CPU" />
             </div>
             <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-                <Memory CPU="@board.CPU" mDevice="@board.RAM" />
+                <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" />
             </div>
             @* <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
                 <Memory CPU="@board.CPU" mDevice="@board.ROM" />
@@ -89,6 +89,7 @@
 
     //WSIM Operation
     RexBoard board;
+    uint finalAddress = 50;
 
     protected override void OnInitialized()
     {
@@ -99,7 +100,7 @@
 
     async Task LoadSREC(InputFileChangeEventArgs e) {
         using Stream stream = e.File.OpenReadStream();
-        await board.LoadSrecAsync(stream);
+        finalAddress = await board.LoadSrecAsync(stream);
     }
 
     //Take a .s file from the user and compile it to an SREC for use in the wsim
@@ -108,8 +109,6 @@
         //Reset board
         board.Reset();
         running = false;
-
-
         StateHasChanged();
 
         byte[] codeBytes = Encoding.UTF8.GetBytes(code);
@@ -119,14 +118,23 @@
 
         //Open a new memory stream, and pass to wsim for execution
         MemoryStream ms = new MemoryStream(srecBytes);
-        await board.LoadSrecAsync(ms);
+        finalAddress = await board.LoadSrecAsync(ms);
     }
 
     //Executes a single instruction
     void Step()
     {
-        while(!board.Tick());
-        StateHasChanged();
+        //If a GPF has been thrown
+        if ((board.CPU.InterruptStatus & (uint)0x1000) == (uint)0x1000)
+        {
+            running = false;
+            JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
+        }
+        else
+        {
+            while(!board.Tick());
+            StateHasChanged();
+        }
     }
 
     //Continuously executes instructions
@@ -136,6 +144,13 @@
             running = true;
             while (running)
             {
+                //If a GPF has been thrown
+                if ((board.CPU.InterruptStatus & (uint)0x1000) == (uint)0x1000)
+                {
+                    running = false;
+                    await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
+                    break;
+                }
                 board.Tick();
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(10);

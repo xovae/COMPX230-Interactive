@@ -3,6 +3,7 @@
 @using RexSimulator.Hardware.Wramp
 @using System.Linq
 @using System.Reflection.Metadata.Ecma335
+@using System.Diagnostics.Contracts
 
 @code {
     [Parameter]
@@ -12,6 +13,10 @@
     [Parameter]
 
     required public SimpleWrampCpu CPU { get; set; }
+
+    [Parameter]
+
+    required public uint wordsLoaded { get; set; }
 
     public class MemoryPos
     {
@@ -29,11 +34,12 @@
     }
 }
 
-@* Prints out the contents of RAM, detailing address, value, and the disassembled instructions *@
+@* Prints out certain sections of RAM, detailing address, value, and the disassembled instructions *@
 @if (mDevice != null)
 {
+    //Print instructions with a small buffer of null addresses at the end
     List<MemoryPos> mPos = new List<MemoryPos>();
-    @for (uint i = mDevice.BaseAddress; i < (mDevice.BaseAddress + mDevice.Size); i++)
+    @for (uint i = mDevice.BaseAddress; i < (mDevice.BaseAddress + wordsLoaded + 5); i++)
     {
         if (mDevice.Name == "Memory (RAM)")
         {
@@ -42,18 +48,27 @@
                 mPos.Add(new MemoryPos("$pc", i, mDevice[i]));
                 continue;
             }
-            else if (i == CPU.mGpRegisters[15])
+            else if (i == CPU.mGpRegisters[RegisterFile.GpRegister.ra])
             {
                 mPos.Add(new MemoryPos("$ra", i, mDevice[i]));
                 continue;
             }
-            else if (i == CPU.mGpRegisters[14])
-            {
-                mPos.Add(new MemoryPos("$sp", i, mDevice[i]));
-                continue;
-            }
         }
         mPos.Add(new MemoryPos("", i, mDevice[i]));
+    }
+
+
+    //Print the stack
+    uint sp = CPU.mGpRegisters[RegisterFile.GpRegister.sp];
+    if (sp != 0xFFFFFFFF)
+    {
+        uint topOfStack = sp;
+        while(mDevice[topOfStack--] != 0xFFFFFFFF)
+        for (uint i = topOfStack; i <= CPU.mGpRegisters[RegisterFile.GpRegister.sp]; i++)
+        {
+            mPos.Add(new MemoryPos("", i, mDevice[i]));
+        }
+        mPos.Add(new MemoryPos("$sp", sp, mDevice[sp]));
     }
 
     <table id="mDeviceTable">

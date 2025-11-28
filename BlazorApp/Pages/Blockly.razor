@@ -1,5 +1,7 @@
 @using System.Runtime.CompilerServices
 @using System.ComponentModel
+@using System.Text
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 
 <div id="blocklyDiv"></div>
@@ -22,15 +24,21 @@
     {
         string code = await JSRuntime.InvokeAsync<string>("generateCode");
 
-        if (code.Contains("main:"))
+        if (code.Contains("main:") && code.Contains(".global main") && code.Contains(".text"))
         {
-            code = ".text\n.global main\n" + code;
-            await onExportClicked.InvokeAsync(code);
+            if (!code.Contains("$_") && !code.Contains("$\n") && !code.Contains("$,"))
+            {
+                @* Regex.Replace(code, ); *@
+                await onExportClicked.InvokeAsync(code);
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Declare all registers!");
+            }
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("alert", "No main label added!");
+            await JSRuntime.InvokeVoidAsync("alert", "You must declare a .text segment with global main, and a label for main!");
         }
-
     }
 }
