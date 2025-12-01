@@ -2,11 +2,11 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-#body {
+/* #body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-}
+} */
 
 #blocklyDiv {
     height: 800px;

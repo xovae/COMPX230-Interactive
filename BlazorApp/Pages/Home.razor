@@ -10,82 +10,96 @@
 
 <h1>WRAMP Sim</h1>
 
-<div id="body">
+<div class="container-fluid" id="body">
 
-    <div id="blockly">
-        <Blockly onExportClicked="Compile" />
-    </div>
-
-    <div>
-        <div>
-            <h2>Upload SREC</h2>
-            <InputFile OnChange="LoadSREC"/>
+    <div class="row">
+        <div class="col" id="blockly">
+            <Blockly onExportClicked="Compile" />
         </div>
 
-        <div>
-            <h2>Controls</h2>
-            <button type="button" class="btn btn-info" @onclick="Step">Step</button>
-            <button type="button" class="btn btn-success" @onclick="Run">Run</button>
-            <button type="button" class="btn btn-danger" @onclick="Pause">Pause</button>
-
-            <div id="switches">
-                @for (int i = 0; i < 16; i++) {
-                    int pos = i;
-                    int value = (int)Math.Pow(2, pos);
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="@pos" @onclick="() => toggleSwitch(pos)">
-                        <label class="form-check-label" for="@pos">Switch @pos</label>
-                    </div>
-                }
-            </div>
-
-            <div id="buttons">
-                @for (int i = 0; i < 3; i++) {
-                    int pos = i;
-                    <button type="button" class="btn btn-primary" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
-                }
-            </div>
-        </div>
-
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
-            </li>
-            @* <li class="nav-item" role="presentation">
-                <button class="nav-link" id="rom-tab" data-bs-toggle="tab" data-bs-target="#rom-tab-pane" type="button" role="tab" aria-controls="rom-tab-pane" aria-selected="false">ROM</button>
-            </li> *@
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
-                <GPRegisters CPU="@board.CPU" />
-            </div>
-            <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-                <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" />
-            </div>
-            @* <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
-                <Memory CPU="@board.CPU" mDevice="@board.ROM" />
+        <div class="col">
+            @* <div>
+                <h2>Upload SREC</h2>
+                <InputFile OnChange="LoadSREC"/>
             </div> *@
-            <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
-                <ParallelRegisters parallelMemory="@board.Parallel" />
+
+            <div>
+                <h2>Controls</h2>
+                <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+                <button type="button" class="btn btn-success" @onclick="Run">Run</button>
+                <button type="button" class="btn btn-danger" @onclick="Pause">Pause</button>
+
+                <div id="switches">
+                    @for (int i = 0; i < 16; i++) {
+                        int pos = i;
+                        int value = (int)Math.Pow(2, pos);
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="@pos" @onclick="() => toggleSwitch(pos)">
+                            <label class="form-check-label" for="@pos">Switch @pos</label>
+                        </div>
+                    }
+                </div>
+
+                <div id="buttons">
+                    @for (int i = 0; i < 3; i++) {
+                        int pos = i;
+                        <button type="button" class="btn btn-primary" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
+                    }
+                </div>
             </div>
-            <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-                <SerialPort serial="@board.Serial1" />
+
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
+                </li>
+                @* <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="rom-tab" data-bs-toggle="tab" data-bs-target="#rom-tab-pane" type="button" role="tab" aria-controls="rom-tab-pane" aria-selected="false">ROM</button>
+                </li> *@
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
+                    <GPRegisters CPU="@board.CPU" />
+                </div>
+                <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
+                    <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" />
+                </div>
+                @* <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
+                    <Memory CPU="@board.CPU" mDevice="@board.ROM" />
+                </div> *@
+                <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
+                    <ParallelRegisters parallelMemory="@board.Parallel" />
+                </div>
+                <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
+                    <SerialPort serial="@board.Serial1" />
+                </div>
+                <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
+                    @wsimCode
+                </div>
             </div>
         </div>
     </div>
+
 </div>
 
 @code {
+    private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
+
+    public string[] blockIDs;
+
+    MarkupString wsimCode;
 
     //WSIM Operation
     RexBoard board;
@@ -96,22 +110,27 @@
         board = new RexBoard();
     }
 
+    bool instructionsLoaded = false;
     bool running = false;
 
-    async Task LoadSREC(InputFileChangeEventArgs e) {
+    @* async Task LoadSREC(InputFileChangeEventArgs e) {
         using Stream stream = e.File.OpenReadStream();
         finalAddress = await board.LoadSrecAsync(stream);
-    }
+    } *@
 
     //Take a .s file from the user and compile it to an SREC for use in the wsim
-    async Task Compile(string code)
+    async Task Compile((string code, string[] IDs) args)
     {
+        //Get array of block IDs
+        blockIDs = args.IDs;
+        wsimCode = (MarkupString)args.code.Replace("\n", "<br>");
+
         //Reset board
         board.Reset();
         running = false;
         StateHasChanged();
 
-        byte[] codeBytes = Encoding.UTF8.GetBytes(code);
+        byte[] codeBytes = Encoding.UTF8.GetBytes(args.code);
 
         //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
         byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
@@ -119,41 +138,89 @@
         //Open a new memory stream, and pass to wsim for execution
         MemoryStream ms = new MemoryStream(srecBytes);
         finalAddress = await board.LoadSrecAsync(ms);
+        if (finalAddress != 0)
+        {
+            instructionsLoaded = true;
+            await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[0]);
+        }
     }
 
     //Executes a single instruction
     void Step()
     {
-        //If a GPF has been thrown
-        if ((board.CPU.InterruptStatus & (uint)0x1000) == (uint)0x1000)
+        if (instructionsLoaded == true)
         {
-            running = false;
-            JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-        }
-        else
-        {
-            while(!board.Tick());
-            StateHasChanged();
+            //Catch any system exceptions
+            switch (board.CPU.InterruptStatus & (uint)0xF000)
+            {
+                case (uint)ExceptionSource.GPF:
+                    running = false;
+                    JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
+                    break;
+                case (uint)ExceptionSource.SYSCALL:
+                    running = false;
+                    JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
+                    break;
+                case (uint)ExceptionSource.BREAK:
+                    running = false;
+                    JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
+                    break;
+                case (uint)ExceptionSource.ARITH:
+                    running = false;
+                    JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
+                    break;
+                default:
+                    while(!board.Tick());
+                    if (board.CPU.PC < finalAddress)
+                    {
+                        JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
+                    }
+                    StateHasChanged();
+                    break;
+            }
         }
     }
 
     //Continuously executes instructions
     async Task Run()
     {
-        if (running == false) {
-            running = true;
-            while (running)
-            {
-                //If a GPF has been thrown
-                if ((board.CPU.InterruptStatus & (uint)0x1000) == (uint)0x1000)
+        if (instructionsLoaded == true)
+        {
+            if (running == false) {
+                running = true;
+                while (running)
                 {
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-                    break;
+                    //Catch any system exceptions
+                    switch (board.CPU.InterruptStatus & (uint)0xF000)
+                    {
+                        case (uint)ExceptionSource.GPF:
+                            running = false;
+                            await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
+                            break;
+                        case (uint)ExceptionSource.SYSCALL:
+                            running = false;
+                            await JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
+                            break;
+                        case (uint)ExceptionSource.BREAK:
+                            running = false;
+                            await JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
+                            break;
+                        case (uint)ExceptionSource.ARITH:
+                            running = false;
+                            await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
+                            break;
+                        default:
+                            board.Tick();
+                            if (board.CPU.PC < finalAddress)
+                            {
+                                await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
+                            }
+                            await InvokeAsync(StateHasChanged);
+                            await Task.Delay(10);
+                            break;
+                    }
+
                 }
-                board.Tick();
-                await InvokeAsync(StateHasChanged);
-                await Task.Delay(10);
             }
         }
     }

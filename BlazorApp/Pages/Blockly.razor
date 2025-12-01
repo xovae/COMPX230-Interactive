@@ -10,7 +10,7 @@
 
 @code {
     [Parameter]
-    public EventCallback<string> onExportClicked { get; set; }
+    public EventCallback<(string, string[])> onExportClicked { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -23,13 +23,25 @@
     async Task export()
     {
         string code = await JSRuntime.InvokeAsync<string>("generateCode");
+        string highlightBlockPattern = @"highlightBlock\('([^']+)'\)\n";
 
         if (code.Contains("main:") && code.Contains(".global main") && code.Contains(".text"))
         {
             if (!code.Contains("$_") && !code.Contains("$\n") && !code.Contains("$,"))
             {
-                @* Regex.Replace(code, ); *@
-                await onExportClicked.InvokeAsync(code);
+                //Remove highlightBlock() from any lines that aren't WRAMP instructions
+                code = Regex.Replace(code, highlightBlockPattern + @"\.text", ".text");
+                code = Regex.Replace(code, highlightBlockPattern + @"\.data", ".data");
+                code = Regex.Replace(code, highlightBlockPattern + @"\.bss", ".bss");
+                code = Regex.Replace(code, highlightBlockPattern + @"\.global main", ".global main");
+
+                //Removes highlightBlock() from labels
+                code = Regex.Replace(code, highlightBlockPattern + @"LABEL([a-zA-Z0-9_.]+):", "$2:");
+
+                string[] highlightStatements = Regex.Matches(code, highlightBlockPattern).Cast<Match>().Select(m => m.Groups[1].Value.Trim()).ToArray();
+                code = Regex.Replace(code, highlightBlockPattern, String.Empty);
+
+                await onExportClicked.InvokeAsync((code, highlightStatements));
             }
             else
             {

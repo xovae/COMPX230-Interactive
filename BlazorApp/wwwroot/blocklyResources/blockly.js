@@ -1,10 +1,14 @@
 window.initBlockly = () => {
-    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
+    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme, maxInstances: {'jump': 3}});
 }
 
 window.generateCode = () => {
     const code = wrampGenerator.workspaceToCode(workspace);
     return code;
+}
+
+window.highlightBlock = (id) => {
+    workspace.highlightBlock(id);
 }
 
 const toolbox = {
@@ -18,11 +22,11 @@ const toolbox = {
             [
                 {
                     kind: 'block',
-                    type: 'global'
+                    type: 'textHead'
                 },
                 {
                     kind: 'block',
-                    type: 'textHead'
+                    type: 'global'
                 },
                 {
                     kind: 'block',
@@ -300,7 +304,8 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'Creates a label which can be jumped to using instructions such as j, jal, jr, beqz, etc.'
+        tooltip: 'Creates a label which can be jumped to using instructions such as j, jal, jr, beqz, etc.',
+        extensions: ['labelValidator']
     },
     {   type: 'jump',
         style: 'branchBlocks',
@@ -641,39 +646,51 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     }
 ]);
 
-Blockly.Extensions.register(
-    'generalRegisterValidator',
-    function(newValue)
+Blockly.Extensions.register('labelValidator',
+    function()
     {
-        const regExPattern = /^\$(?:[0-9]|1[0-5]|ra|sp)/;
+        const regexPattern = /^[a-zA-Z0-9_.]+$/;
+
+        field = this.getField('label');
+
+        field.setValidator(function(newValue) {
+            return regexPattern.test(newValue) ? newValue : null
+        })
+    }
+)
+
+Blockly.Extensions.register('generalRegisterValidator',
+    function()
+    {
+        const regExPattern = /^\$(?:[0-9]|1[0-5]|ra|sp)$/;
 
         var field;
 
         if ((field = this.getField('register')) != null)
         {
-            field.setValidator(function(value) {
-                return regExPattern.test(value) ? value : null
+            field.setValidator(function(newValue) {
+                return regExPattern.test(newValue) ? newValue : null
             })
         }
 
         if ((field = this.getField('register1')) != null)
         {
-            field.setValidator(function(value) {
-                return regExPattern.test(value) ? value : null
+            field.setValidator(function(newValue) {
+                return regExPattern.test(newValue) ? newValue : null
             })
         }
 
         if ((field = this.getField('register2')) != null)
         {
-            field.setValidator(function(value) {
-                return regExPattern.test(value) ? value : null
+            field.setValidator(function(newValue) {
+                return regExPattern.test(newValue) ? newValue : null
             })
         }
 
         if ((field = this.getField('register3')) != null)
         {
-            field.setValidator(function(value) {
-                return regExPattern.test(value) ? value : null
+            field.setValidator(function(newValue) {
+                return regExPattern.test(newValue) ? newValue : null
             })
         }
     }

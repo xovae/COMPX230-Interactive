@@ -1,7 +1,7 @@
 export const wrampGenerator = new Blockly.CodeGenerator('WRAMP');
 
-// wrampGenerator.STATEMENT_PREFIX = 'highlightBlock(%1)\n';
-// wrampGenerator.addReservedWords('highlightBlock');
+wrampGenerator.STATEMENT_PREFIX = 'highlightBlock(%1)\n';
+wrampGenerator.addReservedWords('highlightBlock');
 
 function textBlock(block, generator) {
   const instruction = block.getFieldValue('instruction');
@@ -58,7 +58,7 @@ wrampGenerator.forBlock['bssHead'] = textBlock;
 
 wrampGenerator.forBlock['label'] = function(block, generator) {
   const label = block.getFieldValue('label');
-  return `${label}:`;
+  return `LABEL${label}:`;
 }
 
 wrampGenerator.forBlock['jump'] = function(block, generator) {
