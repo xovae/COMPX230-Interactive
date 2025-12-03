@@ -1,1 +1,1 @@
-/home/jb469/Downloads/emsdk-main/upstream/emscripten/em++ -sEXPORTED_FUNCTIONS=[_wasm] -sEXPORTED_RUNTIME_METHODS=[ccall,cwrap,FS] -sINVOKE_RUN=0 -sNO_EXIT_RUNTIME=1 -sMODULARIZE=1 -sEXPORT_NAME=WasmModule -sEXPORT_ES6=1 @CMakeFiles/wasm.dir/objects1.rsp -o wasm.js 
+/home/jb469/Downloads/emsdk-main/upstream/emscripten/em++ -sEXPORTED_FUNCTIONS=[_wasm] -sEXPORTED_RUNTIME_METHODS=[ccall,cwrap,FS] -sINVOKE_RUN=0 -sNO_EXIT_RUNTIME=1 -sMODULARIZE=1 -sEXPORT_NAME=WasmModule -sEXPORT_ES6=1 CMakeFiles/wasm.dir/assembler.cpp.o CMakeFiles/wasm.dir/instructions.cpp.o -o wasm 

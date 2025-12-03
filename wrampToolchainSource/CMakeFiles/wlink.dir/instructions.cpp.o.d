@@ -1,5 +1,5 @@
 CMakeFiles/wlink.dir/instructions.cpp.o: \
-  /home/jb469/Downloads/wasm-toolchain-master/instructions.cpp \
+  /home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/instructions.cpp \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/iostream \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config_site \
@@ -645,4 +645,4 @@ CMakeFiles/wlink.dir/instructions.cpp.o: \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/print \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/unistd.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/iomanip \
-  /home/jb469/Downloads/wasm-toolchain-master/instructions.h
+  /home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/instructions.h

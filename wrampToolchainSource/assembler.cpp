@@ -546,8 +546,20 @@ unsigned int parse_address(char *&ptr)
 			ptr++;
 		}
 	}
+	// If this is binary
+	else if (*ptr == '0' && tolower(*(ptr + 1)) == 'b')
+	{
+		if (!(*ptr == '0' || *ptr == '1'))
+			error(input_filename, current_line, "Numeric value expected.", NULL);
+		while (*ptr == '0' || *ptr == '1')
+		{
+			value = value << 1;
+			value += *ptr - '0';
+			ptr++;
+		}
+	}
 	else
-		error(input_filename, current_line, "Hexadecimal address expected.", NULL);
+		error(input_filename, current_line, "Hexadecimal or binary address expected.", NULL);
 
 	if (value > 0xfffff)
 		error(input_filename, current_line, "Constant too large.", NULL);
@@ -580,6 +592,22 @@ unsigned int parse_word(char *&ptr)
 				value += *ptr - '0';
 			else
 				value += tolower(*ptr) - 'a' + 10;
+			ptr++;
+		}
+	}
+	//If this is binary
+	else if (*ptr == '0' && tolower(*(ptr + 1)) == 'b')
+	{
+		ptr += 2;
+		if (!(*ptr == '0' || *ptr == '1'))
+			error(input_filename, current_line, "Numeric value expected.", NULL);
+		while (*ptr == '0' || *ptr == '1')
+		{
+			if (value > 0x0fffffff)
+				error(input_filename, current_line, "Constant too large.", NULL);
+
+			value = value << 1;
+			value += *ptr - '0';
 			ptr++;
 		}
 	}
@@ -653,6 +681,19 @@ unsigned int parse_half(char *&ptr)
 				value += *ptr - '0';
 			else
 				value += tolower(*ptr) - 'a' + 10;
+			ptr++;
+		}
+	}
+	//If this is binary
+	else if (*ptr == '0' && tolower(*(ptr + 1)) == 'b')
+	{
+		ptr += 2;
+		if (!(*ptr == '0' || *ptr == '1'))
+			error(input_filename, current_line, "Numeric value expected.", NULL);
+		while (*ptr == '0' || *ptr == '1')
+		{
+			value = value << 1;
+			value += *ptr - '0';
 			ptr++;
 		}
 	}
@@ -971,14 +1012,14 @@ void parse_line(char *buf)
 			if (still_more(operands))
 				error(input_filename, current_line, "Additional text after directive arguments.", NULL);
 		}
-		
+
 		else if (strcmp(mnemonic, ".mask") == 0)
 			;
 		else if (strcmp(mnemonic, ".frame") == 0)
 			;
 		else if (strcmp(mnemonic, ".extern") == 0)
 			;
-		
+
 		else
 			error(input_filename, current_line, "Unknown directive : ", mnemonic);
 		return;
@@ -1045,6 +1086,19 @@ void parse_line(char *buf)
 						offset += *operands - '0';
 					else
 						offset += tolower(*operands) - 'a' + 10;
+					operands++;
+				}
+			}
+			// If this is binary
+			else if (*operands == '0' && tolower(*(operands + 1)) == 'b')
+			{
+				operands += 2;
+				if (!(*operands == '0' || *operands == '1'))
+					error(input_filename, current_line, "Numeric value expected.", NULL);
+				while (*operands == '0' || *operands == '1')
+				{
+					offset = offset << 1;
+					offset += *operands - '0';
 					operands++;
 				}
 			}
@@ -1135,7 +1189,8 @@ void parse_line(char *buf)
 			new_entry->data |= (parse_half(operands) & 0xffff);
 			break;
 		case 'j':
-			if (*operands == '0' && tolower(*(operands + 1)) == 'x')
+			// If this is hexadecimal or binary
+			if (*operands == '0' && (tolower(*(operands + 1)) == 'x' || tolower(*(operands + 1)) == 'b'))
 			{
 				new_entry->data |= (parse_address(operands) & 0xfffff);
 			}
@@ -1452,7 +1507,7 @@ void usage(char *progname)
 	exit(1);
 }
 
-extern "C" {	
+extern "C" {
 	EMSCRIPTEN_KEEPALIVE
 	void wasm(char fileName[]) {
 		input_filename = fileName;

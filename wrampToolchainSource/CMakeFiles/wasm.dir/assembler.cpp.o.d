@@ -1,5 +1,5 @@
 CMakeFiles/wasm.dir/assembler.cpp.o: \
-  /home/jb469/Downloads/wasm-toolchain-master/assembler.cpp \
+  /home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/assembler.cpp \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/iostream \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config_site \
@@ -664,8 +664,8 @@ CMakeFiles/wasm.dir/assembler.cpp.o: \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__filesystem/path_iterator.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__filesystem/recursive_directory_iterator.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__filesystem/u8path.h \
-  /home/jb469/Downloads/wasm-toolchain-master/instructions.h \
-  /home/jb469/Downloads/wasm-toolchain-master/object_file.h \
+  /home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/instructions.h \
+  /home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/object_file.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/emscripten/emscripten.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/emscripten/em_asm.h \
   /home/jb469/Downloads/emsdk-main/upstream/emscripten/cache/sysroot/include/emscripten/em_macros.h \

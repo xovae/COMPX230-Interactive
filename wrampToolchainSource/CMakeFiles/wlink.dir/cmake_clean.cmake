@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/wlink.dir/instructions.cpp.o.d"
   "CMakeFiles/wlink.dir/linker.cpp.o"
   "CMakeFiles/wlink.dir/linker.cpp.o.d"
-  "wlink.js"
+  "wlink"
   "wlink.pdb"
 )
 

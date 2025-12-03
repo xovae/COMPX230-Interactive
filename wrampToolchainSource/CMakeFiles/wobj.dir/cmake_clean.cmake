@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/wobj.dir/instructions.cpp.o.d"
   "CMakeFiles/wobj.dir/objectViewer.cpp.o"
   "CMakeFiles/wobj.dir/objectViewer.cpp.o.d"
-  "wobj.js"
+  "wobj"
   "wobj.pdb"
 )
 

@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/wasm.dir/assembler.cpp.o.d"
   "CMakeFiles/wasm.dir/instructions.cpp.o"
   "CMakeFiles/wasm.dir/instructions.cpp.o.d"
-  "wasm.js"
+  "wasm"
   "wasm.pdb"
 )
 

@@ -4,7 +4,7 @@
 # compile CXX with /home/jb469/Downloads/emsdk-main/upstream/emscripten/em++
 CXX_DEFINES = 
 
-CXX_INCLUDES = @CMakeFiles/wobj.dir/includes_CXX.rsp
+CXX_INCLUDES = -I/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master
 
-CXX_FLAGS = -std=gnu++17
+CXX_FLAGS = 
 
