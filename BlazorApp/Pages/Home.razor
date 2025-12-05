@@ -18,11 +18,6 @@
         </div>
 
         <div class="col">
-            @* <div>
-                <h2>Upload SREC</h2>
-                <InputFile OnChange="LoadSREC"/>
-            </div> *@
-
             <div>
                 <h2>Controls</h2>
                 <button type="button" class="btn btn-info" @onclick="Step">Step</button>
@@ -55,9 +50,6 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
                 </li>
-                @* <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="rom-tab" data-bs-toggle="tab" data-bs-target="#rom-tab-pane" type="button" role="tab" aria-controls="rom-tab-pane" aria-selected="false">ROM</button>
-                </li> *@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
                 </li>
@@ -67,6 +59,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
                 </li>
+                <li class="nav-item ms-auto" role="presentation" @onclick="quack">
+                    <button class="nav-link duck" id="duck-tab"><img src="img/reginald.png" class="duckImg" alt="duck!"></button>
+                </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
@@ -74,11 +69,8 @@
                     <GPRegisters CPU="@board.CPU" />
                 </div>
                 <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-                    <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" />
+                    <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels" />
                 </div>
-                @* <div class="tab-pane fade mDevice" id="rom-tab-pane" role="tabpanel" aria-labelledby="rom-tab" tabindex="0">
-                    <Memory CPU="@board.CPU" mDevice="@board.ROM" />
-                </div> *@
                 <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
                     <ParallelRegisters parallelMemory="@board.Parallel" />
                 </div>
@@ -98,6 +90,7 @@
     private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
 
     public string[] blockIDs;
+    public List<string> labels;
 
     MarkupString wsimCode;
 
@@ -113,16 +106,12 @@
     bool instructionsLoaded = false;
     bool running = false;
 
-    @* async Task LoadSREC(InputFileChangeEventArgs e) {
-        using Stream stream = e.File.OpenReadStream();
-        finalAddress = await board.LoadSrecAsync(stream);
-    } *@
-
-    //Take a .s file from the user and compile it to an SREC for use in the wsim
-    async Task Compile((string code, string[] IDs) args)
+    //Take a .s file onclickfrom the user and compile it to an SREC for use in the wsim
+    async Task Compile((string code, string[] IDs, List<string> labels) args)
     {
         //Get array of block IDs
         blockIDs = args.IDs;
+        labels = args.labels;
         wsimCode = (MarkupString)args.code.Replace("\n", "<br>");
 
         //Reset board
@@ -133,15 +122,20 @@
         byte[] codeBytes = Encoding.UTF8.GetBytes(args.code);
 
         //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
-        byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
-
-        //Open a new memory stream, and pass to wsim for execution
-        MemoryStream ms = new MemoryStream(srecBytes);
-        finalAddress = await board.LoadSrecAsync(ms);
-        if (finalAddress != 0)
+        try
         {
-            instructionsLoaded = true;
-            await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[0]);
+            byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
+            //Open a new memory stream, and pass to wsim for execution
+            MemoryStream ms = new MemoryStream(srecBytes);
+            finalAddress = await board.LoadSrecAsync(ms);
+            if (finalAddress != 0)
+            {
+                instructionsLoaded = true;
+                await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[0]);
+            }
+        }
+        catch {
+            labels.Clear();
         }
     }
 
@@ -244,5 +238,10 @@
     void releaseButton()
     {
         board.Parallel.Buttons = 0;
+    }
+
+    void quack()
+    {
+        JSRuntime.InvokeVoidAsync("quacker");
     }
 }

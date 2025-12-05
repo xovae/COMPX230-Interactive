@@ -18,18 +18,23 @@
 
     required public uint wordsLoaded { get; set; }
 
+    [Parameter]
+    required public List<string> labels { get; set; }
+
     public class MemoryPos
     {
         public string pointer;
         public uint address;
         public uint value;
         public IR ir = new IR();
-        public MemoryPos(string pointer, uint address, uint value)
+        public string label;
+        public MemoryPos(string pointer, uint address, uint value, string label)
         {
             this.pointer = pointer;
             this.address = address;
             this.value = value;
             ir.Instruction = value;
+            this.label = label;
         }
     }
 }
@@ -45,16 +50,26 @@
         {
             if (i == CPU.PC)
             {
-                mPos.Add(new MemoryPos("$pc", i, mDevice[i]));
+                mPos.Add(new MemoryPos("$pc", i, mDevice[i], ""));
                 continue;
             }
             else if (i == CPU.mGpRegisters[RegisterFile.GpRegister.ra])
             {
-                mPos.Add(new MemoryPos("$ra", i, mDevice[i]));
+                mPos.Add(new MemoryPos("$ra", i, mDevice[i], ""));
                 continue;
             }
         }
-        mPos.Add(new MemoryPos("", i, mDevice[i]));
+        mPos.Add(new MemoryPos("", i, mDevice[i], ""));
+    }
+    if (labels != null)
+    {
+        @for (int i = 0; i < labels.Count; i++)
+        {
+            if (labels[i] != "")
+            {
+                mPos[i].label = labels[i];
+            }
+        }
     }
 
 
@@ -66,9 +81,9 @@
         while(mDevice[topOfStack--] != 0xFFFFFFFF)
         for (uint i = topOfStack; i <= CPU.mGpRegisters[RegisterFile.GpRegister.sp]; i++)
         {
-            mPos.Add(new MemoryPos("", i, mDevice[i]));
+            mPos.Add(new MemoryPos("", i, mDevice[i], ""));
         }
-        mPos.Add(new MemoryPos("$sp", sp, mDevice[sp]));
+        mPos.Add(new MemoryPos("$sp", sp, mDevice[sp], ""));
     }
 
     <table id="mDeviceTable">
@@ -78,6 +93,7 @@
                 <th>Address</th>
                 <th>Value</th>
                 <th>Disassembly</th>
+                <th>Label</th>
             </tr>
         </thead>
         <tbody>
@@ -87,6 +103,7 @@
                     <td>@item.address.ToString("X8")</td>
                     <td>@item.value.ToString("X8")</td>
                     <td>@item.ir.ToString()</td>
+                    <td>@item.label</td>
                 </tr>
             </Virtualize>
         </tbody>
