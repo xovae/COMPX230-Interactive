@@ -77,6 +77,22 @@ const toolbox = {
                 {
                     kind: 'block',
                     type: 'loadAddress'
+                },
+                {
+                    kind: 'block',
+                    type: 'word'
+                },
+                {
+                    kind: 'block',
+                    type: 'asciiz'
+                },
+                {
+                    kind: 'block',
+                    type: 'ascii'
+                },
+                {
+                    kind: 'block',
+                    type: 'space'
                 }
             ]
         },
@@ -261,7 +277,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        toolbox: 'Exposes the label main to global scope to serve as an entry point to the program'
+        tooltip: 'Makes the label "main" global to serve as an entry point to the program'
     },
     {   type: 'textHead',
         style: 'sectionBlocks',
@@ -271,7 +287,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
             {type: 'field_label_serializable', name: 'instruction', text: '.text'}
         ],
         nextStatement: null,
-        toolbox: 'Defines the beginning of the .text section'
+        tooltip: 'Defines the beginning of a .text section, which should contain WRAMP instructions'
     },
     {   type: 'dataHead',
         style: 'sectionBlocks',
@@ -280,9 +296,9 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         [
             {type: 'field_label_serializable', name: 'instruction', text: '.data'}
         ],
-        previousStatement: null,        //TODO: Get thoughts on previous connection for section blocks?
+        previousStatement: null,
         nextStatement: null,
-        toolbox: 'Defines the beginning of the .data section'
+        tooltip: 'Defines the beginning of a .data section, which should contain strings, constants, or variables with initial values'
     },
     {   type: 'bssHead',
         style: 'sectionBlocks',
@@ -293,7 +309,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        toolbox: 'Defines the beginning of the .bss section'
+        tooltip: 'Defines the beginning of a .bss section, which declares reserved but uninitialised memory. Useful for arrays.'
     },
     {   type: 'label',
         style: 'branchBlocks',
@@ -317,7 +333,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func address\nJump to the address provided'
+        tooltip: 'func address\nJump to the address provided. For jal, save the address of the next instruction in $ra'
     },
     {   type: 'jumpRegister',
         style: 'branchBlocks',
@@ -329,7 +345,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func register\nJump to the register provided',
+        tooltip: 'func register\nJump to the register provided. For jalr, save the address of the next instruction in $ra',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'branchOn',
@@ -343,7 +359,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func Rs, offset\nBranch depending on the instruction and the contents of Rs to the offset location',
+        tooltip: 'func Rs, offset\nConditionally branch the number of instructions specified by the sign-extended offset if register Rs is/is not equal to 0.',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'loadWord',
@@ -358,7 +374,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func lw Rd, Offset(Rs)\nCombine the contents of register Rs and the offset to give a memory address. Load the contents of that address into register Rd.',
+        tooltip: 'func lw Rd, Offset(Rs)\nCombine the contents of register Rs and the offset to give an effective memory address. Load the contents of that address into register Rd.',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'storeWord',
@@ -373,7 +389,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func lw Rd, Offset(Rs)\nCombine the contents of register Rs and the offset to give a memory address. Store the contents of register Rd into that address.',
+        tooltip: 'func lw Rd, Offset(Rs)\nCombine the contents of register Rs and the offset to give an effective memory address. Store the contents of register Rd into that address.',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'loadAddress',
@@ -401,7 +417,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd',
+        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on signed overflow.',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'arithmeticUnsigned',
@@ -416,52 +432,55 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd',
+        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on unsigned overflow.',
         extensions: ['generalRegisterValidator']
     },
     {   type: 'arithmeticImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
+        message0: '%1 %2 %3 %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addi', 'addi'], ['subi', 'subi'], ['multi', 'multi'], ['divi', 'divi'], ['remi', 'remi']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_number', name: 'immediate'}
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'Adds the contents of register Rx and immediate y and stores the result in Ry',
-        extensions: ['generalRegisterValidator']
+        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on signed overflow.',
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'arithmeticUnsignedImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
+        message0: '%1 %2 %3 %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addui', 'addui'], ['subui', 'subui'], ['multui', 'multui'], ['divui', 'divui'], ['remui', 'remui']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_number', name: 'immediate'}
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
-        tooltip: 'Adds the contents of register Rx and immediate y and stores the result in Ry',
-        extensions: ['generalRegisterValidator']
+        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on unsigned overflow.',
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'loadHighImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2, %3',
+        message0: '%1 %2, %3 %4',
         args0:
         [
             {type: 'field_label_serializable', name: 'instruction', text: 'lhi'},
             {type: 'field_input', name: 'register', text: '$_'},
-            {type: 'field_number', name: 'immediate'}
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
         tooltip: 'lhi Rd, Immediate\nPut the 16 bit immediate in the upper 16 bits of register Rd, and set the lower 16 bits to 0',
-        extensions: ['generalRegisterValidator']
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'bitwise',
         style: 'logicBlocks',
@@ -480,18 +499,19 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'bitwiseImmediate',
         style: 'logicBlocks',
-        message0: '%1 %2, %3, %4',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['andi', 'andi'], ['ori', 'ori'], ['xori', 'xori']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_number', name: 'immediate', text: ''}
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
         tooltip: 'func Rd, Rs, immediate\nPerform the logical operation func on register Rs and the immediate, storing the result in Rd',
-        extensions: ['generalRegisterValidator']
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'shift',
         style: 'logicBlocks',
@@ -510,18 +530,19 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'shiftImmediate',
         style: 'logicBlocks',
-        message0: '%1 %2, %3, %4',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['slli', 'slli'], ['srli', 'srli'], ['srai', 'srai']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_number', name: 'immediate'}
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
         tooltip: 'func Rd, Rs, immediate\nShift the bits in the direction defined by func in register Rs by the amount in the immediate, storing the result in Rd',
-        extensions: ['generalRegisterValidator']
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'setOn',
         style: 'conditionalBlocks',
@@ -555,33 +576,35 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'setOnImmediate',
         style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['slti', 'slti'], ['sgti', 'sgti'], ['slei', 'slei'], ['sgei', 'sgei'], ['seqi', 'seqi'], ['snei', 'snei']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
             {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
         tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator']
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'setOnUnsignedImmediate',
         style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['sltui', 'sltui'], ['sgtui', 'sgtui'], ['sleui', 'sleui'], ['sgeui', 'sgeui'], ['sequi', 'sequi'], ['sneui', 'sneui']]},
             {type: 'field_input', name: 'register1', text: '$_'},
             {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
             {type: 'field_input', name: 'immediate'}
         ],
         previousStatement: null,
         nextStatement: null,
         tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator']
+        extensions: ['generalRegisterValidator', 'immediateFormatter']
     },
     {   type: 'moveGeneralToSpecial',
         style: 'specialBlocks',
@@ -620,7 +643,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        toolbox: 'Generate a break point exception'
+        tooltip: 'Generate a break point exception'
     },
     {   type: 'syscall',
         style: 'specialBlocks',
@@ -631,7 +654,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        toolbox: 'Generate a syscall exception'
+        tooltip: 'Generate a syscall exception'
     },
     {   type: 'returnFromException',
         style: 'specialBlocks',
@@ -642,7 +665,55 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         ],
         previousStatement: null,
         nextStatement: null,
-        toolbox: 'Generate a rfe exception'
+        tooltip: 'Execute a Return from Exception (rfe)'
+    },
+    {   type: 'word',
+        style: 'memoryBlocks',
+        message0: '%1 %2',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: '.word'},
+            {type: 'field_input', name: 'string'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Assigns one word of memory space and initialises it to the value provided.'
+    },
+    {   type: 'asciiz',
+        style: 'memoryBlocks',
+        message0: '%1 %2',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: '.asciiz'},
+            {type: 'field_input', name: 'string'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Initialises space for the ASCII string provided, adding a NULL terminator'
+    },
+    {   type: 'ascii',
+        style: 'memoryBlocks',
+        message0: '%1 %2',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: '.ascii'},
+            {type: 'field_input', name: 'string'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Initialises space for the ASCII string provided, without NULL terminating'
+    },
+    {   type: 'space',
+        style: 'memoryBlocks',
+        message0: '%1, %2',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: '.space'},
+            {type: 'field_number', name: 'string'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Allocate a chunk of space of the inputted size in the .bss section'
     }
 ]);
 
@@ -654,10 +725,10 @@ Blockly.Extensions.register('labelValidator',
         field = this.getField('label');
 
         field.setValidator(function(newValue) {
-            return regexPattern.test(newValue) ? newValue : null
-        })
+            return regexPattern.test(newValue) ? newValue : null;
+        });
     }
-)
+);
 
 Blockly.Extensions.register('generalRegisterValidator',
     function()
@@ -693,6 +764,68 @@ Blockly.Extensions.register('generalRegisterValidator',
                 return regExPattern.test(newValue) ? newValue : null
             })
         }
+    }
+);
+
+Blockly.Extensions.register('immediateFormatter',
+    function()
+    {
+        const block = this;
+        block.fieldImage = block.getField('format');
+        block.fieldImmediate = block.getField('immediate');
+        block.format = 0;
+
+        const decimalRegexPattern = /^[0-9]+$/;
+        const hexRegexPattern = /^0x[0-9a-f]{1,5}$/;
+        const binaryRegexPattern = /^0b[0-1]{1,20}$/;
+
+        block.fieldImmediate.setValidator(function(newValue) {
+            return decimalRegexPattern.test(newValue) ? newValue : null;
+        });
+
+        block.fieldImage.setOnClickHandler(function(image)
+        {
+            //Get current field value, removing the 0b if present as parseInt only knows how to handle hex values, not binary
+            value = parseInt(block.fieldImmediate.getText().replace("0b", ""));
+            //0: Decimal, 1: Hex, 2: Binary
+            block.format = (block.format + 1) % 3;
+            switch (block.format)
+            {
+                case 0:
+                    if (isNaN(value))
+                    {
+                        block.fieldImmediate.setValidator(null);
+                        block.fieldImmediate.setValue("");
+                    }
+                    block.fieldImmediate.setValidator(function(newValue) {
+                        return decimalRegexPattern.test(newValue) ? newValue : null;
+                    });
+                    block.fieldImmediate.setValue(parseInt(value, 2));
+                    break;
+                case 1:
+                    if (isNaN(value))
+                    {
+                        block.fieldImmediate.setValidator(null);
+                        block.fieldImmediate.setValue("0x");
+                    }
+                    block.fieldImmediate.setValidator(function(newValue) {
+                        return hexRegexPattern.test(newValue) ? newValue : null;
+                    });
+                    block.fieldImmediate.setValue("0x" + value.toString(16));
+                    break;
+                case 2:
+                    if (isNaN(value))
+                    {
+                        block.fieldImmediate.setValidator(null);
+                        block.fieldImmediate.setValue("0b");
+                    }
+                    block.fieldImmediate.setValidator(function(newValue) {
+                        return binaryRegexPattern.test(newValue) ? newValue : null;
+                    });
+                    block.fieldImmediate.setValue("0b" + parseInt(value).toString(2));
+                    break;
+            };
+        });
     }
 );
 
