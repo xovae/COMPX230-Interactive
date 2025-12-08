@@ -1,5 +1,5 @@
 window.initBlockly = () => {
-    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme, maxInstances: {'jump': 3}});
+    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
 }
 
 window.generateCode = () => {

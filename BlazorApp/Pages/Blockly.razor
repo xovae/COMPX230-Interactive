@@ -27,7 +27,7 @@
 
         if (code.Contains("main:") && code.Contains(".global main") && code.Contains(".text"))
         {
-            if (!code.Contains("$_") && !code.Contains("$\n") && !code.Contains("$,"))
+            if (!code.Contains("$_"))
             {
                 //Remove highlightBlock() from any lines that aren't WRAMP instructions
                 code = Regex.Replace(code, highlightBlockPattern + @"\.text", ".text");
@@ -56,6 +56,7 @@
                     }
                     else
                     {
+                        //Remove the previous whitespace entry (if it exists) to make the position of the label match up with it's proceeding instruction
                         if (labels.Count > 1) labels.RemoveAt(labels.Count - 1);
                         labels.Add(Regex.Replace(lines[i], @"^([a-zA-Z0-9_.]+):$", "$1"));
                     }

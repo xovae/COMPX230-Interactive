@@ -44,9 +44,9 @@ namespace RexSimulator.Hardware
         public readonly Bus mAddressBus;
         public readonly Bus mIrqs;
 
-        public readonly SimpleWrampCpu CPU;
+        public SimpleWrampCpu CPU;
 
-        public readonly MemoryDevice RAM;
+        public MemoryDevice RAM;
         public readonly SerialIO Serial1;
         public readonly SerialIO Serial2;
         public readonly Rex.Timer Timer;
