@@ -17,8 +17,8 @@ html, body {
     margin: 20px 0;
 }
 
-#buttons button {
-    margin: 10px;
+.wrampButton {
+    margin-right: 10px;
 }
 
 .wsimTable th, td {

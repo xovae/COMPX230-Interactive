@@ -830,3 +830,33 @@ Blockly.Extensions.register('immediateFormatter',
 );
 
 Blockly.common.defineBlocks(definitions);
+
+const supportedEvents = new Set ([
+    Blockly.Events.BLOCK_CHANGE,
+    Blockly.Events.BLOCK_CREATE,
+    Blockly.Events.BLOCK_DELETE,
+    Blockly.Events.BLOCK_MOVE,
+    Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE
+]);
+
+function updateCode(event) {
+    if (workspace.isDragging()) return;
+    if (!supportedEvents.has(event.type)) return;
+
+    const codeArea = document.getElementById('wsimCode');
+    const highlightRegex = /highlightBlock\('[^']+'\)\n/g;
+    const tabRegex = /\t(.text|.global main|.bss|.data|LABEL)/g;
+    //Get the current code, and remove all back end elements not meant to be seen by the user
+    code = wrampGenerator.workspaceToCode(workspace);
+    code = code.replace(highlightRegex, "");
+    code = code.replace(tabRegex, "$1");
+    code = code.replaceAll("LABEL", "");
+    //Translate all special characters to their HTML equivalents
+    code = code.replaceAll("\n", "<br>");
+    code = code.replaceAll("\t", "&emsp;")
+    codeArea.innerHTML = code;
+}
+
+window.initUpdate = () => {
+    workspace.addChangeListener(updateCode);
+}

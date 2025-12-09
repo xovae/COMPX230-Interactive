@@ -8,6 +8,7 @@
 @using System.Text.Json
 @using System.Runtime.Intrinsics.X86
 @using System.Diagnostics.Contracts
+@using System.ComponentModel.Design
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
@@ -15,22 +16,26 @@
 <div class="container-fluid" id="body">
 
     <div class="d-flex align-items-center">
-        <img style="height: 50px" src="img/reginald.png"/>
+        <img style="height: 50px; margin-right: 10px;" src="img/reginald.png"/>
         <h1>WRAMP Sim</h1>
     </div>
 
     <div class="row">
         <div class="col" id="blockly">
-            <Blockly onExportClicked="Compile" />
+            <Blockly @ref="blocklyComponent" onExportClicked="Compile" />
         </div>
 
         <div class="col">
             <div>
                 <h2>Controls</h2>
-                <button type="button" class="btn btn-info" @onclick="Step">Step</button>
-                <button type="button" class="btn btn-success" @onclick="Run">Run</button>
-                <button type="button" class="btn btn-danger" @onclick="Pause">Pause</button>
-                <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
+                <button type="button" class="btn btn-warning wrampButton" @onclick="Export">Compile</button>
+
+                <div class="btn-group" role="group" aria-label="WRAMP controls">
+                    <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+                    <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
+                    <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
+                    <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
+                </div>
 
                 <div id="accordionWRAMP" class="accordion">
                     <div class="accordion-item">
@@ -52,10 +57,10 @@
                                     }
                                 </div>
 
-                                <div class="d-flex justify-content-center" id="buttons">
+                                <div class="d-flex justify-content-center">
                                     @for (int i = 0; i < 3; i++) {
                                         int pos = i;
-                                        <button type="button" class="btn btn-primary" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
+                                        <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
                                     }
                                 </div>
                             </div>
@@ -66,7 +71,10 @@
 
             <ul class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
+                    <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
@@ -77,16 +85,16 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
-                </li>
                 <li class="nav-item ms-auto" role="presentation" @onclick="quack">
                     <button class="nav-link duck" id="duck-tab"><img src="img/reginald.png" class="duckImg" alt="duck!"></button>
                 </li>
             </ul>
 
             <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
+                <div class="tab-pane fade show active" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
+                    <p id="wsimCode"></p>
+                </div>
+                <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
                     <GPRegisters CPU="@board.CPU" />
                 </div>
                 <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
@@ -98,9 +106,6 @@
                 <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
                     <SerialPort serial="@board.Serial1" />
                 </div>
-                <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
-                    @wsimCode
-                </div>
             </div>
         </div>
     </div>
@@ -109,11 +114,10 @@
 
 @code {
     private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
+    public required Blockly blocklyComponent;
 
     public required string[] blockIDs;
     public required List<string> labels;
-
-    MarkupString wsimCode;
 
     //WSIM Operation
     RexBoard board = new RexBoard();
@@ -122,13 +126,17 @@
     bool instructionsLoaded = false;
     bool running = false;
 
+    async Task Export()
+    {
+        await blocklyComponent.export();
+    }
+
     //Take a .s file onclickfrom the user and compile it to an SREC for use in the wsim
     async Task Compile((string code, string[] IDs, List<string> labels) args)
     {
         //Get block IDs, labels, and plain text code from args
         blockIDs = args.IDs;
         labels = args.labels;
-        wsimCode = (MarkupString)args.code.Replace("\n", "<br>");
 
         //Reset board
         board.Reset();
@@ -157,38 +165,11 @@
     }
 
     //Executes a single instruction
-    void Step()
+    async Task Step()
     {
         if (instructionsLoaded == true)
         {
-            //Catch any system exceptions
-            switch (board.CPU.InterruptStatus & (uint)0xF000)
-            {
-                case (uint)ExceptionSource.GPF:
-                    running = false;
-                    JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-                    break;
-                case (uint)ExceptionSource.SYSCALL:
-                    running = false;
-                    JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
-                    break;
-                case (uint)ExceptionSource.BREAK:
-                    running = false;
-                    JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
-                    break;
-                case (uint)ExceptionSource.ARITH:
-                    running = false;
-                    JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
-                    break;
-                default:
-                    while(!board.Tick());
-                    if (board.CPU.PC < finalAddress)
-                    {
-                        JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
-                    }
-                    StateHasChanged();
-                    break;
-            }
+            await WSIMWorker(true);
         }
     }
 
@@ -197,41 +178,7 @@
     {
         if (instructionsLoaded == true)
         {
-            if (running == false) {
-                running = true;
-                while (running)
-                {
-                    //Catch any system exceptions
-                    switch (board.CPU.InterruptStatus & (uint)0xF000)
-                    {
-                        case (uint)ExceptionSource.GPF:
-                            running = false;
-                            await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-                            break;
-                        case (uint)ExceptionSource.SYSCALL:
-                            running = false;
-                            await JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
-                            break;
-                        case (uint)ExceptionSource.BREAK:
-                            running = false;
-                            await JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
-                            break;
-                        case (uint)ExceptionSource.ARITH:
-                            running = false;
-                            await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
-                            break;
-                        default:
-                            while(!board.Tick());
-                            if (board.CPU.PC < finalAddress)
-                            {
-                                await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
-                            }
-                            await InvokeAsync(StateHasChanged);
-                            await Task.Delay(100);
-                            break;
-                    }
-                }
-            }
+            await WSIMWorker(false);
         }
     }
 
@@ -239,6 +186,57 @@
     void Pause()
     {
         running = false;
+    }
+
+    async Task WSIMWorker(bool stepping)
+    {
+        running = true;
+        while (running)
+        {
+            running ^= stepping;
+            //Catch any system exceptions
+            switch (board.CPU.InterruptStatus & (uint)0xF000)
+            {
+                case (uint)ExceptionSource.GPF:
+                    running = false;
+                    await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
+                    break;
+                case (uint)ExceptionSource.SYSCALL:
+                    running = false;
+                    await JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
+                    break;
+                case (uint)ExceptionSource.BREAK:
+                    running = false;
+                    await JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
+                    break;
+                case (uint)ExceptionSource.ARITH:
+                    running = false;
+                    await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
+                    break;
+                default:
+                    //If the user used jr $ra
+                    if (board.CPU.PC == 0xFFFFF)
+                    {
+                        running = false;
+                        Verify();
+                        break;
+                    }
+                    while(!board.Tick());
+                    if (board.CPU.PC < finalAddress)
+                    {
+                        await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
+                    }
+                    await InvokeAsync(StateHasChanged);
+                    await Task.Delay(100);
+                    break;
+            }
+        }
+    }
+
+    //Used to check the output of the user's program
+    void Verify()
+    {
+        Console.WriteLine("You did it!");
     }
 
     //Go back one board state

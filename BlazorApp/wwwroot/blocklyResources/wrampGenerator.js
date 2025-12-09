@@ -1,6 +1,6 @@
 export const wrampGenerator = new Blockly.CodeGenerator('WRAMP');
 
-wrampGenerator.STATEMENT_PREFIX = 'highlightBlock(%1)\n';
+wrampGenerator.STATEMENT_PREFIX = 'highlightBlock(%1)\n\t';
 wrampGenerator.addReservedWords('highlightBlock');
 
 function textBlock(block, generator) {
