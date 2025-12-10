@@ -14,28 +14,19 @@
     </div>
 
     <div class="row">
-        <div class="col-1">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Level 1</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Level 2</a>
-                </li>
-            </ul>
-        </div>
+        <LevelSelector Level="home"/>
 
-        <div class="col-11">
-            <Level toolbox="@JsonSerializer.Serialize(toolbox)" registers="@registers" tabs="@tabs" levelNum="levelOne"/>
+        <div class="col">
+            <Level toolbox="@JsonSerializer.Serialize(toolbox)" registers="@registers" tabs="@tabs"/>
         </div>
     </div>
 </div>
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
-        new (1, 0)
+
     };
 
-    public Tabs tabs = new Tabs(GPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, PhysicalComponents: true);
+    public Tabs tabs = new Tabs(Instructions: false, GPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, PhysicalComponents: true, Library: false);
 
     public Toolbox toolbox = new Toolbox{
         contents = new List<Category>() {

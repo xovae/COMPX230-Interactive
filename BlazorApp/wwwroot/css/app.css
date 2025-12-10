@@ -1,6 +1,6 @@
 html, body {
-    font: normal sans-serif;
     width: 100%;
+    height: 100%;
 }
 
 #logo {
@@ -8,8 +8,16 @@ html, body {
     margin-right: 10px;
 }
 
+#levelButton {
+    margin: 10px 0;
+}
+
+.tab-pane {
+    margin-top: 10px;
+}
+
 #blocklyDiv {
-    height: 800px;
+    height: 90vh;
 }
 
 #accordionWRAMP {

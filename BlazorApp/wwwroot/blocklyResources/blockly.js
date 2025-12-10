@@ -3,10 +3,6 @@ window.initBlockly = (tool) => {
     workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
 }
 
-window.updateToolbox = (tool) => {
-    workspace.toolbox = tool;
-}
-
 window.generateCode = () => {
     const code = wrampGenerator.workspaceToCode(workspace);
     return code;

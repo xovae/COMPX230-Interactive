@@ -1,0 +1,63 @@
+@page "/levelOne"
+@using Microsoft.AspNetCore.Components.Infrastructure
+@using RexSimulator.Hardware.Wramp
+@using System.Security.Principal
+@using System.Text.Json
+
+<PageTitle>Home</PageTitle>
+
+<div class="container-fluid" id="body">
+
+    <div class="d-flex align-items-center">
+        <img id="logo" src="img/reginald.png"/>
+        <h1>WRAMP Sim</h1>
+    </div>
+
+    <div class="row">
+        <LevelSelector Level="levelOne"/>
+
+        <div class="col">
+            <Level Toolbox="@JsonSerializer.Serialize(toolbox)" Registers="@registers" Tabs="@tabs" Instructions="@instructions" Library="@Library"/>
+        </div>
+    </div>
+</div>
+@code {
+    public List<KeyValuePair<int, int>> registers = new() {
+        new KeyValuePair<int, int> (1, 5),
+        new KeyValuePair<int, int> (2, 10),
+    };
+
+    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true, RAM: false, ParallelRegisters: false, SerialPort: false, PhysicalComponents: false, Library: true);
+
+    public string instructions = "Make: $1 = 5\n$2 = 10";
+    public string[] Library = {"switches.s", "library!"};
+
+
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" },
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" },
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" },
+                }
+            }
+        }
+    };
+}

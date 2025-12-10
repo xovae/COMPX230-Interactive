@@ -11,13 +11,13 @@
     public EventCallback<(string, string[], List<string>)> Exported { get; set; }
 
     [Parameter]
-    required public string toolbox { get; set; }
+    required public string Toolbox { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initBlockly", toolbox);
+            await JSRuntime.InvokeVoidAsync("initBlockly", Toolbox);
             await JSRuntime.InvokeVoidAsync("initUpdate");
         }
     }

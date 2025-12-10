@@ -8,31 +8,32 @@
 @using System.Runtime.Intrinsics.X86
 @using System.Diagnostics.Contracts
 @using System.ComponentModel.Design
-@inject IJSRuntime JSRuntime
 
 <div class="row">
     <div class="col mx-1" id="blockly">
-        <Blockly @ref="blocklyComponent" Exported="ExportHandler" toolbox="@toolbox"/>
+        <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@Toolbox"/>
     </div>
 
     <div class="col mx-1">
-        <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" registers="@registers" tabs="@tabs"/>
+        <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" Tabs="@Tabs" Instructions="@Instructions" Library="@Library"/>
     </div>
 </div>
 
 @code {
     [Parameter]
-    required public string toolbox { get; set; }
+    required public string Toolbox { get; set; }
 
     [Parameter]
-    required public List<KeyValuePair<int, int>> registers { get; set; }
+    required public List<KeyValuePair<int, int>> Registers { get; set; }
 
     [Parameter]
-    required public Tabs tabs { get; set; }
+    required public Tabs Tabs { get; set; }
 
     [Parameter]
-    required public string levelNum { get; set; }
+    public string? Instructions { get; set; }
 
+    [Parameter]
+    public string[]? Library { get; set; }
 
     required public Blockly blocklyComponent;
     required public WSIM wsimComponent;

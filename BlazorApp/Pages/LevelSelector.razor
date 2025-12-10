@@ -1,0 +1,30 @@
+@inject IJSRuntime JSRuntime
+
+<div class="col-auto">
+    <button class="btn btn-primary" id="levelButton" type="button" data-bs-toggle="collapse" data-bs-target="#levelSelect" aria-expanded="true" aria-controls="levelSelect">
+        ≡
+    </button>
+    <div class="collapse collapse-horizontal show" id="levelSelect">
+        <ul class="nav flex-column nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" id="home" aria-current="page" href="/">Sandbox</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="levelOne" href="/levelOne">Level 1</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    required public string Level { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("levelSelect", Level);
+        }
+    }
+}
