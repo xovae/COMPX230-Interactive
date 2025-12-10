@@ -8,18 +8,21 @@
 
 @code {
     [Parameter]
-    public EventCallback<(string, string[], List<string>)> onExportClicked { get; set; }
+    public EventCallback<(string, string[], List<string>)> Exported { get; set; }
+
+    [Parameter]
+    required public string toolbox { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initBlockly");
+            await JSRuntime.InvokeVoidAsync("initBlockly", toolbox);
             await JSRuntime.InvokeVoidAsync("initUpdate");
         }
     }
 
-    public async Task export()
+    public async Task Export()
     {
         string code = await JSRuntime.InvokeAsync<string>("generateCode");
         await JSRuntime.InvokeVoidAsync("updateCode", "Compile");
@@ -61,7 +64,7 @@
                         labels.Add(Regex.Replace(lines[i], @"^([a-zA-Z0-9_.]+):$", "$1"));
                     }
                 }
-                await onExportClicked.InvokeAsync((code, highlightStatements, labels));
+                await Exported.InvokeAsync((code, highlightStatements, labels));
             }
             else
             {

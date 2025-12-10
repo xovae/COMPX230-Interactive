@@ -1,0 +1,49 @@
+﻿@using RexSimulator.Hardware
+@using RexSimulator.Hardware.Rex
+@using RexSimulator.Hardware.Wramp
+@using System.ComponentModel
+@using System.Security.Permissions
+@using System.Text
+@using System.Text.Json
+@using System.Runtime.Intrinsics.X86
+@using System.Diagnostics.Contracts
+@using System.ComponentModel.Design
+@inject IJSRuntime JSRuntime
+
+<div class="row">
+    <div class="col mx-1" id="blockly">
+        <Blockly @ref="blocklyComponent" Exported="ExportHandler" toolbox="@toolbox"/>
+    </div>
+
+    <div class="col mx-1">
+        <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" registers="@registers" tabs="@tabs"/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    required public string toolbox { get; set; }
+
+    [Parameter]
+    required public List<KeyValuePair<int, int>> registers { get; set; }
+
+    [Parameter]
+    required public Tabs tabs { get; set; }
+
+    [Parameter]
+    required public string levelNum { get; set; }
+
+
+    required public Blockly blocklyComponent;
+    required public WSIM wsimComponent;
+
+    public async Task CompileHandler()
+    {
+        await blocklyComponent.Export();
+    }
+
+    public async Task ExportHandler((string code, string[] IDs, List<string> labels) args)
+    {
+        await wsimComponent.Compile(args);
+    }
+}

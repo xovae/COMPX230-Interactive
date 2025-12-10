@@ -1,5 +1,11 @@
 html, body {
     font: normal sans-serif;
+    width: 100%;
+}
+
+#logo {
+    height: 50px;
+    margin-right: 10px;
 }
 
 #blocklyDiv {
@@ -15,6 +21,10 @@ html, body {
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
     margin: 20px 0;
+}
+
+#wsimTabs {
+    margin-top: 10px;
 }
 
 .wrampButton {

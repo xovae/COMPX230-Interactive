@@ -19,11 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.IO;
 using System.Diagnostics;
 using RexSimulator.Hardware.Wramp;
 using RexSimulator.Hardware.Rex;
@@ -99,8 +95,8 @@ namespace RexSimulator.Hardware
 
         #region Public Methods
 
-        System.Threading.ManualResetEvent mTickEnabler;
-        public void SetTickEnabler(System.Threading.ManualResetEvent tickEnabler)
+        ManualResetEvent? mTickEnabler;
+        public void SetTickEnabler(ManualResetEvent tickEnabler)
         {
             mTickEnabler = tickEnabler;
         }

@@ -19,11 +19,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics;
 
 namespace RexSimulator.Hardware.Rex
 {
@@ -35,7 +30,7 @@ namespace RexSimulator.Hardware.Rex
         #region Members
         protected uint mBaseAddress;
         protected uint[] mMemory;
-        protected Bus mAddressBus, mDataBus, mIrqBus;
+        protected Bus mAddressBus, mDataBus, mIrqBus = null!;
         protected string mName;
         protected int mIrqNumber = int.MinValue, mIrqOffset = int.MinValue;
         #endregion
@@ -80,7 +75,7 @@ namespace RexSimulator.Hardware.Rex
 
             mName = name;
 
-            mAddressBus.Changed += new EventHandler<Bus.BusChangedEventArgs>(mAddressBus_Updated);
+            mAddressBus.Changed += mAddressBus_Updated;
         }
 
         /// <summary>
@@ -88,7 +83,7 @@ namespace RexSimulator.Hardware.Rex
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void mAddressBus_Updated(object sender, Bus.BusChangedEventArgs e)
+        void mAddressBus_Updated(object? sender, Bus.BusChangedEventArgs e)
         {
             Read();
         }

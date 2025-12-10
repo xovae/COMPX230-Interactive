@@ -74,7 +74,7 @@ namespace RexSimulator.Hardware
         /// <summary>
         /// Fired whenever this bus has had its value changed.
         /// </summary>
-        public event EventHandler<BusChangedEventArgs> Changed;
+        public event EventHandler<BusChangedEventArgs>? Changed;
         #endregion
 
         #region Public Methods

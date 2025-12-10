@@ -6,14 +6,12 @@
 @code {
     [Parameter]
     required public MemoryDevice parallelMemory { get; set; }
-
-
 }
 
 @* Prints out the parallel registers in decimal, hex, and binary *@
 @if (parallelMemory != null)
 {
-    <table>
+    <table class="wsimTable">
         <thead>
             <tr>
                 <th>Address</th>

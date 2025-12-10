@@ -1,266 +1,119 @@
-﻿@page "/"
-@using RexSimulator.Hardware
-@using RexSimulator.Hardware.Rex
+@page "/"
+@using Microsoft.AspNetCore.Components.Infrastructure
 @using RexSimulator.Hardware.Wramp
-@using System.ComponentModel
-@using System.Security.Permissions
-@using System.Text
+@using System.Security.Principal
 @using System.Text.Json
-@using System.Runtime.Intrinsics.X86
-@using System.Diagnostics.Contracts
-@using System.ComponentModel.Design
-@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
 
 <div class="container-fluid" id="body">
 
     <div class="d-flex align-items-center">
-        <img style="height: 50px; margin-right: 10px;" src="img/reginald.png"/>
+        <img id="logo" src="img/reginald.png"/>
         <h1>WRAMP Sim</h1>
     </div>
 
     <div class="row">
-        <div class="col" id="blockly">
-            <Blockly @ref="blocklyComponent" onExportClicked="Compile" />
-        </div>
-
-        <div class="col">
-            <div>
-                <h2>Controls</h2>
-                <button type="button" class="btn btn-warning wrampButton" @onclick="Export">Compile</button>
-
-                <div class="btn-group" role="group" aria-label="WRAMP controls">
-                    <button type="button" class="btn btn-info" @onclick="Step">Step</button>
-                    <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
-                    <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
-                    <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
-                </div>
-
-                <div id="accordionWRAMP" class="accordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                Physical Components
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div id="switches">
-                                    @for (int i = 0; i < 16; i++) {
-                                        int pos = i;
-                                        int value = (int)Math.Pow(2, pos);
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="@pos" @onclick="() => toggleSwitch(pos)">
-                                            <label class="form-check-label" for="@pos">Switch @pos</label>
-                                        </div>
-                                    }
-                                </div>
-
-                                <div class="d-flex justify-content-center">
-                                    @for (int i = 0; i < 3; i++) {
-                                        int pos = i;
-                                        <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
+        <div class="col-1">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Level 1</a>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="true">GP Registers</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
-                </li>
-                <li class="nav-item ms-auto" role="presentation" @onclick="quack">
-                    <button class="nav-link duck" id="duck-tab"><img src="img/reginald.png" class="duckImg" alt="duck!"></button>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Level 2</a>
                 </li>
             </ul>
+        </div>
 
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
-                    <p id="wsimCode"></p>
-                </div>
-                <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
-                    <GPRegisters CPU="@board.CPU" />
-                </div>
-                <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-                    <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels" />
-                </div>
-                <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
-                    <ParallelRegisters parallelMemory="@board.Parallel" />
-                </div>
-                <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-                    <SerialPort serial="@board.Serial1" />
-                </div>
-            </div>
+        <div class="col-11">
+            <Level toolbox="@JsonSerializer.Serialize(toolbox)" registers="@registers" tabs="@tabs" levelNum="levelOne"/>
         </div>
     </div>
-
 </div>
-
 @code {
-    private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
-    public required Blockly blocklyComponent;
+    public List<KeyValuePair<int, int>> registers = new() {
+        new (1, 0)
+    };
 
-    public required string[] blockIDs;
-    public required List<string> labels;
+    public Tabs tabs = new Tabs(GPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, PhysicalComponents: true);
 
-    //WSIM Operation
-    RexBoard board = new RexBoard();
-    uint finalAddress = 50;
-
-    bool instructionsLoaded = false;
-    bool running = false;
-
-    async Task Export()
-    {
-        await blocklyComponent.export();
-    }
-
-    //Take a .s file onclickfrom the user and compile it to an SREC for use in the wsim
-    async Task Compile((string code, string[] IDs, List<string> labels) args)
-    {
-        //Get block IDs, labels, and plain text code from args
-        blockIDs = args.IDs;
-        labels = args.labels;
-
-        //Reset board
-        board.Reset();
-        running = false;
-        StateHasChanged();
-
-        byte[] codeBytes = Encoding.UTF8.GetBytes(args.code);
-
-        //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
-        try
-        {
-            byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
-            //Open a new memory stream, and pass to wsim for execution
-            MemoryStream ms = new MemoryStream(srecBytes);
-            finalAddress = await board.LoadSrecAsync(ms);
-            if (finalAddress != 0)
-            {
-                instructionsLoaded = true;
-                await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[0]);
-            }
-            StateHasChanged();
-        }
-        catch {
-            labels.Clear();
-        }
-    }
-
-    //Executes a single instruction
-    async Task Step()
-    {
-        if (instructionsLoaded == true)
-        {
-            await WSIMWorker(true);
-        }
-    }
-
-    //Continuously executes instructions
-    async Task Run()
-    {
-        if (instructionsLoaded == true)
-        {
-            await WSIMWorker(false);
-        }
-    }
-
-    //Pause execution of instructions
-    void Pause()
-    {
-        running = false;
-    }
-
-    async Task WSIMWorker(bool stepping)
-    {
-        running = true;
-        while (running)
-        {
-            running ^= stepping;
-            //Catch any system exceptions
-            switch (board.CPU.InterruptStatus & (uint)0xF000)
-            {
-                case (uint)ExceptionSource.GPF:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-                    break;
-                case (uint)ExceptionSource.SYSCALL:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
-                    break;
-                case (uint)ExceptionSource.BREAK:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
-                    break;
-                case (uint)ExceptionSource.ARITH:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
-                    break;
-                default:
-                    //If the user used jr $ra
-                    if (board.CPU.PC == 0xFFFFF)
-                    {
-                        running = false;
-                        Verify();
-                        break;
-                    }
-                    while(!board.Tick());
-                    if (board.CPU.PC < finalAddress)
-                    {
-                        await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
-                    }
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(100);
-                    break;
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" },
+                    new Block { type = "dataHead" },
+                    new Block { type = "bssHead" },
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jump" },
+                    new Block { type = "jumpRegister" },
+                    new Block { type = "branchOn" }
+                }
+            },
+            new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "loadWord" },
+                    new Block { type = "storeWord" },
+                    new Block { type = "loadAddress" },
+                    new Block { type = "word" },
+                    new Block { type = "asciiz" },
+                    new Block { type = "ascii" },
+                    new Block { type = "space" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmetic" },
+                    new Block { type = "arithmeticUnsigned" },
+                    new Block { type = "arithmeticImmediate" },
+                    new Block { type = "arithmeticUnsignedImmediate" },
+                    new Block { type = "loadHighImmediate" },
+                }
+            },
+            new Category {
+                name = "Logic",
+                categorystyle = "logicCategory",
+                contents = new List<Block>() {
+                    new Block { type = "bitwise" },
+                    new Block { type = "bitwiseImmediate" },
+                    new Block { type = "shift" },
+                    new Block { type = "shiftImmediate" },
+                }
+            },
+            new Category {
+                name = "Conditional",
+                categorystyle = "conditionalCategory",
+                contents = new List<Block>() {
+                    new Block { type = "setOn" },
+                    new Block { type = "setOnUnsigned" },
+                    new Block { type = "setOnImmediate" },
+                    new Block { type = "setOnUnsignedImmediate" },
+                }
+            },
+            new Category {
+                name = "Special",
+                categorystyle = "specialCategory",
+                contents = new List<Block>() {
+                    new Block { type = "moveGeneralToSpecial" },
+                    new Block { type = "moveSpecialToGeneral" },
+                    new Block { type = "break" },
+                    new Block { type = "syscall" },
+                    new Block { type = "returnFromException" },
+                }
             }
         }
-    }
-
-    //Used to check the output of the user's program
-    void Verify()
-    {
-        Console.WriteLine("You did it!");
-    }
-
-    //Go back one board state
-    void Undo()
-    {
-    }
-
-    void toggleSwitch(int pos)
-    {
-        board.Parallel.Switches ^= (1u << pos);
-    }
-
-    void pressButton(int pos)
-    {
-        board.Parallel.Buttons = (uint)1 << pos;
-    }
-
-    void releaseButton()
-    {
-        board.Parallel.Buttons = 0;
-    }
-
-    void quack()
-    {
-        JSRuntime.InvokeVoidAsync("quacker");
-    }
+    };
 }

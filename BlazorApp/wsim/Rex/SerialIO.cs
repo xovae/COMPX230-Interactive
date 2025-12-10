@@ -139,14 +139,14 @@ namespace RexSimulator.Hardware.Rex
                 this.Data = value;
             }
         }
-        public event EventHandler<SerialEventArgs> SerialDataTransmitted;
+        public event EventHandler<SerialEventArgs>? SerialDataTransmitted;
         #endregion
 
         #region Constructor
         public SerialIO(uint baseAddress, uint size, Bus addressBus, Bus dataBus, string name)
             : base(baseAddress, size, addressBus, dataBus, name)
         {
-            
+
         }
         #endregion
 

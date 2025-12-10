@@ -1,5 +1,10 @@
-window.initBlockly = () => {
+window.initBlockly = (tool) => {
+    const toolbox = JSON.parse(tool);
     workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
+}
+
+window.updateToolbox = (tool) => {
+    workspace.toolbox = tool;
 }
 
 window.generateCode = () => {
@@ -11,7 +16,7 @@ window.highlightBlock = (id) => {
     workspace.highlightBlock(id);
 }
 
-const toolbox = {
+const fullToolbox = {
     kind: 'categoryToolbox',
     contents:
     [
