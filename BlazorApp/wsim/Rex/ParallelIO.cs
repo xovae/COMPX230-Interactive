@@ -77,7 +77,7 @@ namespace RexSimulator.Hardware.Rex
         /// The state of the left SSD in the left pair.
         /// </summary>
 		public uint LeftLeftSSD { get { return mMemory[6] & 0xff; } set { mMemory[6] = value; } }
-		
+
 		/// <summary>
         /// The state of the right SSD in the left pair.
         /// </summary>
@@ -107,7 +107,7 @@ namespace RexSimulator.Hardware.Rex
         /// The interrupt acknowledge register.
         /// </summary>
         public uint InterruptAck { get { return mMemory[5]; } set { mMemory[5] = value; } }
-        
+
         /// <summary>
         /// The state of the LEDs.
         /// </summary>

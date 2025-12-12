@@ -46,8 +46,51 @@
                         <div class="d-flex justify-content-center">
                             @for (int i = 0; i < 3; i++) {
                                 int pos = i;
-                                <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="() => releaseButton()">Button</button>
+                                <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
                             }
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div id="sevenSegOne" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
+                            <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
+                            <div id="sevenSegThree" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
+                            <div id="sevenSegFour" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,7 +139,7 @@
             <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
         </li>
     }
-    @if (Tabs.Library)
+    @if (Tabs.Library && Library != null)
     {
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
@@ -147,7 +190,7 @@
             <SerialPort serial="@board.Serial1" />
         </div>
     }
-    @if (Tabs.Library)
+    @if (Tabs.Library && Library != null)
     {
         <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
             <p>@Library[1]</p>
@@ -183,6 +226,17 @@
 
     bool instructionsLoaded = false;
     bool running = false;
+    bool hexDecode = true;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            //Load SSDs on page load
+            updateDisplays();
+            StateHasChanged();
+        }
+    }
 
     async Task OnCompileClicked()
     {
@@ -251,6 +305,7 @@
         running = true;
         while (running)
         {
+            //Only do one cycle if the step button was clicked
             running ^= stepping;
             //Catch any system exceptions
             switch (board.CPU.InterruptStatus & (uint)0xF000)
@@ -285,10 +340,13 @@
                         break;
                     }
                     while(!board.Tick());
+                    //Highlight next block to be executed
                     if (board.CPU.PC < finalAddress)
                     {
                         await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
                     }
+                    //Update SSDs
+                    updateDisplays();
                     await InvokeAsync(StateHasChanged);
                     await Task.Delay(100);
                     break;
@@ -332,6 +390,40 @@
     void releaseButton()
     {
         board.Parallel.Buttons = 0;
+    }
+
+    void updateDisplays()
+    {
+        uint[] SSD_DECODE = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x6F, 0x77, 0x7C, 0x39, 0x5E, 0x79, 0x71 };
+        uint[] values = {board.Parallel.LeftLeftSSD, board.Parallel.LeftRightSSD, board.Parallel.LeftSSD, board.Parallel.RightSSD};
+        string[] IDs = {"sevenSegOne", "sevenSegTwo", "sevenSegThree", "sevenSegFour"};
+        //If Hex-decode is enabled
+        if ((board.Parallel.Control & 1) == 1)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                uint value = values[i] & 0xF;
+                uint segments = SSD_DECODE[value];
+                for (int i2 = 0; i2 < 8; i2++)
+                {
+                    uint bit = segments & 1;
+                    JSRuntime.InvokeVoidAsync("changeSegment", IDs[i], i2, bit);
+                    segments >>= 1;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                for (int i2 = 0; i2 < 8; i2++)
+                {
+                    uint bit = values[i] & 1;;
+                    JSRuntime.InvokeVoidAsync("changeSegment", IDs[i], i2, bit);
+                    values[i] >>= 1;
+                }
+            }
+        }
     }
 
     void quack()
