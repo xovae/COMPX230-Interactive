@@ -23,7 +23,7 @@
 </div>
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
-
+        new (13, 99999)
     };
 
     public Tabs tabs = new Tabs(Instructions: false, GPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, PhysicalComponents: true, Library: false);

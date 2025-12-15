@@ -10,3 +10,15 @@ window.changeSegment = (id, segment, value) => {
 		display.classList.remove(segmentClass);
 	}
 }
+
+window.changeLED = (id, value) => {
+	let LED = document.getElementById(id);
+	if (value == 1)
+	{
+		LED.style.backgroundColor = "red";
+	}
+	else
+	{
+		LED.style.backgroundColor = "black";
+	}
+}
