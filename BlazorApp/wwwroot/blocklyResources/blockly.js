@@ -406,268 +406,6 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         tooltip: 'func la Rd, Address\nPut the address into register Rd.',
         extensions: ['generalRegisterValidator']
     },
-    {   type: 'arithmetic',
-        style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['add', 'add'], ['sub', 'sub'], ['mult', 'mult'], ['div', 'div'], ['rem', 'rem']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on signed overflow.',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'arithmeticUnsigned',
-        style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['addu', 'addu'], ['subu', 'subu'], ['multu', 'multu'], ['divu', 'divu'], ['remu', 'remu']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on unsigned overflow.',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'arithmeticImmediate',
-        style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['addi', 'addi'], ['subi', 'subi'], ['multi', 'multi'], ['divi', 'divi'], ['remi', 'remi']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on signed overflow.',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'arithmeticUnsignedImmediate',
-        style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['addui', 'addui'], ['subui', 'subui'], ['multui', 'multui'], ['divui', 'divui'], ['remui', 'remui']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on unsigned overflow.',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'loadHighImmediate',
-        style: 'arithmeticBlocks',
-        message0: '%1 %2, %3 %4',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'lhi'},
-            {type: 'field_input', name: 'register', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'lhi Rd, Immediate\nPut the 16 bit immediate in the upper 16 bits of register Rd, and set the lower 16 bits to 0',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'bitwise',
-        style: 'logicBlocks',
-        message0: '%1 %2, %3, %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['and', 'and'], ['or', 'or'], ['xor', 'xor']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, Rt\nPerform the logical operation func on registers Rs and Rt, storing the result in Rd',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'bitwiseImmediate',
-        style: 'logicBlocks',
-        message0: '%1 %2, %3, %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['andi', 'andi'], ['ori', 'ori'], ['xori', 'xori']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, immediate\nPerform the logical operation func on register Rs and the immediate, storing the result in Rd',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'shift',
-        style: 'logicBlocks',
-        message0: '%1 %2, %3, %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['sll', 'sll'], ['srl', 'srl'], ['sra', 'sra']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, Rt\nShift the bits in the direction defined by func in register Rs by the amount in Rt, storing the result in Rd',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'shiftImmediate',
-        style: 'logicBlocks',
-        message0: '%1 %2, %3, %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['slli', 'slli'], ['srli', 'srli'], ['srai', 'srai']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, immediate\nShift the bits in the direction defined by func in register Rs by the amount in the immediate, storing the result in Rd',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'setOn',
-        style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['slt', 'slt'], ['sgt', 'sgt'], ['sle', 'sle'], ['sge', 'sge'], ['seq', 'seq'], ['sne', 'sne']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, Rt\nPerform logical operation func on registers Rs and Rt. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'setOnUnsigned',
-        style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['sltu', 'sltu'], ['sgtu', 'sgtu'], ['sleu', 'sleu'], ['sgeu', 'sgeu'], ['sequ', 'sequ'], ['sneu', 'sneu']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_input', name: 'register3', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, Rt\nPerform logical operation func on registers Rs and Rt. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'setOnImmediate',
-        style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['slti', 'slti'], ['sgti', 'sgti'], ['slei', 'slei'], ['sgei', 'sgei'], ['seqi', 'seqi'], ['snei', 'snei']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'setOnUnsignedImmediate',
-        style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4 %5',
-        args0:
-        [
-            {type: 'field_dropdown', name: 'instruction', options: [['sltui', 'sltui'], ['sgtui', 'sgtui'], ['sleui', 'sleui'], ['sgeui', 'sgeui'], ['sequi', 'sequi'], ['sneui', 'sneui']]},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'},
-            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
-            {type: 'field_input', name: 'immediate'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
-        extensions: ['generalRegisterValidator', 'immediateFormatter']
-    },
-    {   type: 'moveGeneralToSpecial',
-        style: 'specialBlocks',
-        message0: '%1 %2, %3',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'movgs'},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'movgs Rd, Rs\nMove the conents of general register Rs into special register Rd',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'moveSpecialToGeneral',
-        style: 'specialBlocks',
-        message0: '%1 %2, %3',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'movsg'},
-            {type: 'field_input', name: 'register1', text: '$_'},
-            {type: 'field_input', name: 'register2', text: '$_'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'movgs Rd, Rs\nMove the conents of special register Rs into general register Rd',
-        extensions: ['generalRegisterValidator']
-    },
-    {   type: 'break',
-        style: 'specialBlocks',
-        message0: '%1',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'break'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'Generate a break point exception'
-    },
-    {   type: 'syscall',
-        style: 'specialBlocks',
-        message0: '%1',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'syscall'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'Generate a syscall exception'
-    },
-    {   type: 'returnFromException',
-        style: 'specialBlocks',
-        message0: '%1',
-        args0:
-        [
-            {type: 'field_label_serializable', name: 'instruction', text: 'rfe'}
-        ],
-        previousStatement: null,
-        nextStatement: null,
-        tooltip: 'Execute a Return from Exception (rfe)'
-    },
     {   type: 'word',
         style: 'memoryBlocks',
         message0: '%1 %2',
@@ -715,6 +453,268 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         previousStatement: null,
         nextStatement: null,
         tooltip: 'Allocate a chunk of space of the inputted size in the .bss section'
+    },
+    {   type: 'arithmetic',
+        style: 'arithmeticBlocks',
+        message0: '%1 %2 %3 %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['add', 'add'], ['sub', 'sub'], ['mult', 'mult'], ['div', 'div'], ['rem', 'rem']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on signed overflow.',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'arithmeticUnsigned',
+        style: 'arithmeticBlocks',
+        message0: '%1 %2 %3 %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['addu', 'addu'], ['subu', 'subu'], ['multu', 'multu'], ['divu', 'divu'], ['remu', 'remu']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func, Rd, Rs, Rt\nPuts the result of performing the instruction func on registers Rs and Rt in register Rd. Generate an overflow exception on unsigned overflow.',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'arithmeticImmediate',
+        style: 'arithmeticBlocks',
+        message0: '%1 %2 %3 %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['addi', 'addi'], ['subi', 'subi'], ['multi', 'multi'], ['divi', 'divi'], ['remi', 'remi']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on signed overflow.',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'arithmeticUnsignedImmediate',
+        style: 'arithmeticBlocks',
+        message0: '%1 %2 %3 %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['addui', 'addui'], ['subui', 'subui'], ['multui', 'multui'], ['divui', 'divui'], ['remui', 'remui']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func, Rd, Rs, Immediate\nPuts the result of performing the instruction func on register Rs and the immediate in register Rd. Generate an overflow exception on unsigned overflow.',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'loadHighImmediate',
+        style: 'arithmeticBlocks',
+        message0: '%1 %2, %3 %4',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'lhi'},
+            {type: 'field_input', name: 'register', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'lhi Rd, Immediate\nPut the 16 bit immediate in the upper 16 bits of register Rd, and set the lower 16 bits to 0',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'bitwise',
+        style: 'logicBlocks',
+        message0: '%1 %2, %3, %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['and', 'and'], ['or', 'or'], ['xor', 'xor']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, Rt\nPerform the logical operation func on registers Rs and Rt, storing the result in Rd',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'bitwiseImmediate',
+        style: 'logicBlocks',
+        message0: '%1 %2, %3, %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['andi', 'andi'], ['ori', 'ori'], ['xori', 'xori']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, immediate\nPerform the logical operation func on register Rs and the immediate, storing the result in Rd',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'shift',
+        style: 'logicBlocks',
+        message0: '%1 %2, %3, %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['sll', 'sll'], ['srl', 'srl'], ['sra', 'sra']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, Rt\nShift the bits in the direction defined by func in register Rs by the amount in Rt, storing the result in Rd',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'shiftImmediate',
+        style: 'logicBlocks',
+        message0: '%1 %2, %3, %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['slli', 'slli'], ['srli', 'srli'], ['srai', 'srai']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, immediate\nShift the bits in the direction defined by func in register Rs by the amount in the immediate, storing the result in Rd',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'setOn',
+        style: 'conditionalBlocks',
+        message0: '%1 %2, %3, %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['slt', 'slt'], ['sgt', 'sgt'], ['sle', 'sle'], ['sge', 'sge'], ['seq', 'seq'], ['sne', 'sne']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, Rt\nPerform logical operation func on registers Rs and Rt. Set Rd to 1 if true, 0 otherwise.',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'setOnUnsigned',
+        style: 'conditionalBlocks',
+        message0: '%1 %2, %3, %4',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['sltu', 'sltu'], ['sgtu', 'sgtu'], ['sleu', 'sleu'], ['sgeu', 'sgeu'], ['sequ', 'sequ'], ['sneu', 'sneu']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_input', name: 'register3', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, Rt\nPerform logical operation func on registers Rs and Rt. Set Rd to 1 if true, 0 otherwise.',
+        extensions: ['generalRegisterValidator']
+    },
+    {   type: 'setOnImmediate',
+        style: 'conditionalBlocks',
+        message0: '%1 %2, %3, %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['slti', 'slti'], ['sgti', 'sgti'], ['slei', 'slei'], ['sgei', 'sgei'], ['seqi', 'seqi'], ['snei', 'snei']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'setOnUnsignedImmediate',
+        style: 'conditionalBlocks',
+        message0: '%1 %2, %3, %4 %5',
+        args0:
+        [
+            {type: 'field_dropdown', name: 'instruction', options: [['sltui', 'sltui'], ['sgtui', 'sgtui'], ['sleui', 'sleui'], ['sgeui', 'sgeui'], ['sequi', 'sequi'], ['sneui', 'sneui']]},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'func Rd, Rs, immediate\nPerform logical operation func on register Rs and the immediate. Set Rd to 1 if true, 0 otherwise.',
+        extensions: ['generalRegisterValidator', 'immediateValidator']
+    },
+    {   type: 'moveGeneralToSpecial',
+        style: 'specialBlocks',
+        message0: '%1 %2, %3',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'movgs'},
+            {type: 'field_input', name: 'specialRegister', text: '$_'},
+            {type: 'field_input', name: 'register2', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'movgs Rd, Rs\nMove the conents of general register Rs into special register Rd',
+        extensions: ['generalRegisterValidator', 'specialRegisterValidator']
+    },
+    {   type: 'moveSpecialToGeneral',
+        style: 'specialBlocks',
+        message0: '%1 %2, %3',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'movsg'},
+            {type: 'field_input', name: 'register1', text: '$_'},
+            {type: 'field_input', name: 'specialRegister', text: '$_'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'movgs Rd, Rs\nMove the conents of special register Rs into general register Rd',
+        extensions: ['generalRegisterValidator', 'specialRegisterValidator']
+    },
+    {   type: 'break',
+        style: 'specialBlocks',
+        message0: '%1',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'break'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Generate a break point exception'
+    },
+    {   type: 'syscall',
+        style: 'specialBlocks',
+        message0: '%1',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'syscall'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Generate a syscall exception'
+    },
+    {   type: 'returnFromException',
+        style: 'specialBlocks',
+        message0: '%1',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: 'rfe'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Execute a Return from Exception (rfe)'
     }
 ]);
 
@@ -734,15 +734,13 @@ Blockly.Extensions.register('labelValidator',
 Blockly.Extensions.register('generalRegisterValidator',
     function()
     {
-        const regExPattern = /^\$(?:[0-9]|1[0-5]|ra|sp)$/;
-
-        var field;
+        const regExPattern = /^\$([0-9]|1[0-5]|ra|sp)$/;
 
         if ((field = this.getField('register')) != null)
         {
             field.setValidator(function(newValue) {
                 return regExPattern.test(newValue) ? newValue : null
-            })
+            });
         }
 
         if ((field = this.getField('register1')) != null)
@@ -756,76 +754,82 @@ Blockly.Extensions.register('generalRegisterValidator',
         {
             field.setValidator(function(newValue) {
                 return regExPattern.test(newValue) ? newValue : null
-            })
+            });
         }
 
         if ((field = this.getField('register3')) != null)
         {
             field.setValidator(function(newValue) {
                 return regExPattern.test(newValue) ? newValue : null
-            })
+            });
         }
     }
 );
 
-Blockly.Extensions.register('immediateFormatter',
+Blockly.Extensions.register('specialRegisterValidator',
+    function()
+    {
+        const regexPattern = /^\$(cctrl|estat|icount|ccount|evec|ear|ers|ptable|rbase)$/;
+
+        field = this.getField('specialRegister');
+
+        field.setValidator(function(newValue) {
+            return regexPattern.test(newValue) ? newValue : null
+        });
+    }
+)
+
+Blockly.Extensions.register('immediateValidator',
     function()
     {
         const block = this;
-        block.fieldImage = block.getField('format');
+        this.fieldImage = block.getField('format');
         block.fieldImmediate = block.getField('immediate');
-        block.format = 0;
 
+        const generalRegexPattern = /^([0-9]+|0x[0-9a-fA-F]{1,5}|0b[0-1]{1,20}|\'[a-zA-Z]\')$/;
         const decimalRegexPattern = /^[0-9]+$/;
-        const hexRegexPattern = /^0x[0-9a-f]{1,5}$/;
+        const hexRegexPattern = /^0x[0-9a-fA-F]{1,5}$/;
         const binaryRegexPattern = /^0b[0-1]{1,20}$/;
+        const charRegexPattern = /^\'[a-zA-Z]\'$/;
 
         block.fieldImmediate.setValidator(function(newValue) {
-            return decimalRegexPattern.test(newValue) ? newValue : null;
+            return generalRegexPattern.test(newValue) ? newValue : null;
         });
 
         block.fieldImage.setOnClickHandler(function(image)
         {
-            //Get current field value, removing the 0b if present as parseInt only knows how to handle hex values, not binary
-            value = parseInt(block.fieldImmediate.getText().replace("0b", ""));
-            //0: Decimal, 1: Hex, 2: Binary
-            block.format = (block.format + 1) % 3;
+            //0: Decimal, 1: Hex, 2: Binary, 3: Char
+            value = block.fieldImmediate.getText();
+            if (decimalRegexPattern.test(value)) block.format = 0;
+            if (hexRegexPattern.test(value)) block.format = 1;
+            if (binaryRegexPattern.test(value)) block.format = 2;
+            if (charRegexPattern.test(value)) block.format = 3;
+
+            block.format = (block.format + 1) % 4;
             switch (block.format)
             {
                 case 0:
-                    if (isNaN(value))
-                    {
-                        block.fieldImmediate.setValidator(null);
-                        block.fieldImmediate.setValue("");
-                    }
-                    block.fieldImmediate.setValidator(function(newValue) {
-                        return decimalRegexPattern.test(newValue) ? newValue : null;
-                    });
-                    block.fieldImmediate.setValue(parseInt(value, 2));
+                    block.fieldImmediate.setValue(value.charCodeAt(1));
                     break;
                 case 1:
-                    if (isNaN(value))
-                    {
-                        block.fieldImmediate.setValidator(null);
-                        block.fieldImmediate.setValue("0x");
-                    }
-                    block.fieldImmediate.setValidator(function(newValue) {
-                        return hexRegexPattern.test(newValue) ? newValue : null;
-                    });
-                    block.fieldImmediate.setValue("0x" + value.toString(16));
+                    block.fieldImmediate.setValue(`0x${parseInt(value).toString(16)}`);
                     break;
                 case 2:
-                    if (isNaN(value))
-                    {
-                        block.fieldImmediate.setValidator(null);
-                        block.fieldImmediate.setValue("0b");
-                    }
-                    block.fieldImmediate.setValidator(function(newValue) {
-                        return binaryRegexPattern.test(newValue) ? newValue : null;
-                    });
-                    block.fieldImmediate.setValue("0b" + parseInt(value).toString(2));
+                    block.fieldImmediate.setValue(`0b${parseInt(value).toString(2)}`);
                     break;
-            };
+                case 3:
+                    value = parseInt(value.replace("0b", ""), 2);
+                    string = `\'${String.fromCharCode(value)}\'`;
+                    if (charRegexPattern.test(string))
+                    {
+                        block.fieldImmediate.setValue(string);
+                    }
+                    else
+                    {
+                        block.fieldImmediate.setValue(value);
+                    }
+                    break;
+            }
         });
     }
 );

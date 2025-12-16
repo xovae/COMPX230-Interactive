@@ -131,6 +131,13 @@
                 <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
             </li>
         }
+        @if (Tabs.SPRegisters)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sp-tab" data-bs-toggle="tab" data-bs-target="#sp-tab-pane" type="button" role="tab"
+                aria-controls="sp-tab-pane" aria-selected="false">SP Registers</button>
+            </li>
+        }
         @if (Tabs.RAM)
         {
             <li class="nav-item" role="presentation">
@@ -179,7 +186,13 @@
         @if (Tabs.GPRegisters)
         {
             <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
-                <GPRegisters CPU="@board.CPU"/>
+                <Registers CPU="@board.CPU" registerType="@RegisterType.GP"/>
+            </div>
+        }
+        @if (Tabs.SPRegisters)
+        {
+            <div class="tab-pane fade" id="sp-tab-pane" role="tabpanel" aria-labelledby="sp-tab" tabindex="0">
+                <Registers CPU="@board.CPU" registerType="@RegisterType.SP"/>
             </div>
         }
         @if (Tabs.RAM)
@@ -191,7 +204,7 @@
         @if (Tabs.ParallelRegisters)
         {
             <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
-                <ParallelRegisters parallelMemory="@board.Parallel"/>
+                <PeripheralMemory parallelMemory="@board.Parallel"/>
             </div>
         }
         @if (Tabs.SerialPort)
@@ -225,7 +238,7 @@
     [Parameter]
     public string[]? Library { get; set; }
 
-    private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
+    public enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
 
     public List<BoardState> memoryStates = new List<BoardState>();
     public List<BoardState> gpRegisterStates = new List<BoardState>();

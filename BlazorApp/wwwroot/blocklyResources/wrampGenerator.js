@@ -35,8 +35,16 @@ function wordBlock(block, generator) {
 function specialMoveBlock(block, generator) {
   const instruction = block.getFieldValue('instruction');
   const register1 = block.getFieldValue('register1');
-  const register2 = block.getFieldValue('register2');
-  return `${instruction} ${register1}, ${register2}`;
+  const register2 = block.getFieldValue('register2')
+  const specialRegister = block.getFieldValue('specialRegister');
+  if (register1 != null)
+  {
+    return `${instruction} ${register1}, ${specialRegister}`;
+  }
+  else
+  {
+    return `${instruction} ${specialRegister}, ${register2}`
+  }
 }
 
 function memoryBlocks(block, generator) {

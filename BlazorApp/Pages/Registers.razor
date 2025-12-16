@@ -1,9 +1,17 @@
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
+@using System.Runtime.InteropServices
+@using System.Reflection.Metadata
 
 @code {
     [Parameter]
     required public SimpleWrampCpu CPU { get; set; }
+
+    [Parameter]
+    required public RegisterType registerType { get; set; }
+
+    public string[] GPRegisterNames = new string[] { "$0", "$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8", "$9", "$10", "$11", "$12", "$13", "$sp", "$ra" };
+    public string[] SPRegisterNames = new string[] { "$spr0", "$spr1", "$spr2", "$spr3", "$cctrl", "$estat", "$icount", "$ccount", "$evec", "$ear", "$esp", "$ers", "$ptable", "$rbase", "$spr14", "$spr15" };
 }
 
 @* Prints out the GPIO registers $1-$13 in decimal, hex, and binary *@
@@ -18,21 +26,19 @@
             </tr>
         </thead>
         <tbody>
-            @for (int i = 1; i <= 15; i++)
+            @for (uint i = 1; i <= 15; i++)
             {
-                uint val = CPU.mGpRegisters[(RegisterFile.GpRegister)i];
+                uint val;
                 <tr>
-                    @if (i == 14)
+                    @if (registerType == RegisterType.GP)
                     {
-                        <td>$@i ($sp)</td>
-                    }
-                    else if (i == 15)
-                    {
-                        <td>$@i ($ra)</td>
+                        val = CPU.mGpRegisters[i];
+                        <td>@GPRegisterNames[i]</td>
                     }
                     else
                     {
-                        <td>$@i</td>
+                        val = CPU.mSpRegisters[i];
+                        <td>@SPRegisterNames[i]</td>
                     }
                     <td>@val</td>
                     <td>@("0x" + val.ToString("X8"))</td>
