@@ -1,213 +1,212 @@
 @using RexSimulator.Hardware
-@using RexSimulator.Hardware.Rex
 @using RexSimulator.Hardware.Wramp
-@using System.ComponentModel
-@using System.Security.Permissions
 @using System.Text
-@using System.Text.Json
-@using System.Runtime.Intrinsics.X86
-@using System.Diagnostics.Contracts
-@using System.ComponentModel.Design
 @using System.Text.RegularExpressions
+@using System.Runtime.InteropServices
+
 @inject IJSRuntime JSRuntime
 
-<h2>Controls</h2>
-<button type="button" class="btn btn-warning wrampButton" @onclick="OnCompileClicked">Compile</button>
+<div class="controls">
+    <h2>Controls</h2>
+    <button type="button" class="btn btn-warning me-2" @onclick="OnCompileClicked">Compile</button>
 
-<div class="btn-group" role="group" aria-label="WRAMP controls">
-    <button type="button" class="btn btn-info" @onclick="Step">Step</button>
-    <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
-    <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
-    <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
+    <div class="btn-group" role="group" aria-label="WRAMP controls">
+        <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+        <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
+        <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
+        <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
+    </div>
 </div>
 
-@if (Tabs.PhysicalComponents)
-{
-    <div id="accordionWRAMP" class="accordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    Physical Components
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
+<div class="overflow-scroll">
+    @if (Tabs.PhysicalComponents)
+    {
+        <div class="accordion" id="accordionWRAMP">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Physical Components
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
 
-                    <div class="row justify-content-center">
-                        @for (int i = 0; i < 16; i++)
-                        {
-                            int pos = i;
-                            string id = "led" + i;
-                            <div class="led col-auto" id="@id"></div>
-                        }
-                    </div>
+                        <div class="row justify-content-center">
+                            @for (int i = 0; i < 16; i++)
+                            {
+                                int pos = i;
+                                string id = "led" + i;
+                                <div class="led col-auto" id="@id"></div>
+                            }
+                        </div>
 
-                    <div id="switches">
-                        @for (int i = 0; i < 16; i++)
-                        {
-                            int pos = i;
-                            int value = (int)Math.Pow(2, pos);
-                            string ID = "switch" + i;
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)">
-                                <label class="form-check-label" for="@ID">Switch @pos</label>
+                        <div id="switches">
+                            @for (int i = 0; i < 16; i++)
+                            {
+                                int pos = i;
+                                int value = (int)Math.Pow(2, pos);
+                                string ID = "switch" + i;
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)">
+                                    <label class="form-check-label" for="@ID">Switch @pos</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            @for (int i = 0; i < 3; i++)
+                            {
+                                int pos = i;
+                                <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
+                            }
+                        </div>
+
+                        <div class="row justify-content-center">
+                            <div id="sevenSegOne" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
                             </div>
-                        }
-                    </div>
-
-                    <div class="d-flex justify-content-center">
-                        @for (int i = 0; i < 3; i++)
-                        {
-                            int pos = i;
-                            <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
-                        }
-                    </div>
-
-                    <div class="row justify-content-center">
-                        <div id="sevenSegOne" class="display-container display-size-12 col-auto">
-                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                            <div class="segment-h"></div>
-                        </div>
-                        <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
-                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                            <div class="segment-h"></div>
-                        </div>
-                        <div id="sevenSegThree" class="display-container display-size-12 col-auto">
-                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                            <div class="segment-h"></div>
-                        </div>
-                        <div id="sevenSegFour" class="display-container display-size-12 col-auto">
-                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                            <div class="segment-h"></div>
+                            <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
+                            <div id="sevenSegThree" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
+                            <div id="sevenSegFour" class="display-container display-size-12 col-auto">
+                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                                <div class="segment-h"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    }
+
+    <ul class="nav nav-tabs" id="wsimTabs" role="tablist">
+        @if (Tabs.Instructions && Instructions != null)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="true">Code</button>
+            </li>
+        }
+        @if (Tabs.GPRegisters)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
+            </li>
+        }
+        @if (Tabs.RAM)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
+            </li>
+        }
+        @if (Tabs.ParallelRegisters)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
+            </li>
+        }
+        @if (Tabs.SerialPort)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
+            </li>
+        }
+        @if (Tabs.Library && Library != null)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
+            </li>
+        }
+        <li class="nav-item ms-auto" role="presentation" @onclick="quack">
+            <button class="nav-link duck" id="duck-tab"><img src="img/reginald.png" class="duckImg" alt="duck!"></button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        @if (Tabs.Instructions && Instructions != null)
+        {
+            <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
+                <pre>@((MarkupString)Instructions)</pre>
+            </div>
+            <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
+                <p id="wsimCode"></p>
+            </div>
+        }
+        else
+        {
+            <div class="tab-pane fade show active" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
+                <p id="wsimCode"></p>
+            </div>
+        }
+        @if (Tabs.GPRegisters)
+        {
+            <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
+                <GPRegisters CPU="@board.CPU"/>
+            </div>
+        }
+        @if (Tabs.RAM)
+        {
+            <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
+                <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels"/>
+            </div>
+        }
+        @if (Tabs.ParallelRegisters)
+        {
+            <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
+                <ParallelRegisters parallelMemory="@board.Parallel"/>
+            </div>
+        }
+        @if (Tabs.SerialPort)
+        {
+            <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
+                <SerialPort serial="@board.Serial1"/>
+            </div>
+        }
+        @if (Tabs.Library && Library != null)
+        {
+            <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
+                <pre>@((MarkupString)Library[1])</pre>
+            </div>
+        }
     </div>
-}
-
-<ul class="nav nav-tabs" id="wsimTabs" role="tablist">
-    @if (Tabs.Instructions && Instructions != null)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="true">Code</button>
-        </li>
-    }
-    @if (Tabs.GPRegisters)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
-        </li>
-    }
-    @if (Tabs.RAM)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
-        </li>
-    }
-    @if (Tabs.ParallelRegisters)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
-        </li>
-    }
-    @if (Tabs.SerialPort)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
-        </li>
-    }
-    @if (Tabs.Library && Library != null)
-    {
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
-        </li>
-    }
-    <li class="nav-item ms-auto" role="presentation" @onclick="quack">
-        <button class="nav-link duck" id="duck-tab"><img src="img/reginald.png" class="duckImg" alt="duck!"></button>
-    </li>
-</ul>
-
-<div class="tab-content">
-    @if (Tabs.Instructions && Instructions != null)
-    {
-        <div class="tab-pane fade show active scroll" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
-            <pre>@((MarkupString)Instructions)</pre>
-        </div>
-        <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
-            <p id="wsimCode"></p>
-        </div>
-    }
-    else
-    {
-        <div class="tab-pane fade show active" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
-            <p id="wsimCode"></p>
-        </div>
-    }
-    @if (Tabs.GPRegisters)
-    {
-        <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
-            <GPRegisters CPU="@board.CPU"/>
-        </div>
-    }
-    @if (Tabs.RAM)
-    {
-        <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-            <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels"/>
-        </div>
-    }
-    @if (Tabs.ParallelRegisters)
-    {
-        <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
-            <ParallelRegisters parallelMemory="@board.Parallel"/>
-        </div>
-    }
-    @if (Tabs.SerialPort)
-    {
-        <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-            <SerialPort serial="@board.Serial1"/>
-        </div>
-    }
-    @if (Tabs.Library && Library != null)
-    {
-        <div class="tab-pane fade scroll" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
-            <pre>@((MarkupString)Library[1])</pre>
-        </div>
-    }
 </div>
 
 @code {

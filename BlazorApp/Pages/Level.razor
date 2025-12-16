@@ -1,22 +1,9 @@
-﻿@using RexSimulator.Hardware
-@using RexSimulator.Hardware.Rex
-@using RexSimulator.Hardware.Wramp
-@using System.ComponentModel
-@using System.Security.Permissions
-@using System.Text
-@using System.Text.Json
-@using System.Runtime.Intrinsics.X86
-@using System.Diagnostics.Contracts
-@using System.ComponentModel.Design
+﻿<div class="col" id="blocklyDiv">
+    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@Toolbox"/>
+</div>
 
-<div class="row">
-    <div class="col mx-1" id="blockly">
-        <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@Toolbox"/>
-    </div>
-
-    <div class="col mx-1">
-        <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" Tabs="@Tabs" Instructions="@Instructions" Library="@Library"/>
-    </div>
+<div class="col d-flex flex-column h-100">
+    <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" Tabs="@Tabs" Instructions="@Instructions" Library="@Library"/>
 </div>
 
 @code {

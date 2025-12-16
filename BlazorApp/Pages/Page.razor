@@ -1,0 +1,39 @@
+@using System.Text.Json
+
+<div class="flex-column d-flex vh-100">
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img id="logo" src="img/reginald.png"/>
+                <span class="h1">WRAMP SIM</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid flex-grow-1 overflow-hidden pb-3">
+        <div class="row h-100">
+            <LevelSelector Level="@Level"/>
+            <Level toolbox="@JsonSerializer.Serialize(Toolbox)" registers="@Registers" tabs="@tabs" Instructions="@Instructions" Library="@Library"/>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    required public string Level { get; set; }
+
+    [Parameter]
+    required public Toolbox Toolbox { get; set; }
+
+    [Parameter]
+    required public List<KeyValuePair<int, int>> Registers { get; set; }
+
+    [Parameter]
+    required public Tabs tabs { get; set; }
+
+    [Parameter]
+    public string? Instructions { get; set; }
+
+    [Parameter]
+    public string[]? Library { get; set; }
+}

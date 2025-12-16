@@ -1,0 +1,50 @@
+@page "/levelTwo"
+
+<PageTitle>Level 2</PageTitle>
+
+<Page Level="levelTwo" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@Instructions"/>
+
+@code {
+    public List<KeyValuePair<int, int>> registers = new() {
+        new KeyValuePair<int, int> (1, 50),
+        new KeyValuePair<int, int> (2, 13),
+    };
+
+    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true);
+
+    public string Instructions = """
+    Make:
+        $1 = 50
+        $2 = 13
+    """;
+
+    public string serialOutput = "hello!";
+
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" }
+                }
+            }
+        }
+    };
+}

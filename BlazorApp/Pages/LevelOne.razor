@@ -1,26 +1,8 @@
 @page "/levelOne"
-@using Microsoft.AspNetCore.Components.Infrastructure
-@using RexSimulator.Hardware.Wramp
-@using System.Security.Principal
-@using System.Text.Json
 
 <PageTitle>Home</PageTitle>
 
-<div class="container-fluid" id="body">
-
-    <div class="d-flex align-items-center">
-        <img id="logo" src="img/reginald.png"/>
-        <h1>WRAMP Sim</h1>
-    </div>
-
-    <div class="row">
-        <LevelSelector Level="levelOne"/>
-
-        <div class="col">
-            <Level Toolbox="@JsonSerializer.Serialize(toolbox)" Registers="@registers" Tabs="@tabs" Instructions="@instructions" Library="@Library"/>
-        </div>
-    </div>
-</div>
+<Page Level="levelOne" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@Instructions" Library="@Library"/>
 
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
@@ -30,7 +12,7 @@
 
     public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true, RAM: false, ParallelRegisters: false, SerialPort: false, PhysicalComponents: false, Library: true);
 
-    public string instructions = """
+    public string Instructions = """
     Make:
         $1 = 5
         $2 = 10

@@ -1,26 +1,9 @@
 @page "/"
-@using Microsoft.AspNetCore.Components.Infrastructure
-@using RexSimulator.Hardware.Wramp
-@using System.Security.Principal
-@using System.Text.Json
 
-<PageTitle>Home</PageTitle>
+<PageTitle>WRAMP Simulator</PageTitle>
 
-<div class="container-fluid" id="body">
+<Page Level="sandbox" Toolbox="@toolbox" Registers="@registers" tabs="@tabs"/>
 
-    <div class="d-flex align-items-center vh-10">
-        <img id="logo" src="img/reginald.png"/>
-        <h1>WRAMP Sim</h1>
-    </div>
-
-    <div class="row vh-90">
-        <LevelSelector Level="home"/>
-
-        <div class="col">
-            <Level toolbox="@JsonSerializer.Serialize(toolbox)" registers="@registers" tabs="@tabs"/>
-        </div>
-    </div>
-</div>
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
         new (13, 99999)

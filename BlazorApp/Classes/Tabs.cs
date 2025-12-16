@@ -7,7 +7,7 @@ public class Tabs {
     public bool PhysicalComponents;
     public bool Library;
 
-    public Tabs(bool Instructions, bool GPRegisters, bool RAM, bool ParallelRegisters, bool SerialPort, bool PhysicalComponents, bool Library)
+    public Tabs(bool Instructions = false, bool GPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool PhysicalComponents = false, bool Library = false)
     {
         this.Instructions = Instructions;
         this.GPRegisters = GPRegisters;
