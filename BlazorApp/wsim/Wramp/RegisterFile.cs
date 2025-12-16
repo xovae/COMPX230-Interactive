@@ -47,7 +47,7 @@ namespace RexSimulator.Hardware.Wramp
         public string Name { get { return mName; } }
         #endregion
 
-        private uint[] mRegisters;
+        public uint[] mRegisters;
 
         /// <summary>
         /// Creates a new register file.

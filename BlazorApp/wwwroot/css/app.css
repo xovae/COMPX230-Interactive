@@ -1,6 +1,7 @@
 html, body {
     width: 100%;
     height: 100%;
+    margin: 0;
 }
 
 #logo {
@@ -77,9 +78,18 @@ html, body {
     width: 15px;
 }
 
+.scroll {
+    height: 75vh;
+    overflow-y: scroll;
+}
+
 pre {
-    font-family: monospace;
-    font-size: 1em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: inherit;
 }
 
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */

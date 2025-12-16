@@ -39,11 +39,11 @@ namespace RexSimulator.Hardware
         #endregion
 
         #region Internal Logic
-        public readonly RegisterFile mGpRegisters, mSpRegisters;
+        public RegisterFile mGpRegisters, mSpRegisters;
         private ALU mAlu;
-        private uint mPC;
+        public uint mPC;
         private IR mIR;
-        private uint mInterruptStatus = 0;
+        public uint mInterruptStatus = 0;
         private MPU mMPU;
         #endregion
 

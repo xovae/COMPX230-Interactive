@@ -29,7 +29,7 @@ namespace RexSimulator.Hardware.Rex
     {
         #region Members
         protected uint mBaseAddress;
-        protected uint[] mMemory;
+        public uint[] mMemory;
         protected Bus mAddressBus, mDataBus, mIrqBus = null!;
         protected string mName;
         protected int mIrqNumber = int.MinValue, mIrqOffset = int.MinValue;

@@ -8,108 +8,108 @@
 @using System.Runtime.Intrinsics.X86
 @using System.Diagnostics.Contracts
 @using System.ComponentModel.Design
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 
-<div>
-    <h2>Controls</h2>
-    <button type="button" class="btn btn-warning wrampButton" @onclick="OnCompileClicked">Compile</button>
+<h2>Controls</h2>
+<button type="button" class="btn btn-warning wrampButton" @onclick="OnCompileClicked">Compile</button>
 
-    <div class="btn-group" role="group" aria-label="WRAMP controls">
-        <button type="button" class="btn btn-info" @onclick="Step">Step</button>
-        <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
-        <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
-        <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
-    </div>
+<div class="btn-group" role="group" aria-label="WRAMP controls">
+    <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+    <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
+    <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
+    <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
+</div>
 
-    @if (Tabs.PhysicalComponents)
-    {
-        <div id="accordionWRAMP" class="accordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                        Physical Components
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
+@if (Tabs.PhysicalComponents)
+{
+    <div id="accordionWRAMP" class="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Physical Components
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
 
-                        <div class="row justify-content-center">
-                            @for (int i = 0; i < 16; i++)
-                            {
-                                int pos = i;
-                                string id = "led" + i;
-                                <div class="led col-auto" id="@id"></div>
-                            }
+                    <div class="row justify-content-center">
+                        @for (int i = 0; i < 16; i++)
+                        {
+                            int pos = i;
+                            string id = "led" + i;
+                            <div class="led col-auto" id="@id"></div>
+                        }
+                    </div>
+
+                    <div id="switches">
+                        @for (int i = 0; i < 16; i++)
+                        {
+                            int pos = i;
+                            int value = (int)Math.Pow(2, pos);
+                            string ID = "switch" + i;
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)">
+                                <label class="form-check-label" for="@ID">Switch @pos</label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        @for (int i = 0; i < 3; i++)
+                        {
+                            int pos = i;
+                            <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
+                        }
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div id="sevenSegOne" class="display-container display-size-12 col-auto">
+                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                            <div class="segment-h"></div>
                         </div>
-
-                        <div id="switches">
-                            @for (int i = 0; i < 16; i++)
-                            {
-                                int pos = i;
-                                int value = (int)Math.Pow(2, pos);
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="@pos" @onclick="() => toggleSwitch(pos)">
-                                    <label class="form-check-label" for="@pos">Switch @pos</label>
-                                </div>
-                            }
+                        <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
+                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                            <div class="segment-h"></div>
                         </div>
-
-                        <div class="d-flex justify-content-center">
-                            @for (int i = 0; i < 3; i++)
-                            {
-                                int pos = i;
-                                <button type="button" class="btn btn-primary wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
-                            }
+                        <div id="sevenSegThree" class="display-container display-size-12 col-auto">
+                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                            <div class="segment-h"></div>
                         </div>
-
-                        <div class="row justify-content-center">
-                            <div id="sevenSegOne" class="display-container display-size-12 col-auto">
-                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                <div class="segment-h"></div>
-                            </div>
-                            <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
-                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                <div class="segment-h"></div>
-                            </div>
-                            <div id="sevenSegThree" class="display-container display-size-12 col-auto">
-                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                <div class="segment-h"></div>
-                            </div>
-                            <div id="sevenSegFour" class="display-container display-size-12 col-auto">
-                                <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                <div class="segment-h"></div>
-                            </div>
+                        <div id="sevenSegFour" class="display-container display-size-12 col-auto">
+                            <div class="segment-x segment-a"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-b"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-c"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-d"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-e"><span class="segment-border"></span></div>
+                            <div class="segment-y segment-f"><span class="segment-border"></span></div>
+                            <div class="segment-x segment-g"><span class="segment-border"></span></div>
+                            <div class="segment-h"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    }
-</div>
+    </div>
+}
 
 <ul class="nav nav-tabs" id="wsimTabs" role="tablist">
     @if (Tabs.Instructions && Instructions != null)
@@ -165,8 +165,8 @@
 <div class="tab-content">
     @if (Tabs.Instructions && Instructions != null)
     {
-        <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
-            <p>@((MarkupString)Instructions.Replace("\n", "<br />"))</p>
+        <div class="tab-pane fade show active scroll" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
+            <pre>@((MarkupString)Instructions)</pre>
         </div>
         <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
             <p id="wsimCode"></p>
@@ -181,31 +181,31 @@
     @if (Tabs.GPRegisters)
     {
         <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
-            <GPRegisters CPU="@board.CPU" />
+            <GPRegisters CPU="@board.CPU"/>
         </div>
     }
     @if (Tabs.RAM)
     {
         <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
-            <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels" />
+            <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels"/>
         </div>
     }
     @if (Tabs.ParallelRegisters)
     {
         <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
-            <ParallelRegisters parallelMemory="@board.Parallel" />
+            <ParallelRegisters parallelMemory="@board.Parallel"/>
         </div>
     }
     @if (Tabs.SerialPort)
     {
         <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-            <SerialPort serial="@board.Serial1" />
+            <SerialPort serial="@board.Serial1"/>
         </div>
     }
     @if (Tabs.Library && Library != null)
     {
-        <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
-            <pre>@((MarkupString)Library[1].Replace("\n", "<br />"))</pre>
+        <div class="tab-pane fade scroll" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
+            <pre>@((MarkupString)Library[1])</pre>
         </div>
     }
 </div>
@@ -228,6 +228,13 @@
 
     private enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
 
+    public List<BoardState> memoryStates = new List<BoardState>();
+    public List<BoardState> gpRegisterStates = new List<BoardState>();
+    public List<BoardState> spRegisterStates = new List<BoardState>();
+    public List<BoardState> interruptStates = new List<BoardState>();
+    public List<BoardState> pRegisterStates = new List<BoardState>();
+    public List<uint> pcStates = new List<uint>();
+
     required public string[] blockIDs;
     required public List<string> labels;
 
@@ -237,14 +244,13 @@
 
     bool instructionsLoaded = false;
     bool running = false;
-    bool hexDecode = true;
 
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
             //Load SSDs on page load
-            updateDisplays();
+            updateSSDs();
             StateHasChanged();
         }
     }
@@ -264,13 +270,28 @@
         //Reset board
         board.Reset();
         running = false;
+
+        //Remove any stored states
+        memoryStates.Clear();
+        gpRegisterStates.Clear();
+        spRegisterStates.Clear();
+        pcStates.Clear();
+        interruptStates.Clear();
+        pRegisterStates.Clear();
+
+        //Update UI
+        updateSSDs();
+        updateLEDs();
+        updateSwitches();
         StateHasChanged();
 
         byte[] codeBytes;
 
         if (Library != null)
         {
-            string combinedCode = args.code + "\n" + Library[1];
+            string htmlTags = @"<table>|</table>|<tr>|</tr>|<td>|</td>\n";
+            string libraryCode = Regex.Replace(Library[1], htmlTags, "");
+            string combinedCode = args.code + "\n" + libraryCode;
             codeBytes = Encoding.UTF8.GetBytes(combinedCode);
         }
         else
@@ -288,7 +309,7 @@
             if (finalAddress != 0)
             {
                 instructionsLoaded = true;
-                await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[0]);
+                await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[0]);
             }
             StateHasChanged();
         }
@@ -353,23 +374,36 @@
                     await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
                     break;
                 default:
-                    //If the user used jr $ra
+                    //If the user used jr $ra correctly
                     if (board.CPU.PC == 0xFFFFF)
                     {
                         running = false;
                         Verify();
                         break;
                     }
+
+                    //Store board state
+                    StoreBoardState();
+
+                    //Execute next instruction
                     while(!board.Tick());
-                    //Highlight next block to be executed
+
+                    //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
                     try
                     {
-                        await JSRuntime.InvokeAsync<byte[]>("highlightBlock", blockIDs[board.CPU.PC]);
+                        await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
                     }
-                    catch {}
+                    catch
+                    {
+                        await JSRuntime.InvokeVoidAsync("highlightBlock", null);
+                    }
+
                     //Update SSDs & LEDs
-                    updateDisplays();
+                    updateSSDs();
                     updateLEDs();
+                    updateSwitches();
+
+                    //Update UI, and add a delay between instructions
                     await InvokeAsync(StateHasChanged);
                     await Task.Delay(100);
                     break;
@@ -395,9 +429,102 @@
         }
     }
 
+    void StoreBoardState()
+    {
+        //Store board state, either creating a new entry if it is unique, or incrementing the repeat value for the previous state
+        if (memoryStates.Count == 0 || !memoryStates[^1].Keys.SequenceEqual(board.RAM.mMemory))
+        {
+            memoryStates.Add(new ((uint[])board.RAM.mMemory.Clone()));
+        }
+        else
+        {
+            memoryStates[^1].Repeats++;
+        }
+        if (gpRegisterStates.Count == 0 || !gpRegisterStates[^1].Keys.SequenceEqual(board.CPU.mGpRegisters.mRegisters))
+        {
+            gpRegisterStates.Add(new ((uint[])board.CPU.mGpRegisters.mRegisters.Clone()));
+        }
+        else
+        {
+            gpRegisterStates[^1].Repeats++;
+        }
+        if (spRegisterStates.Count == 0 || !spRegisterStates[^1].Keys.SequenceEqual(board.CPU.mSpRegisters.mRegisters))
+        {
+            spRegisterStates.Add(new ((uint[])board.CPU.mSpRegisters.mRegisters.Clone()));
+        }
+        else
+        {
+            spRegisterStates[^1].Repeats++;
+        }
+        if (interruptStates.Count == 0 || board.CPU.InterruptStatus != interruptStates[^1].Key)
+        {
+            interruptStates.Add(new BoardState(board.CPU.InterruptStatus));
+        }
+        else
+        {
+            interruptStates[^1].Repeats++;
+        }
+        if (pRegisterStates.Count == 0 || !pRegisterStates[^1].Keys.SequenceEqual(board.Parallel.mMemory))
+        {
+            pRegisterStates.Add(new BoardState((uint[])board.Parallel.mMemory.Clone()));
+        }
+        else
+        {
+            pRegisterStates[^1].Repeats++;
+        }
+        pcStates.Add(board.CPU.PC);
+    }
+
     //Go back one board state
     void Undo()
     {
+        //If there is a state to revert to
+        if (pcStates.Count != 0)
+        {
+            //Restore previous states
+            board.RAM.mMemory = memoryStates[^1].Keys;
+            board.CPU.mGpRegisters.mRegisters = gpRegisterStates[^1].Keys;
+            board.CPU.mSpRegisters.mRegisters = spRegisterStates[^1].Keys;
+            board.CPU.InterruptStatus = (uint)interruptStates[^1].Key;
+            board.CPU.mPC = pcStates[^1];
+            board.Parallel.mMemory = pRegisterStates[^1].Keys;
+
+            //Highlight previous block (try catch used to account for library code which is un-highlightable)
+            try
+            {
+                JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
+            }
+            catch {}
+
+            //Remove restored states from list or decrement number of repeats
+            if (--memoryStates[^1].Repeats < 0)
+            {
+                memoryStates.RemoveAt(memoryStates.Count - 1);
+            }
+            if (--gpRegisterStates[^1].Repeats < 0)
+            {
+                gpRegisterStates.RemoveAt(gpRegisterStates.Count - 1);
+            }
+            if (--spRegisterStates[^1].Repeats < 0)
+            {
+                spRegisterStates.RemoveAt(spRegisterStates.Count - 1);
+            }
+            if (--interruptStates[^1].Repeats < 0)
+            {
+                interruptStates.RemoveAt(interruptStates.Count - 1);
+            }
+            if (--pRegisterStates[^1].Repeats < 0)
+            {
+                pRegisterStates.RemoveAt(pRegisterStates.Count - 1);
+            }
+            pcStates.RemoveAt(pcStates.Count - 1);
+
+            //Update UI
+            updateLEDs();
+            updateSSDs();
+            updateSwitches();
+            StateHasChanged();
+        }
     }
 
     void toggleSwitch(int pos)
@@ -415,7 +542,7 @@
         board.Parallel.Buttons = 0;
     }
 
-    void updateDisplays()
+    void updateSSDs()
     {
         uint[] SSD_DECODE = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x7, 0x7F, 0x6F, 0x77, 0x7C, 0x39, 0x5E, 0x79, 0x71 };
         uint[] values = {board.Parallel.LeftLeftSSD, board.Parallel.LeftRightSSD, board.Parallel.LeftSSD, board.Parallel.RightSSD};
@@ -458,6 +585,18 @@
             uint value = LEDValues & 1;
             JSRuntime.InvokeVoidAsync("changeLED", ID, value);
             LEDValues >>= 1;
+        }
+    }
+
+    void updateSwitches()
+    {
+        uint switchValues = board.Parallel.Switches;
+        for (int i = 0; i < 16; i++)
+        {
+            string ID = "switch" + i;
+            uint value = switchValues & 1;
+            JSRuntime.InvokeVoidAsync("changeSwitch", ID, value);
+            switchValues >>= 1;
         }
     }
 

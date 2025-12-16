@@ -22,3 +22,15 @@ window.changeLED = (id, value) => {
 		LED.style.backgroundColor = "black";
 	}
 }
+
+window.changeSwitch = (id, value) => {
+	let switchElement = document.getElementById(id);
+	if (value == 1)
+	{
+		switchElement.checked = true;
+	}
+	else
+	{
+		switchElement.checked = false;
+	}
+}
