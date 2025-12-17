@@ -9,6 +9,10 @@ html, body {
     margin-right: 10px;
 }
 
+#blocklyDiv {
+    height: 95%
+}
+
 .tab-pane {
     margin-top: 10px;
 }

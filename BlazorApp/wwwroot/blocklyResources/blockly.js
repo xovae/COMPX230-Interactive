@@ -1,5 +1,5 @@
 window.initBlockly = (tool) => {
-    const toolbox = JSON.parse(tool);
+    toolbox = JSON.parse(tool);
     workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
 }
 
@@ -194,9 +194,8 @@ const fullToolbox = {
                 {
                     kind: 'block',
                     type: 'returnFromException'
-                },
+                }
             ]
-
         }
     ]
 };
@@ -864,4 +863,13 @@ function updateCode(event) {
 
 window.initUpdate = () => {
     workspace.addChangeListener(updateCode);
+}
+
+window.saveWorkspace = () => {
+    workspaceJSON = JSON.stringify(Blockly.serialization.workspaces.save(workspace));
+    window.saveFile(workspaceJSON, "workspace.json");
+}
+
+window.loadWorkspace = (workspaceJSON) => {
+    Blockly.serialization.workspaces.load(JSON.parse(workspaceJSON), workspace);
 }

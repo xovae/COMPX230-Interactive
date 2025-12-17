@@ -7,10 +7,14 @@ window.saveCode = async () => {
     code = document.getElementById("wsimCode").innerHTML;
     code = code.replaceAll("<br>", "\n");
     code = code.replaceAll("&emsp;", "\t")
-    const file = new Blob([code], { type: 'text/plain' });
+    saveFile(code, "code.s");
+}
+
+window.saveFile = async (content, name) => {
+    const file = new Blob([content], { type: 'text/plain' });
 
     const link = document.createElement('a');
-    link.download = "code.s";
+    link.download = name;
     link.href = URL.createObjectURL(file);
     document.body.appendChild(link);
     link.click();

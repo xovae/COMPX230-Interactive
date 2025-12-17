@@ -1,7 +1,7 @@
 import WasmModule from './wasm.js'
 import WLinkModule from './wlink.js'
 
-export async function assembleAndLink(fileName, content) {
+window.assembleAndLink = async (fileName, content) => {
     //Create instances of the JS wrappers for Wasm and WLink
     const WasmModuleInstance = await WasmModule();
     const WLinkModuleInstance = await WLinkModule();
@@ -26,5 +26,3 @@ export async function assembleAndLink(fileName, content) {
     const srecData = WLinkModuleInstance.FS.readFile('output.srec');
     return srecData;
 }
-
-window.assembleAndLink = assembleAndLink;
