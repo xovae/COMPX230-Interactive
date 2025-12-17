@@ -47,7 +47,8 @@
                                 int value = (int)Math.Pow(2, pos);
                                 string ID = "switch" + i;
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)"
+                                    style="transform: rotate(-90deg); margin: 0.25rem 0;">
                                     <label class="form-check-label" for="@ID">Switch @pos</label>
                                 </div>
                             }
