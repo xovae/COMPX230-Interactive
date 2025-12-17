@@ -1,6 +1,15 @@
 @using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 
+<div class="btn-group mb-2" role="group" aria-label="Code Controls">
+    <button type="button" class="btn btn-warning" @onclick="saveWorkspace">Save</button>
+    <label class="btn btn-info">Load
+        <InputFile hidden id="workspaceInput" OnChange="loadWorkspace"/>
+    </label>
+</div>
+
+<div id="blocklyDiv"></div>
+
 @code {
     [Parameter]
     public EventCallback<(string, string[], List<string>)> Exported { get; set; }
@@ -71,5 +80,27 @@
         {
             await JSRuntime.InvokeVoidAsync("alert", "You must declare a .text segment with global main, and a label for main!");
         }
+    }
+
+    async Task saveWorkspace()
+    {
+        await JSRuntime.InvokeVoidAsync("saveWorkspace");
+    }
+
+    async Task loadWorkspace(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            string workspaceJSON;
+            using (Stream s = e.File.OpenReadStream())
+            {
+                using (StreamReader sr = new StreamReader(s))
+                {
+                    workspaceJSON = await sr.ReadToEndAsync();
+                    await JSRuntime.InvokeVoidAsync("loadWorkspace", workspaceJSON);
+                }
+            }
+        }
+        catch {}
     }
 }

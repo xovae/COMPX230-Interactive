@@ -35,33 +35,28 @@
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        @if (Tabs.LEDs)
-                        {
-                            <div class="row justify-content-center">
-                                @for (int i = 15; i != -1; i--)
-                                {
-                                    int pos = i;
-                                    string id = "led" + i;
-                                    <div class="led col-auto" id="@id"></div>
-                                }
-                            </div>
-                        }
+                        <div class="row justify-content-center mb-1">
+                            @for (int i = 15; i != -1; i--)
+                            {
+                                int pos = i;
+                                int value = (int)Math.Pow(2, pos);
+                                string ledID = "led" + i;
+                                string switchID = "switch" + i;
 
-                        @if (Tabs.Switches)
-                        {
-                            <div id="switches">
-                                @for (int i = 0; i < 16; i++)
-                                {
-                                    int pos = i;
-                                    int value = (int)Math.Pow(2, pos);
-                                    string ID = "switch" + i;
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="@ID" @onclick="() => toggleSwitch(pos)">
-                                        <label class="form-check-label" for="@ID">Switch @pos</label>
-                                    </div>
-                                }
-                            </div>
-                        }
+                                <div class="col-auto p-1">
+                                    @if (Tabs.LEDs)
+                                    {
+                                        <div class="led mb-3" id="@ledID"></div>
+                                    }
+                                    @if (Tabs.Switches)
+                                    {
+                                        <div class="form-check form-switch wsimSwitch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="@switchID" @onclick="() => toggleSwitch(pos)">
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
 
                         @if (Tabs.Buttons)
                         {
@@ -77,46 +72,10 @@
                         @if (Tabs.SSDs)
                         {
                             <div class="row justify-content-center">
-                                <div id="sevenSegOne" class="display-container display-size-12 col-auto">
-                                    <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                    <div class="segment-h"></div>
-                                </div>
-                                <div id="sevenSegTwo" class="display-container display-size-12 col-auto">
-                                    <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                    <div class="segment-h"></div>
-                                </div>
-                                <div id="sevenSegThree" class="display-container display-size-12 col-auto">
-                                    <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                    <div class="segment-h"></div>
-                                </div>
-                                <div id="sevenSegFour" class="display-container display-size-12 col-auto">
-                                    <div class="segment-x segment-a"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-b"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-c"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-d"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-e"><span class="segment-border"></span></div>
-                                    <div class="segment-y segment-f"><span class="segment-border"></span></div>
-                                    <div class="segment-x segment-g"><span class="segment-border"></span></div>
-                                    <div class="segment-h"></div>
-                                </div>
+                                <SSD ID="sevenSegOne"/>
+                                <SSD ID="sevenSegTwo"/>
+                                <SSD ID="sevenSegThree"/>
+                                <SSD ID="sevenSegFour"/>
                             </div>
                         }
                     </div>

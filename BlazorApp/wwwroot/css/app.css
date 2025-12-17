@@ -26,11 +26,8 @@ html, body {
     background-color: black;
 }
 
-#switches {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin: 20px 0;
+.wsimSwitch {
+    rotate: 90deg;
 }
 
 .wsimTable th, td {

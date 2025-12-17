@@ -36,10 +36,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmxvY2tseS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/GPRegisters.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvR1BSZWdpc3RlcnMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Level.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -50,10 +46,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelSelector.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxTZWxlY3Rvci5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelTwo.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxUd28ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Memory.razor]
@@ -68,8 +60,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/ParallelRegisters.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFyYWxsZWxSZWdpc3RlcnMucmF6b3I=
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/PeripheralMemory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGVyaXBoZXJhbE1lbW9yeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Registers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVnaXN0ZXJzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Sandbox.razor]
@@ -78,6 +74,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/SerialPort.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2VyaWFsUG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/SSD.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU1NELnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/WSIM.razor]
