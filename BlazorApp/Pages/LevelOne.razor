@@ -2,7 +2,7 @@
 
 <PageTitle>Home</PageTitle>
 
-<Page Level="levelOne" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@Instructions" Library="@Library"/>
+<Page Level="levelOne" Toolbox="@toolbox" Registers="@registers" tabs="@tabs"  Library="@Library"/>
 
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
@@ -10,7 +10,7 @@
         new KeyValuePair<int, int> (2, 10),
     };
 
-    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true, RAM: false, ParallelRegisters: false, SerialPort: false, PhysicalComponents: false, Library: true);
+    public Tabs tabs = new Tabs(Instructions: false, GPRegisters: true, RAM: false, ParallelRegisters: false, SerialPort: false, PhysicalComponents: false, Library: true);
 
     public string Instructions = """
     Make:

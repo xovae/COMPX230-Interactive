@@ -2,7 +2,7 @@
 
 <PageTitle>Level 2</PageTitle>
 
-<Page Level="levelTwo" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@Instructions"/>
+<Page Level="levelTwo" Toolbox="@toolbox" Registers="@registers" tabs="@tabs"/> 
 
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
@@ -10,7 +10,7 @@
         new KeyValuePair<int, int> (2, 13),
     };
 
-    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true);
+    public Tabs tabs = new Tabs(Instructions: false, GPRegisters: true);
 
     public string Instructions = """
     Make:

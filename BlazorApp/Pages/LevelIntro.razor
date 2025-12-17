@@ -1,0 +1,83 @@
+@page "/levelIntro"
+
+<PageTitle>Introduction to WRAMP using Blockly</PageTitle>
+
+<Page Level="levelIntro" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@InstructionsContent" />
+
+@code {
+    public List<KeyValuePair<int, int>> registers = new() {
+        new KeyValuePair<int, int> (1, 1)
+    };
+
+    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true);
+
+    private int step = 0;
+
+    public RenderFragment InstructionsContent => @<div>
+    <h3>Writing WRAMP code using blockly</h3>
+    <ul>
+         <li>On the left side of the screen is a blockly workspace.</li>
+        <li>You can click on the sections to find WRAMP code blocks, try adding some of these to the workspace and connecting them together.</li>
+
+        @if (step >= 1)
+        {
+        <li>Every WRAMP program needs a .text section and a main label that identifies the start of the program.</li>
+        <li>You should also make the main label be visible from the outside by adding .global main.</li>
+        <li>Finally, to successfully finish your program should jump return to the $ra return address at the end of the program.  </li>
+        }
+
+    @if (step >= 2)
+    {
+    <li> This will be the basic setup for all WRAMP programs. Try saving it now so you can reuse it later. </li>
+    }
+
+@if (step >= 3)
+    {
+  <li> Finally, try to put the number 1 into register 1 using the addi block, then compile and run your code to see if it works properly.  </li>
+    }
+
+@if (step >= 4)
+    {
+    <li> Next, you can choose a different level in the sidebar on the left to continue.  </li>
+    }
+
+    </ul>
+@if (step < 4)
+    {
+    <button class="btn btn-primary mt-2" @onclick="Next">Next</button>
+    }
+    </div>
+    ;
+
+    private void Next() { step++; }
+
+    public string serialOutput = "hello!";
+
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" }
+                }
+            }
+        }
+    };
+}
