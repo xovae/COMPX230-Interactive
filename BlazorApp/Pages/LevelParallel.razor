@@ -1,0 +1,114 @@
+@page "/levelParallel"
+
+<PageTitle>Introduction to the Parallel Interface</PageTitle>
+
+<Page Level="levelParallel" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@InstructionsContent" />
+
+@code {
+    public List<KeyValuePair<int, int>> registers = new() {
+        new KeyValuePair<int, int> (73000, 1)
+    };
+
+    public Tabs tabs = new Tabs(Instructions: true, ParallelRegisters: true, PhysicalComponents: true);
+
+    private int step = 0;
+
+    public RenderFragment InstructionsContent => @<div>
+    <h3>Physical Components</h3>
+    <ul>
+         <li>On the right side of the screen is a display showing the physical components of the WRAMP board.</li>
+        <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
+        <li>Which memory address contains the value of the switches?</li>
+        
+        <input value="@userInput"
+                   @oninput="OnInputChanged"
+               placeholder="Enter address"
+               style="border: 2px solid; padding: 0.25rem; width: 150px;" />
+                
+        @if (step >= 1)
+        {
+        <li>That's correct!</li>
+        <li>Next, can you toggle the switches such that this value has the decimal value 10?</li>
+        }
+
+    @if (step >= 2)
+    {
+    <li> Great work! </li>
+        <li> Next, write some blockly code to light up the LEDs above the switches. </li>
+        <li> You can write a value to these using the sw (store word) instruction and using the memory address 0x7300A </li>
+        <li> Can you light up all the switches at once? </li>
+    }
+
+@if (step >= 3)
+    {
+  <li> Finally, can you load the value from the switches and store it into the leds? </li>
+  <li> You'll need to use both the lw and sw instructions. </li>
+  <li> Note that you can't move the value directly from one address to another, you'll need to temporarily store it in a register. </li>
+    }
+
+@if (step >= 4)
+    {
+    <li> To test that it is working properly, try switching different switches and watch the corresponding LED light up.  </li>
+        <li> You may need to add a loop back to the start to have it continually update.  </li>
+    }
+
+    </ul>
+@if (step >= 1 && step < 4)
+    {
+    <button class="btn btn-primary mt-2" @onclick="Next">Next</button>
+    }
+    </div>
+    ;
+
+    private void Next() { step++; }
+
+private string userInput = "";
+private bool isValidAddress = false;
+
+
+private void OnInputChanged(ChangeEventArgs e)
+{
+    userInput = e.Value?.ToString() ?? "";
+    if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
+    {
+        isValidAddress = true;
+        if(step == 0) step++;
+    }
+    else
+    {
+        isValidAddress = false;
+    }
+}
+
+
+
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                     new Block { type = "jump" },
+                    new Block { type = "jumpRegister" }
+                }
+            },
+            new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "loadWord" },
+                    new Block { type = "storeWord" }
+                }
+            }
+        }
+    };
+}
