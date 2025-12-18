@@ -24,7 +24,7 @@
 </div>
 
 <div class="overflow-scroll">
-    @if (Tabs.LEDs || Tabs.Switches || Tabs.Buttons || Tabs.SSDs)
+    @if (Components.LEDs || Components.Switches || Components.Buttons || Components.SSDs)
     {
         <div class="accordion my-2">
             <div class="accordion-item">
@@ -35,7 +35,7 @@
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
-                        <div class="row justify-content-center mb-1">
+                        <div class="row justify-content-center mb-3">
                             @for (int i = 15; i != -1; i--)
                             {
                                 int pos = i;
@@ -44,11 +44,11 @@
                                 string switchID = "switch" + i;
 
                                 <div class="col-auto p-1">
-                                    @if (Tabs.LEDs)
+                                    @if (Components.LEDs)
                                     {
-                                        <div class="led mb-3" id="@ledID"></div>
+                                        <div class="led mb-2" id="@ledID"></div>
                                     }
-                                    @if (Tabs.Switches)
+                                    @if (Components.Switches)
                                     {
                                         <div class="form-check form-switch wsimSwitch">
                                             <input class="form-check-input" type="checkbox" role="switch" id="@switchID" @onclick="() => toggleSwitch(pos)">
@@ -58,7 +58,7 @@
                             }
                         </div>
 
-                        @if (Tabs.Buttons)
+                        @if (Components.Buttons)
                         {
                             <div class="d-flex justify-content-center">
                                 @for (int i = 0; i < 3; i++)
@@ -69,7 +69,7 @@
                             </div>
                         }
 
-                        @if (Tabs.SSDs)
+                        @if (Components.SSDs)
                         {
                             <div class="row justify-content-center">
                                 <SSD ID="sevenSegOne"/>
@@ -85,10 +85,10 @@
     }
 
     <ul class="nav nav-tabs" role="tablist">
-        @if (Tabs.Instructions && Instructions != null)
+        @if (Components.WSIMInstructions && WSIMInstructions != null)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
+                <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">WSIMInstructions</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
@@ -100,38 +100,38 @@
                 <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="true">Code</button>
             </li>
         }
-        @if (Tabs.GPRegisters)
+        @if (Components.GPRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
             </li>
         }
-        @if (Tabs.SPRegisters)
+        @if (Components.SPRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="sp-tab" data-bs-toggle="tab" data-bs-target="#sp-tab-pane" type="button" role="tab"
                 aria-controls="sp-tab-pane" aria-selected="false">SP Registers</button>
             </li>
         }
-        @if (Tabs.RAM)
+        @if (Components.RAM)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
             </li>
         }
-        @if (Tabs.ParallelRegisters)
+        @if (Components.ParallelRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
             </li>
         }
-        @if (Tabs.SerialPort)
+        @if (Components.SerialPort)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
             </li>
         }
-        @if (Tabs.Library && Library != null)
+        @if (Components.Library && Library != null)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
@@ -143,10 +143,10 @@
     </ul>
 
     <div class="tab-content">
-        @if (Tabs.Instructions && Instructions != null)
+        @if (Components.WSIMInstructions && WSIMInstructions != null)
         {
             <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
-                <pre>@((MarkupString)Instructions)</pre>
+                <pre>@((MarkupString)WSIMInstructions)</pre>
             </div>
             <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
                 <p id="wsimCode"></p>
@@ -158,37 +158,37 @@
                 <p id="wsimCode"></p>
             </div>
         }
-        @if (Tabs.GPRegisters)
+        @if (Components.GPRegisters)
         {
             <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
                 <Registers CPU="@board.CPU" registerType="@RegisterType.GP"/>
             </div>
         }
-        @if (Tabs.SPRegisters)
+        @if (Components.SPRegisters)
         {
             <div class="tab-pane fade" id="sp-tab-pane" role="tabpanel" aria-labelledby="sp-tab" tabindex="0">
                 <Registers CPU="@board.CPU" registerType="@RegisterType.SP"/>
             </div>
         }
-        @if (Tabs.RAM)
+        @if (Components.RAM)
         {
             <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
                 <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels"/>
             </div>
         }
-        @if (Tabs.ParallelRegisters)
+        @if (Components.ParallelRegisters)
         {
             <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
                 <PeripheralMemory parallelMemory="@board.Parallel"/>
             </div>
         }
-        @if (Tabs.SerialPort)
+        @if (Components.SerialPort)
         {
             <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
                 <SerialPort serial="@board.Serial1"/>
             </div>
         }
-        @if (Tabs.Library && Library != null)
+        @if (Components.Library && Library != null)
         {
             <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
                 <pre>@((MarkupString)Library[1])</pre>
@@ -202,13 +202,13 @@
     public EventCallback CompileRequested { get; set; }
 
     [Parameter]
-    required public List<KeyValuePair<int, int>> Registers { get; set; }
+    public List<KeyValuePair<int, int>>? Registers { get; set; }
 
     [Parameter]
-    required public Tabs Tabs { get; set; }
+    required public Components Components { get; set; }
 
     [Parameter]
-    public string? Instructions { get; set; }
+    public string? WSIMInstructions { get; set; }
 
     [Parameter]
     public string[]? Library { get; set; }
@@ -402,18 +402,27 @@
     void Verify()
     {
         bool correct = true;
-        foreach (KeyValuePair<int, int> answer in Registers)
+        if (Registers != null)
         {
-            uint userRegister = board.CPU.mGpRegisters[(RegisterFile.GpRegister)answer.Key];
-            if (userRegister != answer.Value)
-            {
-                correct = false;
-            }
+            correct = CheckRegisters();
         }
         if (correct == true)
         {
             JSRuntime.InvokeVoidAsync("alert", "You did it!");
         }
+    }
+
+    bool CheckRegisters()
+    {
+        foreach (KeyValuePair<int, int> answer in Registers)
+        {
+            uint userRegister = board.CPU.mGpRegisters[(RegisterFile.GpRegister)answer.Key];
+            if (userRegister != answer.Value)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     void StoreBoardState()

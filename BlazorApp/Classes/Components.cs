@@ -1,5 +1,5 @@
-public class Tabs {
-    public bool Instructions;
+public class Components {
+    public bool WSIMInstructions;
     public bool GPRegisters;
     public bool SPRegisters;
     public bool RAM;
@@ -11,9 +11,11 @@ public class Tabs {
     public bool SSDs;
     public bool Library;
 
-    public Tabs(bool Instructions = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Library = false)
+    public bool Blockly;
+
+    public Components(bool WSIMInstructions = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Library = false, bool Blockly = false)
     {
-        this.Instructions = Instructions;
+        this.WSIMInstructions = WSIMInstructions;
         this.GPRegisters = GPRegisters;
         this.SPRegisters = SPRegisters;
         this.RAM = RAM;
@@ -24,6 +26,7 @@ public class Tabs {
         this.Buttons = Buttons;
         this.SSDs = SSDs;
         this.Library = Library;
+        this.Blockly = Blockly;
     }
 }
 

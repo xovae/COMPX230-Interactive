@@ -18,13 +18,13 @@
 
 @code {
     [Parameter]
-    required public string Level { get; set; }
+    required public string LevelName { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("levelSelect", Level);
+            await JSRuntime.InvokeVoidAsync("levelSelect", LevelName);
         }
     }
 }

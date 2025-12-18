@@ -27,7 +27,7 @@ html, body {
 }
 
 .wsimSwitch {
-    rotate: 90deg;
+    rotate: -90deg;
 }
 
 .wsimTable th, td {

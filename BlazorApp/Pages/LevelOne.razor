@@ -1,8 +1,6 @@
 @page "/levelOne"
 
-<PageTitle>Home</PageTitle>
-
-<Page Level="levelOne" Toolbox="@toolbox" Registers="@registers" tabs="@tabs" Instructions="@Instructions" Library="@Library"/>
+<Level Title="Level One" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" WSIMInstructions="@Instructions" MainInstructions="@MainInstructions" Library="@Library"/>
 
 @code {
     public List<KeyValuePair<int, int>> registers = new() {
@@ -10,12 +8,16 @@
         new KeyValuePair<int, int> (2, 10),
     };
 
-    public Tabs tabs = new Tabs(Instructions: true, GPRegisters: true, Library: true);
+    public Components Components = new Components(WSIMInstructions: true, GPRegisters: true, Library: true);
 
     public string Instructions = """
     Make:
         $1 = 5
         $2 = 10
+    """;
+
+    public string MainInstructions = """
+        Hello!
     """;
 
     public string[] Library = {"switches.s", """

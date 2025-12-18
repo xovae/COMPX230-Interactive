@@ -1,25 +1,61 @@
-﻿@inject IJSRuntime JSRuntime
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
 
-<div class="col">
-    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@Toolbox"/>
-</div>
+<PageTitle>@Title</PageTitle>
 
-<div class="col d-flex flex-column h-100">
-    <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" Tabs="@Tabs" Instructions="@Instructions" Library="@Library"/>
+<div class="flex-column d-flex vh-100">
+    <nav class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img id="logo" src="img/reginald.png" alt="Photo of a duck"/>
+                <span class="h1">WRAMP SIM</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid flex-grow-1 overflow-hidden pb-3">
+        <div class="row h-100">
+            <LevelSelector LevelName="@LevelName"/>
+
+            <div class="col">
+                @if (Components.Blockly)
+                {
+                    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)"/>
+                }
+                else if (MainInstructions != null)
+                {
+                    @((MarkupString)MainInstructions);
+                }
+            </div>
+
+            <div class="col d-flex flex-column h-100">
+                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
     [Parameter]
-    required public string Toolbox { get; set; }
+    required public string Title { get; set; }
+
+    [Parameter]
+    required public string LevelName { get; set; }
+
+    [Parameter]
+    required public Toolbox toolbox { get; set; }
 
     [Parameter]
     required public List<KeyValuePair<int, int>> Registers { get; set; }
 
     [Parameter]
-    required public Tabs Tabs { get; set; }
+    required public Components Components { get; set; }
 
     [Parameter]
-    public string? Instructions { get; set; }
+    public string? WSIMInstructions { get; set; }
+
+    [Parameter]
+    public string? MainInstructions { get; set; }
 
     [Parameter]
     public string[]? Library { get; set; }
