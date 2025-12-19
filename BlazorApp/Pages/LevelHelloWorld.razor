@@ -1,7 +1,8 @@
 @page "/levelHelloWorld"
 @using RexSimulator.Hardware
+@inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Hello World!" LevelName="levelHelloWorld" Toolbox="@toolbox" Registers="@registers" components="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
+<Level @ref="levelComponent" Title="Hello World!" LevelName="levelHelloWorld" Registers="@registers" components="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
 
 @code {
     public Level? levelComponent;
@@ -33,7 +34,10 @@
             <li>You can use the COMPILE button to get things started, then use the RUN and STEP buttons to simulate running this program</li>
             <li>What message is being displayed?</li>
 
-        <input @oninput="OnInputMessageChanged" placeholder="Enter message" />
+
+        <input id="inputOne" @oninput="OnInputMessageChanged" placeholder="Enter message" />
+            <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne">✔</label>
+
 
             @if (step >= 1)
             {
@@ -62,6 +66,7 @@
         if (userInput.Trim().ToUpper() == "HELLO 230" || userInput.Trim().ToUpper() == "HELLO230")
         {
             if(step == 0) step++;
+            JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
         }
     }
 
