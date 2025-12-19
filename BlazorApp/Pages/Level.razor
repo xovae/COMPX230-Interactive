@@ -72,13 +72,13 @@
         if (blocklyComponent != null) await blocklyComponent.Export();
     }
 
-    async Task BoardHandler()
-    {
-        await LevelChanged.InvokeAsync();
-    }
-
     async Task ExportHandler((string code, string[] IDs, List<string> labels) args)
     {
         if (wsimComponent != null) await wsimComponent.Compile(args);
+    }
+
+    async Task BoardHandler()
+    {
+        await LevelChanged.InvokeAsync();
     }
 }

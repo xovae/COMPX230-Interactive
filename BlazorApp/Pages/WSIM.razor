@@ -247,7 +247,14 @@
 
     async Task OnCompileClicked()
     {
-        await CompileRequested.InvokeAsync();
+        if (Components.Blockly)
+        {
+            await CompileRequested.InvokeAsync();
+        }
+        else
+        {
+            await Compile(("", [], new List<String>()));
+        }
     }
 
     //Take a .s file onclickfrom the user and compile it to an SREC for use in the wsim
