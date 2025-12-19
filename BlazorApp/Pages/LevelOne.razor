@@ -1,5 +1,6 @@
 @page "/levelOne"
 @using RexSimulator.Hardware
+@inject IJSRuntime JSRuntime
 
 <Level @ref="levelComponent" Title="Level One" LevelChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" WSIMInstructions="@MainInstructions"/>
 
@@ -40,7 +41,8 @@
             <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
             <li>Which memory address contains the value of the switches?</li>
 
-            <input @oninput="OnInputChanged" placeholder="Enter address"/>
+            <input id="inputOne" @oninput="OnInputChanged" placeholder="Enter address"/>
+            <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne">✔</label>
 
             @if (step >= 1)
             {
@@ -77,6 +79,7 @@
         if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
         {
             if(step == 0) step++;
+            JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
         }
     }
 

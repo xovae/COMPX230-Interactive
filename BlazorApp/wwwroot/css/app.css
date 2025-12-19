@@ -67,6 +67,10 @@ pre {
     text-align: inherit;
 }
 
+.inputCheckmark {
+    color: red;
+}
+
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */
 .display-container {
 	position: relative;

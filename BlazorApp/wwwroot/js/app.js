@@ -27,3 +27,11 @@ window.quacker = () =>
     let audio = document.getElementById("quackAudio");
     audio.play();
 }
+
+window.objectiveCheck = (id) =>
+{
+    let checkmark = document.getElementById(id);
+    let audio = document.getElementById("quackAudio");
+    checkmark.style.color = "green";
+    audio.play();
+}
