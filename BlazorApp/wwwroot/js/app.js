@@ -32,6 +32,12 @@ window.objectiveCheck = (id) =>
 {
     let checkmark = document.getElementById(id);
     let audio = document.getElementById("quackAudio");
-    checkmark.style.color = "green";
+    checkmark.style.opacity = 1;
     audio.play();
+}
+
+window.initTooltips = () =>
+{
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }

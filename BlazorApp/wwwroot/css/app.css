@@ -68,7 +68,8 @@ pre {
 }
 
 .inputCheckmark {
-    color: red;
+    opacity: 0;
+    color: green;
 }
 
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */

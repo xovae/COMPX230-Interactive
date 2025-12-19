@@ -14,5 +14,6 @@ public class EQUs {
     .equ par_urssd,		0x73007
     .equ par_llssd,		0x73008
     .equ par_lrssd,		0x73009
+    .equ par_led,       0x7300A
     """;
 }
