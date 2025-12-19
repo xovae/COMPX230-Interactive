@@ -1,0 +1,148 @@
+@page "/levelHelloWorld"
+@using RexSimulator.Hardware
+
+<Level @ref="levelComponent" Title="Hello World!" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
+
+@code {
+    public Level? levelComponent;
+    required public RexBoard board;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        {
+            board = levelComponent.wsimComponent.board;
+        }
+    }
+
+    public List<KeyValuePair<int, int>> registers = new() {
+        new KeyValuePair<int, int> (1, 5),
+        new KeyValuePair<int, int> (2, 10),
+    };
+
+    public Components Components = new Components(Blockly: false, GPRegisters: true, SSDs: true, ParallelRegisters: true, Library: true, RAM: true);
+
+    public int step = 0;
+
+    public RenderFragment MainInstructions =>
+    @<div>
+        <h1>Hello World!</h1>
+        <ul>
+            <li>On the right side of the screen is a simulator that is showing the internal RAM and LED display of a basys3 board.</li>
+            <li>Currently loaded into RAM is a WRAMP program that will display a message on the LEDs.</li>
+            <li>You can use the COMPILE button to get things started, then use the RUN and STEP buttons to simulate running this program</li>
+            <li>What message is being displayed?</li>
+
+        <input @oninput="OnInputChanged" placeholder="Enter message" />
+
+            @if (step >= 1)
+            {
+                <li>That's right!</li>
+                <li>If you're interested, try switching to the RAM tab to see the program running.</li>
+                <li>Can you find where the message is stored?</li>
+            }
+        </ul>
+    </div>;
+
+    public void OnInputChanged(ChangeEventArgs e)
+    {
+        string userInput = e.Value?.ToString() ?? "";
+        if (userInput.Trim().ToUpper() == "HELLO 230" || userInput.Trim().ToUpper() == "HELLO230")
+        {
+            if(step == 0) step++;
+        }
+    }
+
+    public string[] Library = { "hello.s", """
+    .text				#specifies that what follows are instructions
+.global main			#specifies that the label "main" is globally accessible
+
+main:				#entry point into the program
+	sw $0, 0x73004($0)	#enable individual control of SSD segments
+
+	addi $2, $0, 0		#initialise loop counter to zero
+loop:
+	seqi $8, $2, 13		#has the loop finished?
+	bnez $8, main		#if so, go to "main"
+
+	jal write		#write the pattern to the SSD
+	jal delay		#delay so it can actually be seen
+
+	addi $2, $2, 1		#increment loop counter
+	j loop			#go around again
+
+write:
+    lw $1, 0x73007($0)  # transfer SSD contents to the left
+    sw $1, 0x73006($0)
+    lw $1, 0x73008($0)
+    sw $1, 0x73007($0)
+	lw $1, 0x73009($0)
+	sw $1, 0x73008($0)
+	lw $1, hello($2)	#load the new pattern to the rightmost SSD
+	sw $1, 0x73009($0)
+	jr $ra			#return
+
+delay:
+	addui $9, $0, 0xFFFF 	#a big number to count down from
+	slli $9, $9, 2		#make it even bigger
+delayLoop:
+	subui $9, $9, 1		#around we go...
+	bnez $9, delayLoop
+	jr $ra			#return
+
+.data				#specifies that what follows are data with initial values
+hello:				
+	.word 0x76 #H
+	.word 0x79 #E
+	.word 0x38 #L
+	.word 0x38 #L
+	.word 0x3F #O
+	.word 0x00
+	.word 0x5B #2
+	.word 0x3F #0
+	.word 0x4F #3
+	.word 0x00
+	.word 0x00
+	.word 0x00
+""" };
+
+
+
+    public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" },
+                    new Block { type = "jump" }
+                }
+            },
+            new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "loadWord" },
+                    new Block { type = "storeWord" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" },
+                    new Block { type = "loadHighImmediate" }
+                }
+            }
+        }
+    };
+}
