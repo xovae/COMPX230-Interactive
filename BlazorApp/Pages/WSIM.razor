@@ -284,16 +284,18 @@
 
         byte[] codeBytes;
 
+        string codeWithEQUs = EQUs.EQUString + "\n" + args.code;
+
         if (Library != null)
         {
             string htmlTags = @"<table>|</table>|<tr>|</tr>|<td>|</td>\n";
             string libraryCode = Regex.Replace(Library[1], htmlTags, "");
-            string combinedCode = args.code + "\n" + libraryCode;
+            string combinedCode = codeWithEQUs + "\n" + libraryCode;
             codeBytes = Encoding.UTF8.GetBytes(combinedCode);
         }
         else
         {
-            codeBytes = Encoding.UTF8.GetBytes(args.code);
+            codeBytes = Encoding.UTF8.GetBytes(codeWithEQUs);
         }
 
         //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
@@ -385,6 +387,7 @@
                     //Execute next instruction
                     while(!board.Tick());
 
+                    //Invoke the EventCallback to allow the Level to check any changes to the board state to see if an objective has been completed
                     await BoardChanged.InvokeAsync();
 
                     //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
