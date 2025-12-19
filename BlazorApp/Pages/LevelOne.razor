@@ -1,139 +1,103 @@
 @page "/levelOne"
+@using RexSimulator.Hardware
 
-<Level Title="Level One" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" WSIMInstructions="@Instructions" MainInstructions="@MainInstructions" Library="@Library"/>
+<Level @ref="levelComponent" Title="Level One" LevelChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" WSIMInstructions="@MainInstructions"/>
 
 @code {
+    public Level? levelComponent;
+    required public RexBoard board;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        {
+            board = levelComponent.wsimComponent.board;
+        }
+    }
+
     public List<KeyValuePair<int, int>> registers = new() {
         new KeyValuePair<int, int> (1, 5),
         new KeyValuePair<int, int> (2, 10),
     };
 
-    public Components Components = new Components(WSIMInstructions: true, GPRegisters: true, Library: true);
+    public Components Components = new Components(Blockly: true, WSIMInstructions: true, GPRegisters: true, Switches: true, LEDs: true, ParallelRegisters: true);
 
-    public string Instructions = """
-    Make:
-        $1 = 5
-        $2 = 10
-    """;
+    public RenderFragment Instructions => @<div>
+        <p>Set the following registers to the following values</p>
+        <ul>
+            <li>$1: 5</li>
+            <li>$2: 10</li>
+        </ul>
+    </div>;
 
-    public string MainInstructions = """
-        Hello!
-    """;
+    public int step = 0;
 
-    public string[] Library = {"switches.s", """
-    <table>
-        <tr>
-            <td>.equ sp1_tx,</td>
-            <td>0x70000</td>
-        </tr>
-        <tr>
-            <td>.equ sp1_rx,</td>
-            <td>0x70001</td>
-        </tr>
-        <tr>
-            <td>.equ sp1_ctrl,</td>
-            <td>0x70002</td>
-        </tr>
-        <tr>
-            <td>.equ sp1_stat,</td>
-            <td>0x70003</td>
-        </tr>
-        <tr>
-            <td>.equ sp1_iack,</td>
-            <td>0x70004</td>
-        </tr>
-        <tr>
-            <td>.equ par_switch,</td>
-            <td>0x73000</td>
-        </tr>
-        <tr>
-            <td>.equ par_btn,</td>
-            <td>0x73001</td>
-        </tr>
-        <tr>
-            <td>.equ par_ctrl,</td>
-            <td>0x73004</td>
-        </tr>
-        <tr>
-            <td>.equ par_iack,</td>
-            <td>0x73005</td>
-        </tr>
-            <td>.equ par_ulssd,</td>
-            <td>0x73006</td>
-        <tr>
-            <td>.equ par_urssd,</td>
-            <td>0x73007</td>
-        </tr>
-        <tr>
-            <td>.equ par_llssd,</td>
-            <td>0x73008</td>
-        </tr>
-        <tr>
-            <td>.equ par_lrssd,</td>
-            <td>0x73009</td>
-        </tr>
-    </table>
-    .text
-    .global putch
-    putch:
-        subui $sp, $sp, 1
-        sw $13, 0($sp)
-        putch_wait:
-        lw $13, sp1_stat($0)
-        andi $13, $13, 2
-        beqz $13, putch_wait
-        sw $2, sp1_tx($0)
-        lw $13, 0($sp)
-        addi $sp, $sp, 1
-        jr $ra
+    public RenderFragment MainInstructions =>
+    @<div>
+        <h1>Welcome!</h1>
+        <ul>
+            <li>On the right side of the screen is a display showing the physical components of the WRAMP board.</li>
+            <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
+            <li>Which memory address contains the value of the switches?</li>
 
-    .global putstr
-    putstr:
-        subui $sp, $sp, 3
-        sw $13, 0($sp)
-        sw $2, 1($sp)
-        sw $ra, 2($sp)
+            <input @oninput="OnInputChanged" placeholder="Enter address"/>
 
-        add $13, $0, $2
+            @if (step >= 1)
+            {
+                <li>That's correct!</li>
+                <li>Next, can you toggle the switches such that this value has the decimal value 10?</li>
+            }
 
-        putstr_loop:
-        lw $2, 0($13)
-        beqz $2, putstr_end
-        jal putch
-        addi $13, $13, 1
-        j putstr_loop
+            @if (step >= 2)
+            {
+                <li> Great work! </li>
+                <li> Next, write some blockly code to light up the LEDs above the switches. </li>
+                <li> You can write a value to these using the sw (store word) instruction and using the memory address 0x7300A </li>
+                <li> Can you light up all the switches at once? </li>
+            }
 
-        putstr_end:
-        lw $13, 0($sp)
-        lw $2, 1($sp)
-        lw $ra, 2($sp)
-        addi $sp, $sp, 3
-        jr $ra
+            @if (step >= 3)
+            {
+                <li> Finally, can you load the value from the switches and store it into the leds? </li>
+                <li> You'll need to use both the lw and sw instructions. </li>
+                <li> Note that you can't move the value directly from one address to another, you'll need to temporarily store it in a register. </li>
+            }
 
-    .global readswitches
-    readswitches:
-        lw $1, par_switch($0)
-        jr $ra
+            @if (step >= 4)
+            {
+            <li> To test that it is working properly, try switching different switches and watch the corresponding LED light up.  </li>
+                <li> You may need to add a loop back to the start to have it continually update.  </li>
+            }
+        </ul>
+    </div>;
 
-    .global writessd
-    writessd:
-        subui $sp, $sp, 1
-        sw $2, 0($sp)
+    public void OnInputChanged(ChangeEventArgs e)
+    {
+        string userInput = e.Value?.ToString() ?? "";
+        if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
+        {
+            if(step == 0) step++;
+        }
+    }
 
-        sw $2, par_lrssd($0)
-        srli $2, $2, 4
-        sw $2, par_llssd($0)
-        srli $2, $2, 4
-        sw $2, par_urssd($0)
-        srli $2, $2, 4
-        sw $2, par_ulssd($0)
-
-        lw $2, 0($sp)
-        addui $sp, $sp, 1
-        jr $ra
-    """};
-
-
+    public async Task CheckBoard()
+    {
+        if (board.Parallel.Switches == 10 && step == 1)
+        {
+            step++;
+            StateHasChanged();
+        }
+        if (board.Parallel.Leds == 4294967295 && step == 2)
+        {
+            step++;
+            StateHasChanged();
+        }
+        if (board.Parallel.Leds == 65535 && board.Parallel.Switches == 65535 && step == 3)
+        {
+            step++;
+            StateHasChanged();
+        }
+    }
 
     public Toolbox toolbox = new Toolbox{
         contents = new List<Category>() {
@@ -155,10 +119,19 @@
                 }
             },
             new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "loadWord" },
+                    new Block { type = "storeWord" }
+                }
+            },
+            new Category {
                 name = "Arithmetic",
                 categorystyle = "arithmeticCategory",
                 contents = new List<Block>() {
-                    new Block { type = "arithmeticImmediate" }
+                    new Block { type = "arithmeticImmediate" },
+                    new Block { type = "loadHighImmediate" }
                 }
             }
         }

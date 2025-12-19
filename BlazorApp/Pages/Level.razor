@@ -1,4 +1,5 @@
-@using System.Text.Json
+﻿@using System.Text.Json
+@using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
 <PageTitle>@Title</PageTitle>
@@ -24,12 +25,12 @@
                 }
                 else if (MainInstructions != null)
                 {
-                    @((MarkupString)MainInstructions);
+                    <div>@MainInstructions</div>
                 }
             </div>
 
             <div class="col d-flex flex-column h-100">
-                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
+                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
             </div>
         </div>
     </div>
@@ -52,24 +53,32 @@
     required public Components Components { get; set; }
 
     [Parameter]
-    public string? WSIMInstructions { get; set; }
+    public RenderFragment? WSIMInstructions { get; set; }
 
     [Parameter]
-    public string? MainInstructions { get; set; }
+    public RenderFragment? MainInstructions { get; set; }
+
+    [Parameter]
+    public EventCallback LevelChanged { get; set; }
 
     [Parameter]
     public string[]? Library { get; set; }
 
-    required public Blockly blocklyComponent;
-    required public WSIM wsimComponent;
+    public Blockly? blocklyComponent;
+    public WSIM? wsimComponent;
 
-    public async Task CompileHandler()
+    async Task CompileHandler()
     {
-        await blocklyComponent.Export();
+        if (blocklyComponent != null) await blocklyComponent.Export();
     }
 
-    public async Task ExportHandler((string code, string[] IDs, List<string> labels) args)
+    async Task BoardHandler()
     {
-        await wsimComponent.Compile(args);
+        await LevelChanged.InvokeAsync();
+    }
+
+    async Task ExportHandler((string code, string[] IDs, List<string> labels) args)
+    {
+        if (wsimComponent != null) await wsimComponent.Compile(args);
     }
 }
