@@ -33,23 +33,44 @@
             <li>You can use the COMPILE button to get things started, then use the RUN and STEP buttons to simulate running this program</li>
             <li>What message is being displayed?</li>
 
-        <input @oninput="OnInputChanged" placeholder="Enter message" />
+        <input @oninput="OnInputMessageChanged" placeholder="Enter message" />
 
             @if (step >= 1)
             {
                 <li>That's right!</li>
+                <li>This simulation is slow so that you can see each SSD update individually</li>
+                <li>On the real board, you need to include an artifial delay to make it human readable</li>
+
                 <li>If you're interested, try switching to the RAM tab to see the program running.</li>
                 <li>Can you find where the message is stored?</li>
+                <li>What address in RAM is the letter 'H' stored in?</li>
+
+                <input @oninput="OnInputAddressChanged" placeholder="Enter message" />
+            }
+            @if (step >= 2)
+            {
+                <li>Correct!</li>
+                <li>The 'Disassembly' column shows the WRAMP instruction that is disassembled from the value 0x00000076</li>
+                <li>Because everything is just made of 0s and 1s, the same number that represents 'H' may also be an 'add' instruction!</li>
             }
         </ul>
     </div>;
 
-    public void OnInputChanged(ChangeEventArgs e)
+    public void OnInputMessageChanged(ChangeEventArgs e)
     {
         string userInput = e.Value?.ToString() ?? "";
         if (userInput.Trim().ToUpper() == "HELLO 230" || userInput.Trim().ToUpper() == "HELLO230")
         {
             if(step == 0) step++;
+        }
+    }
+
+    public void OnInputAddressChanged(ChangeEventArgs e)
+    {
+        string userInput = e.Value?.ToString() ?? "";
+        if (userInput.Trim() == "10" || userInput.Trim() == "00000010" || userInput.Trim() == "0x00000010")
+        {
+            if (step == 1) step++;
         }
     }
 
@@ -62,7 +83,7 @@
         addi $2, $0, 0		    #initialise loop counter to zero
 
     loop:
-        seqi $8, $2, 13		    #has the loop finished?
+        seqi $8, $2, 12		    #has the loop finished?
         bnez $8, main		    #if so, go to "main"
         jal write		        #write the pattern to the SSD
         addi $2, $2, 1		    #increment loop counter
@@ -95,43 +116,4 @@
         .word 0x00
 """ };
 
-
-
-    public Toolbox toolbox = new Toolbox{
-        contents = new List<Category>() {
-            new Category {
-                name = "Sections",
-                categorystyle = "sectionCategory",
-                contents = new List<Block>() {
-                    new Block { type = "textHead" },
-                    new Block { type = "global" }
-                }
-            },
-            new Category {
-                name = "Branch",
-                categorystyle = "branchCategory",
-                contents = new List<Block>() {
-                    new Block { type = "label" },
-                    new Block { type = "jumpRegister" },
-                    new Block { type = "jump" }
-                }
-            },
-            new Category {
-                name = "Memory",
-                categorystyle = "memoryCategory",
-                contents = new List<Block>() {
-                    new Block { type = "loadWord" },
-                    new Block { type = "storeWord" }
-                }
-            },
-            new Category {
-                name = "Arithmetic",
-                categorystyle = "arithmeticCategory",
-                contents = new List<Block>() {
-                    new Block { type = "arithmeticImmediate" },
-                    new Block { type = "loadHighImmediate" }
-                }
-            }
-        }
-    };
 }
