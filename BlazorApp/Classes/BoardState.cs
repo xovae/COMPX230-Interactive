@@ -1,6 +1,7 @@
-public class BoardState {
-    public uint[] Keys = [0];
-    public uint Key = 0;
+public class BoardState
+{
+    public uint[]? Keys;
+    public uint? Key;
     public int Repeats = 0;
 
     public BoardState(uint[] keys)

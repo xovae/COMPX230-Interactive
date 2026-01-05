@@ -2,7 +2,7 @@
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Level One" LevelChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" Registers="@registers" components="@Components" WSIMInstructions="@MainInstructions"/>
+<Level @ref="levelComponent" Title="Level One" LevelChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" components="@Components" WSIMInstructions="@Instructions" ParallelStates="@parallelStates"/>
 
 @code {
     public Level? levelComponent;
@@ -16,24 +16,15 @@
         }
     }
 
-    public List<KeyValuePair<int, int>> registers = new() {
-        new KeyValuePair<int, int> (1, 5),
-        new KeyValuePair<int, int> (2, 10),
+    public List<ParallelState> parallelStates = new List<ParallelState>() {
+        new ParallelState(ParallelComponents.LeftSSD, 1, 9)
     };
 
-    public Components Components = new Components(Blockly: true, WSIMInstructions: true, GPRegisters: true, Switches: true, LEDs: true, ParallelRegisters: true);
-
-    public RenderFragment Instructions => @<div>
-        <p>Set the following registers to the following values</p>
-        <ul>
-            <li>$1: 5</li>
-            <li>$2: 10</li>
-        </ul>
-    </div>;
+    public Components Components = new Components(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, ParallelRegisters: true);
 
     public int step = 0;
 
-    public RenderFragment MainInstructions =>
+    public RenderFragment Instructions =>
     @<div>
         <h1>Welcome!</h1>
         <ul>
@@ -90,7 +81,7 @@
             step++;
             StateHasChanged();
         }
-        if (board.Parallel.Leds == 4294967295 && step == 2)
+        if ((board.Parallel.Leds == 4294967295 || board.Parallel.Leds == 65535) && step == 2)
         {
             step++;
             StateHasChanged();

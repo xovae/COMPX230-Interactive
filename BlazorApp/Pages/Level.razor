@@ -1,5 +1,6 @@
 ﻿@using System.Text.Json
 @using RexSimulator.Hardware
+@using RexSimulator.Hardware.Rex
 @inject IJSRuntime JSRuntime
 
 <PageTitle>@Title</PageTitle>
@@ -30,7 +31,7 @@
             </div>
 
             <div class="col d-flex flex-column h-100">
-                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
+                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library" parallelStates="@ParallelStates"/>
             </div>
         </div>
     </div>
@@ -47,7 +48,10 @@
     required public Toolbox toolbox { get; set; }
 
     [Parameter]
-    required public List<KeyValuePair<int, int>> Registers { get; set; }
+    public List<KeyValuePair<int, int>>? Registers { get; set; }
+
+    [Parameter]
+    public List<ParallelState>? ParallelStates { get; set; }
 
     [Parameter]
     required public Components Components { get; set; }
