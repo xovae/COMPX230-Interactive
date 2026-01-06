@@ -40,16 +40,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelHelloWorld.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxIZWxsb1dvcmxkLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelOne.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxPbmUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelSelector.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxTZWxlY3Rvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelTwo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxUd28ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Memory.razor]

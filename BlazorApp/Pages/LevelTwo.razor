@@ -1,8 +1,8 @@
-@page "/levelHelloWorld"
+@page "/levelTwo"
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Hello World!" LevelName="levelHelloWorld" UIComponents="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
+<Level @ref="levelComponent" Title="Level Two" LevelName="levelTwo" UIComponents="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
 
 @code {
     public Level? levelComponent;
@@ -16,14 +16,9 @@
         }
     }
 
-    public List<KeyValuePair<int, int>> registers = new() {
-        new KeyValuePair<int, int> (1, 5),
-        new KeyValuePair<int, int> (2, 10),
-    };
-
     public UIComponents Components = new UIComponents(Blockly: false, GPRegisters: true, SSDs: true, ParallelRegisters: true, Library: true, RAM: true);
 
-    public int step = 0;
+    public int section = 0;
 
     public RenderFragment MainInstructions =>
     @<div>
@@ -39,7 +34,7 @@
             <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne">✔</label>
 
 
-            @if (step >= 1)
+            @if (section >= 1)
             {
                 <li>That's right!</li>
                 <li>This simulation is slow so that you can see each SSD update individually</li>
@@ -52,11 +47,12 @@
                 <input id="inputTwo" @oninput="OnInputAddressChanged" placeholder="Enter message"/>
                 <label class="inputCheckmark" id="inputTwoCheckmark" for="inputTwo">✔</label>
             }
-            @if (step >= 2)
+            @if (section >= 2)
             {
                 <li>Correct!</li>
                 <li>The 'Disassembly' column shows the WRAMP instruction that is disassembled from the value 0x00000076</li>
                 <li>Because everything is just made of 0s and 1s, the same number that represents 'H' may also be an 'add' instruction!</li>
+                JSRuntime.InvokeVoidAsync("levelCompleted");
             }
         </ul>
     </div>;
@@ -66,7 +62,7 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput.Trim().ToUpper() == "HELLO 230" || userInput.Trim().ToUpper() == "HELLO230")
         {
-            if(step == 0) step++;
+            if(section == 0) section++;
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
         }
     }
@@ -76,7 +72,7 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput.Trim() == "10" || userInput.Trim() == "00000010" || userInput.Trim() == "0x00000010")
         {
-            if (step == 1) step++;
+            if (section == 1) section++;
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputTwoCheckmark");
         }
     }

@@ -80,6 +80,7 @@
             @if (section >= 5)
             {
                 <li> Congrats, you did it! </li>
+                JSRuntime.InvokeVoidAsync("levelCompleted");
             }
         </ul>
     </div>;

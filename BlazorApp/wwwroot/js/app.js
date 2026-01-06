@@ -1,6 +1,12 @@
 window.levelSelect = (id) => {
     let level = document.getElementById(id);
     level.classList.add("active");
+
+    let checkmark = document.getElementById(id + "Checkmark");
+    if (checkmark != null)
+    {
+        checkmark.style.color = "white";
+    }
 }
 
 window.saveCode = async () => {
@@ -47,6 +53,29 @@ window.objectiveUncheck = (id) =>
     {
         checkmark.style.opacity = 0;
         audio.play();
+    }
+}
+
+window.levelCompleted = () =>
+{
+    id = window.location.pathname.substring(1);
+    localStorage.setItem(id, true);
+    levelCheck();
+}
+
+window.levelCheck = () =>
+{
+    const levelIDs = document.getElementsByTagName('a');
+
+    for (let i = 0; i < levelIDs.length; i++)
+    {
+        id = levelIDs[i].id;
+        if (localStorage.getItem(id) != null)
+        {
+            checkmarkID = id + "Checkmark";
+            let checkmark = document.getElementById(checkmarkID);
+            checkmark.style.opacity = 1;
+        }
     }
 }
 
