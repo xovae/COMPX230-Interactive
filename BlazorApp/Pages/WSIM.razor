@@ -432,19 +432,59 @@
     //Used to check the output of the user's program
     public bool Verify(BoardCheck boardCheck)
     {
-        switch (boardCheck.component)
+        if (boardCheck.component != null)
         {
-            case WRAMPComponents c when (int)c >= 0 && (int) c < 11:
-                return CheckStateList(boardCheck, pRegisterStates, (int)boardCheck.component);
-            case WRAMPComponents.GPRegisters:
-                return CheckStateList(boardCheck, gpRegisterStates, (int)boardCheck.checkIndex!);
-            case WRAMPComponents.SPRegisters:
-                return CheckStateList(boardCheck, spRegisterStates, (int)boardCheck.checkIndex!);
-            case WRAMPComponents.RAM:
-                return CheckStateList(boardCheck, memoryStates, (int)boardCheck.checkIndex!);
-            default:
-                return false;
+            switch (boardCheck.component)
+            {
+                case WRAMPComponents c when (int)c >= 0 && (int) c < 11:
+                    return CheckStateList(boardCheck, pRegisterStates, (int)boardCheck.component);
+                case WRAMPComponents.GPRegisters:
+                    return CheckStateList(boardCheck, gpRegisterStates, (int)boardCheck.checkIndex!);
+                case WRAMPComponents.SPRegisters:
+                    return CheckStateList(boardCheck, spRegisterStates, (int)boardCheck.checkIndex!);
+                case WRAMPComponents.RAM:
+                    return CheckStateList(boardCheck, memoryStates, (int)boardCheck.checkIndex!);
+                default:
+                    return false;
+            }
         }
+        else if (boardCheck.components != null)
+        {
+            foreach (WRAMPComponents component in boardCheck.components)
+            {
+                switch (boardCheck.component)
+                {
+                    case WRAMPComponents c when (int)c >= 0 && (int) c < 11:
+                        if(!CheckStateList(boardCheck, pRegisterStates, (int)boardCheck.component))
+                        {
+                            return false;
+                        }
+                        break;
+                    case WRAMPComponents.GPRegisters:
+                        if(!CheckStateList(boardCheck, gpRegisterStates, (int)boardCheck.checkIndex!))
+                        {
+                            return false;
+                        }
+                        break;
+                    case WRAMPComponents.SPRegisters:
+                        if(!CheckStateList(boardCheck, spRegisterStates, (int)boardCheck.checkIndex!))
+                        {
+                            return false;
+                        }
+                        break;
+                    case WRAMPComponents.RAM:
+                        if(!CheckStateList(boardCheck, memoryStates, (int)boardCheck.checkIndex!))
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     bool CheckStateList(BoardCheck boardCheck, List<BoardState> states, int componentIndex)

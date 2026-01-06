@@ -24,16 +24,30 @@ window.saveFile = async (content, name) => {
 
 window.quacker = () =>
 {
-    let audio = document.getElementById("quackAudio");
+    let audio = document.getElementById("duckQuack");
     audio.play();
 }
 
 window.objectiveCheck = (id) =>
 {
     let checkmark = document.getElementById(id);
-    let audio = document.getElementById("quackAudio");
-    checkmark.style.opacity = 1;
-    audio.play();
+    let audio = document.getElementById("duckQuack");
+    if (checkmark != null)
+    {
+        checkmark.style.opacity = 1;
+        audio.play();
+    }
+}
+
+window.objectiveUncheck = (id) =>
+{
+    let checkmark = document.getElementById(id);
+    let audio = document.getElementById("kcauQkcud");
+    if (checkmark != null && checkmark.style.opacity == 1)
+    {
+        checkmark.style.opacity = 0;
+        audio.play();
+    }
 }
 
 window.initTooltips = () =>

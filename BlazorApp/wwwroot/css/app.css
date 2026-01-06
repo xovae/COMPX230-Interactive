@@ -30,7 +30,7 @@ html, body {
     rotate: -90deg;
 }
 
-.wsimTable th, td {
+th, td {
     padding: 0 5px;
 }
 
@@ -70,6 +70,10 @@ pre {
 .inputCheckmark {
     opacity: 0;
     color: green;
+}
+
+.objectiveTable td {
+    border: 1px black solid;
 }
 
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */

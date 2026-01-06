@@ -35,21 +35,21 @@
 
         if (code.Contains("main:") && code.Contains(".global main") && code.Contains(".text"))
         {
+            //Remove highlightBlock() from any lines that aren't WRAMP instructions
+            code = Regex.Replace(code, highlightBlockPattern + @"\.text", ".text");
+            code = Regex.Replace(code, highlightBlockPattern + @"\.data", ".data");
+            code = Regex.Replace(code, highlightBlockPattern + @"\.bss", ".bss");
+            code = Regex.Replace(code, highlightBlockPattern + @"\.global main", ".global main");
+
+            //Removes highlightBlock() from labels
+            code = Regex.Replace(code, highlightBlockPattern + @"LABEL([a-zA-Z0-9_.]+):", "$2:");
+
+            //Extracts the ID of each block that can be executed in WRAMP for highlighting them in the Blockly workspace
+            string[] highlightStatements = Regex.Matches(code, highlightBlockPattern).Cast<Match>().Select(m => m.Groups[1].Value.Trim()).ToArray();
+            code = Regex.Replace(code, highlightBlockPattern, String.Empty);
+
             if (!code.Contains("$_"))
             {
-                //Remove highlightBlock() from any lines that aren't WRAMP instructions
-                code = Regex.Replace(code, highlightBlockPattern + @"\.text", ".text");
-                code = Regex.Replace(code, highlightBlockPattern + @"\.data", ".data");
-                code = Regex.Replace(code, highlightBlockPattern + @"\.bss", ".bss");
-                code = Regex.Replace(code, highlightBlockPattern + @"\.global main", ".global main");
-
-                //Removes highlightBlock() from labels
-                code = Regex.Replace(code, highlightBlockPattern + @"LABEL([a-zA-Z0-9_.]+):", "$2:");
-
-                //Extracts the ID of each block that can be executed in WRAMP for highlighting them in the Blockly workspace
-                string[] highlightStatements = Regex.Matches(code, highlightBlockPattern).Cast<Match>().Select(m => m.Groups[1].Value.Trim()).ToArray();
-                code = Regex.Replace(code, highlightBlockPattern, String.Empty);
-
                 //Get every label name and position for display in WSIM
                 string[] lines = code.Split(Environment.NewLine);
                 List<string> labels = new List<string>();

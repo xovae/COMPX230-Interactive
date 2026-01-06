@@ -19,8 +19,6 @@
         }
     }
 
-    public bool needsReturn = true;
-
     public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, ParallelRegisters: true);
 
     public int section = 0;
@@ -29,39 +27,59 @@
     @<div>
         <h1>Welcome!</h1>
         <ul>
-            <li>On the right side of the screen is a display showing the physical components of the WRAMP board.</li>
-            <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
-            <li>Which memory address contains the value of the switches?</li>
-
-            <input id="inputOne" @oninput="OnInputChanged" placeholder="Enter address"/>
-            <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne">✔</label>
-
-            @if (section >= 1)
+            @if (section == 0)
             {
-                <li>That's correct!</li>
-                <li id="switchOne">Next, can you toggle the switches such that this value has the decimal value 10?</li>
-                <label class="inputCheckmark" id="switchCheckmark" for="switchOne">✔</label>
+                <li>On the right side of the screen is a display showing the physical components of the WRAMP board.</li>
+                <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
+                <li>Which memory address contains the value of the switches?</li>
+
+                <input id="inputOne" @oninput="OnInputChanged" placeholder="Enter address"/>
+                <label class="inputCheckmark" id="checkmarkOne" for="inputOne">✔</label>
             }
 
-            @if (section >= 2)
+            @if (section == 1)
+            {
+                <li>That's correct!</li>
+                <li>
+                    Next, can you toggle the switches such that this value has the decimal value 10?
+                    <label class="inputCheckmark" id="checkmarkTwo">✔</label>
+                </li>
+            }
+
+            @if (section == 2)
             {
                 <li> Great work! </li>
                 <li> Next, write some blockly code to light up the LEDs above the switches. </li>
-                <li> You can write a value to these using the sw (store word) instruction and using the memory address 0x7300A </li>
-                <li> Can you light up all the LEDs at once? </li>
+                <li> You can write a value to these using the sw (store word) instruction and using the memory address 0x7300A or the label par_led</li>
+                <li> Can you light up all the LEDs at once?</li>
             }
 
-            @if (section >= 3)
+            @if (section == 3)
             {
-                <li> Finally, can you load the value from the switches and store it into the leds? </li>
-                <li> You'll need to use both the lw and sw instructions. </li>
-                <li> Note that you can't move the value directly from one address to another, you'll need to temporarily store it in a register. </li>
+                <li> Now, can you load the value from the switches and store it into the leds?</li>
+                <li> You'll need to use both the lw and sw instructions.</li>
+                <li> Note that you can't move the value directly from one address to another, you'll need to temporarily store it in a register.</li>
+                <table class="objectiveTable">
+                    <tr>
+                        <td>All switches enabled</td>
+                        <td><label class="inputCheckmark" id="checkmarkThree">✔</label></td>
+                    </tr>
+                    <tr>
+                        <td>All LEDs lit up</td>
+                        <td><label class="inputCheckmark" id="checkmarkFour">✔</label></td>
+                    </tr>
+                </table>
             }
 
-            @if (section >= 4)
+            @if (section == 4)
             {
-            <li> To test that it is working properly, try switching different switches and watch the corresponding LED light up.  </li>
-                <li> You may need to add a loop back to the start to have it continually update.  </li>
+                <li> Finally, try making the far left SSD count from 1 to 10!</li>
+                <li> You may need to add a loop back to the start to have it continually update.</li>
+            }
+
+            @if (section >= 5)
+            {
+                <li> Congrats, you did it! </li>
             }
         </ul>
     </div>;
@@ -72,38 +90,62 @@
         if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
         {
             if(section == 0) section++;
-            JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
+            JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkOne");
         }
     }
 
     public async Task CheckBoard()
     {
-
-        switch (section)
+        if (section == 1)
         {
-            case 1:
-                if (WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 10)))
-                {
-                    await JSRuntime.InvokeVoidAsync("objectiveCheck", "switchCheckmark");
-                    section++;
-                    StateHasChanged();
-                }
-                break;
-            case 2:
-                if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
-                {
-                    section++;
-                    StateHasChanged();
-                }
-                break;
-            case 3:
-                if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) && WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
-                {
-                    section++;
-                    StateHasChanged();
-                }
-                break;
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 10)))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkTwo");
+                section++;
+            }
         }
+        if (section == 2)
+        {
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
+            {
+                section++;
+            }
+        }
+        if (section == 3)
+        {
+            bool stepOne = false;
+            bool stepTwo = false;
+            if (stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkThree");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkThree");
+            }
+
+            if (stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkFour");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkFour");
+            }
+
+            if (stepOne && stepTwo)
+            {
+                section++;
+            }
+        }
+        if (section == 4)
+        {
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LeftLeftSSD, start: 1, 10)))
+            {
+                section++;
+            }
+        }
+        StateHasChanged();
     }
 
     public async Task CheckBlockly()
