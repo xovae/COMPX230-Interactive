@@ -23,7 +23,7 @@
 </div>
 
 <div class="overflow-scroll">
-    @if (Components.LEDs || Components.Switches || Components.Buttons || Components.SSDs)
+    @if (UIComponents.LEDs || UIComponents.Switches || UIComponents.Buttons || UIComponents.SSDs)
     {
         <div class="accordion my-2">
             <div class="accordion-item">
@@ -35,11 +35,11 @@
                 <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
 
-                        <a class="float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Physical components can be accessed using these labels:<br>Switches: par_switch<br>LEDs: par_led<br>Buttons: par_btn<br>SSDs: par_ulssd, par_urssd, par_llssd, par_lrssd">
+                        <a class="float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Physical Components can be accessed using these labels:<br>Switches: par_switch<br>LEDs: par_led<br>Buttons: par_btn<br>SSDs: par_ulssd, par_urssd, par_llssd, par_lrssd">
                             <img class="float-end" src="img/questionmark.svg" alt="An icon of a question mark surrounded by a circle">
                         </a>
 
-                        @if (Components.LEDs || Components.Switches)
+                        @if (UIComponents.LEDs || UIComponents.Switches)
                         {
                             <div class="row justify-content-center">
                                 @for (int i = 15; i != -1; i--)
@@ -50,11 +50,11 @@
                                     string switchID = "switch" + i;
 
                                     <div class="col-auto p-0 mb-3">
-                                        @if (Components.LEDs)
+                                        @if (UIComponents.LEDs)
                                         {
                                             <div class="led mb-2" id="@ledID"></div>
                                         }
-                                        @if (Components.Switches)
+                                        @if (UIComponents.Switches)
                                         {
                                             <div class="form-check form-switch wsimSwitch">
                                                 <input class="form-check-input" type="checkbox" role="switch" id="@switchID" @onclick="() => toggleSwitch(pos)">
@@ -65,7 +65,7 @@
                             </div>
                         }
 
-                        @if (Components.Buttons)
+                        @if (UIComponents.Buttons)
                         {
                             <div class="d-flex justify-content-center mt-2">
                                 @for (int i = 0; i < 3; i++)
@@ -76,7 +76,7 @@
                             </div>
                         }
 
-                        @if (Components.SSDs)
+                        @if (UIComponents.SSDs)
                         {
                             <div class="row justify-content-center">
                                 <SSD ID="sevenSegOne"/>
@@ -92,7 +92,7 @@
     }
 
     <ul class="nav nav-tabs" role="tablist">
-        @if (Components.WSIMInstructions && WSIMInstructions != null)
+        @if (UIComponents.WSIMInstructions && WSIMInstructions != null)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
@@ -107,38 +107,38 @@
                 <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="true">Code</button>
             </li>
         }
-        @if (Components.GPRegisters)
+        @if (UIComponents.GPRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
             </li>
         }
-        @if (Components.SPRegisters)
+        @if (UIComponents.SPRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="sp-tab" data-bs-toggle="tab" data-bs-target="#sp-tab-pane" type="button" role="tab"
                 aria-controls="sp-tab-pane" aria-selected="false">SP Registers</button>
             </li>
         }
-        @if (Components.RAM)
+        @if (UIComponents.RAM)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
             </li>
         }
-        @if (Components.ParallelRegisters)
+        @if (UIComponents.ParallelRegisters)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
             </li>
         }
-        @if (Components.SerialPort)
+        @if (UIComponents.SerialPort)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
             </li>
         }
-        @if (Components.Library && Library != null)
+        @if (UIComponents.Library && Library != null)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
@@ -150,7 +150,7 @@
     </ul>
 
     <div class="tab-content">
-        @if (Components.WSIMInstructions && WSIMInstructions != null)
+        @if (UIComponents.WSIMInstructions && WSIMInstructions != null)
         {
             <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
                 @WSIMInstructions
@@ -165,37 +165,37 @@
                 <p id="wsimCode"></p>
             </div>
         }
-        @if (Components.GPRegisters)
+        @if (UIComponents.GPRegisters)
         {
             <div class="tab-pane fade" id="gp-tab-pane" role="tabpanel" aria-labelledby="gp-tab" tabindex="0">
                 <Registers CPU="@board.CPU" registerType="@RegisterType.GP"/>
             </div>
         }
-        @if (Components.SPRegisters)
+        @if (UIComponents.SPRegisters)
         {
             <div class="tab-pane fade" id="sp-tab-pane" role="tabpanel" aria-labelledby="sp-tab" tabindex="0">
                 <Registers CPU="@board.CPU" registerType="@RegisterType.SP"/>
             </div>
         }
-        @if (Components.RAM)
+        @if (UIComponents.RAM)
         {
             <div class="tab-pane fade mDevice" id="ram-tab-pane" role="tabpanel" aria-labelledby="ram-tab" tabindex="0">
                 <Memory CPU="@board.CPU" mDevice="@board.RAM" wordsLoaded="@finalAddress" labels="@labels"/>
             </div>
         }
-        @if (Components.ParallelRegisters)
+        @if (UIComponents.ParallelRegisters)
         {
             <div class="tab-pane fade" id="parallel-tab-pane" role="tabpanel" aria-labelledby="parallel-tab" tabindex="0">
                 <PeripheralMemory parallelMemory="@board.Parallel"/>
             </div>
         }
-        @if (Components.SerialPort)
+        @if (UIComponents.SerialPort)
         {
             <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
                 <SerialPort serial="@board.Serial1"/>
             </div>
         }
-        @if (Components.Library && Library != null)
+        @if (UIComponents.Library && Library != null)
         {
             <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
                 <pre>@((MarkupString)Library[1])</pre>
@@ -212,13 +212,7 @@
     public EventCallback BoardChanged { get; set; }
 
     [Parameter]
-    public List<KeyValuePair<int, int>>? Registers { get; set; }
-
-    [Parameter]
-    public List<ParallelState>? parallelStates { get; set; }
-
-    [Parameter]
-    required public Components Components { get; set; }
+    required public UIComponents UIComponents { get; set; }
 
     [Parameter]
     public RenderFragment? WSIMInstructions { get; set; }
@@ -233,7 +227,7 @@
     public List<BoardState> spRegisterStates = new List<BoardState>();
     public List<BoardState> interruptStates = new List<BoardState>();
     public List<BoardState> pRegisterStates = new List<BoardState>();
-    public List<uint> pcStates = new List<uint>();
+    public List<BoardState> pcStates = new List<BoardState>();
 
     required public string[] blockIDs;
     required public List<string> labels;
@@ -277,7 +271,7 @@
 
     async Task OnCompileClicked()
     {
-        if (Components.Blockly)
+        if (UIComponents.Blockly)
         {
             await CompileRequested.InvokeAsync();
         }
@@ -406,14 +400,6 @@
                     //Store board state
                     StoreBoardState();
 
-                    Verify();
-                    //If the user used jr $ra correctly
-                    if (board.CPU.PC == 0xFFFFF)
-                    {
-                        running = false;
-                        break;
-                    }
-
                     //Execute next instruction
                     while(!board.Tick());
 
@@ -444,36 +430,65 @@
     }
 
     //Used to check the output of the user's program
-    void Verify()
+    public bool Verify(BoardCheck boardCheck)
     {
-        bool correct = true;
-        if (Registers != null)
+        switch (boardCheck.component)
         {
-            if (!CheckRegisters())
-            {
-                correct = false;
-            }
-        }
-        if (parallelStates != null)
-        {
-            if (!CheckParallel())
-            {
-                correct = false;
-            }
-        }
-        if (correct == true)
-        {
-            JSRuntime.InvokeVoidAsync("alert", "You did it!");
-            running = false;
+            case WRAMPComponents c when (int)c >= 0 && (int) c < 11:
+                return CheckStateList(boardCheck, pRegisterStates, (int)boardCheck.component);
+            case WRAMPComponents.GPRegisters:
+                return CheckStateList(boardCheck, gpRegisterStates, (int)boardCheck.checkIndex!);
+            case WRAMPComponents.SPRegisters:
+                return CheckStateList(boardCheck, spRegisterStates, (int)boardCheck.checkIndex!);
+            case WRAMPComponents.RAM:
+                return CheckStateList(boardCheck, memoryStates, (int)boardCheck.checkIndex!);
+            default:
+                return false;
         }
     }
 
-    bool CheckRegisters()
+    bool CheckStateList(BoardCheck boardCheck, List<BoardState> states, int componentIndex)
     {
-        foreach (KeyValuePair<int, int> answer in Registers!)
+        if (boardCheck.start != null && boardCheck.end != null)
         {
-            uint userRegister = board.CPU.mGpRegisters[(RegisterFile.GpRegister)answer.Key];
-            if (userRegister != answer.Value)
+            List<uint> values = getSummaryStateList(componentIndex, states);
+
+            if (values.Count <= Math.Abs((int)(boardCheck.end - boardCheck.start)))
+            {
+                return false;
+            }
+
+            int pos = 1;
+            for (int i = (int)boardCheck.end; i >= boardCheck.start; i--)
+            {
+                if (values[^pos] != i)
+                {
+                    return false;
+                }
+                pos++;
+            }
+        }
+        if (boardCheck.value != null)
+        {
+            if (states[^1].Keys![componentIndex] != boardCheck.value)
+            {
+                return false;
+            }
+        }
+        if (boardCheck.values != null)
+        {
+            List<uint> values = getSummaryStateList(componentIndex, states);
+            List<uint> answers = boardCheck.values;
+            if (values.Count >= answers.Count)
+            {
+                values.RemoveRange(0, values.Count - answers.Count);
+
+                if (!answers.SequenceEqual(values))
+                {
+                    return false;
+                }
+            }
+            else
             {
                 return false;
             }
@@ -481,91 +496,27 @@
         return true;
     }
 
-    bool CheckParallel()
-    {
-        foreach (ParallelState pState in parallelStates!)
-        {
-            int componentIndex = (int)pState.component;
-            if (pState.start != null && pState.end != null)
-            {
-                List<uint> values = getDistinctStateList(componentIndex);
-
-                if (values.Count <= Math.Abs((int)(pState.end - pState.start)))
-                {
-                    return false;
-                }
-
-                int pos = 1;
-                for (int i = (int)pState.end; i >= pState.start; i--)
-                {
-                    if (values[^pos] != i)
-                    {
-                        return false;
-                    }
-                    pos++;
-                }
-            }
-            if (pState.value != null)
-            {
-                if (pRegisterStates[^1].Keys![componentIndex] != pState.value)
-                {
-                    return false;
-                }
-            }
-            if (pState.values != null)
-            {
-                List<uint> values = getDistinctStateList(componentIndex);
-                List<uint> answers = pState.values;
-                if (values.Count >= answers.Count)
-                {
-                    values.RemoveRange(0, values.Count - answers.Count);
-
-                    @* Console.Write("Current contents of values after being truncated: ");
-                    foreach(uint value in values) Console.Write(value + ",");
-                    Console.WriteLine();
-
-                    Console.Write("Current contents of answers: ");
-                    foreach(uint answer in answers) Console.Write(answer + ",");
-                    Console.WriteLine(); *@
-
-                    if (!answers.SequenceEqual(values))
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    @* List<uint> getSummaryStateList(int componentIndex)
+    List<uint> getSummaryStateList(int componentIndex, List<BoardState> states)
     {
         List<uint> values = new List<uint>();
+        uint next = 0;
 
-        foreach (BoardState state in pRegisterStates)
+        foreach (BoardState state in states)
         {
-            uint next = state.Keys![componentIndex];
+            if (state.Keys != null)
+            {
+                next = state.Keys[componentIndex];
+            }
+            else if (state.Key != null)
+            {
+                next = (uint)state.Key;
+            }
+
             if (values.Count == 0 || values.Last() != next)
             {
                 values.Add(next);
             }
         }
-        return values;
-    } *@
-
-    List<uint> getDistinctStateList(int componentIndex)
-    {
-        List<uint> values = new List<uint>();
-
-        foreach (BoardState state in pRegisterStates)
-        {
-            values.Add(state.Keys![componentIndex]);
-        }
-        values = values.Distinct().ToList();
         return values;
     }
 
@@ -596,7 +547,7 @@
         {
             spRegisterStates[^1].Repeats++;
         }
-        if (interruptStates.Count == 0 || board.CPU.InterruptStatus != interruptStates[^1].Key)
+        if (interruptStates.Count == 0 || interruptStates[^1].Key != board.CPU.InterruptStatus)
         {
             interruptStates.Add(new BoardState(board.CPU.InterruptStatus));
         }
@@ -612,7 +563,14 @@
         {
             pRegisterStates[^1].Repeats++;
         }
-        pcStates.Add(board.CPU.PC);
+        if (pcStates.Count == 0 || pcStates[^1].Key != board.CPU.PC)
+        {
+            pcStates.Add(new BoardState(board.CPU.PC));
+        }
+        else
+        {
+            pcStates[^1].Repeats++;
+        }
     }
 
     //Go back one board state
@@ -626,7 +584,7 @@
             board.CPU.mGpRegisters.mRegisters = gpRegisterStates[^1].Keys!;
             board.CPU.mSpRegisters.mRegisters = spRegisterStates[^1].Keys!;
             board.CPU.InterruptStatus = (uint)interruptStates[^1].Key!;
-            board.CPU.mPC = pcStates[^1];
+            board.CPU.mPC = (uint)pcStates[^1].Key!;
             board.Parallel.mMemory = pRegisterStates[^1].Keys!;
 
             //Highlight previous block (try catch used to account for library code which is un-highlightable)
@@ -657,7 +615,10 @@
             {
                 pRegisterStates.RemoveAt(pRegisterStates.Count - 1);
             }
-            pcStates.RemoveAt(pcStates.Count - 1);
+            if (--pcStates[^1].Repeats < 0)
+            {
+                pcStates.RemoveAt(pcStates.Count - 1);
+            }
 
             //Update UI
             updateLEDs();
@@ -670,6 +631,7 @@
     async Task toggleSwitch(int pos)
     {
         board.Parallel.Switches ^= (1u << pos);
+        StoreBoardState();
         await BoardChanged.InvokeAsync();
     }
 
@@ -677,11 +639,13 @@
     {
         board.Parallel.Buttons = (uint)1 << pos;
         await BoardChanged.InvokeAsync();
+        StoreBoardState();
     }
 
     void releaseButton()
     {
         board.Parallel.Buttons = 0;
+        StoreBoardState();
     }
 
     void updateSSDs()

@@ -1,0 +1,1 @@
+public enum WRAMPComponents { Switches = 0, Buttons = 1, Control = 4, InterruptAck = 5, LeftLeftSSD = 6, LeftRightSSD = 7, LeftSSD = 8, RightSSD = 9, LEDs = 10, GPRegisters = 11, SPRegisters = 12, RAM = 13}

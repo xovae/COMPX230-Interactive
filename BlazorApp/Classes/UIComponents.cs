@@ -1,4 +1,4 @@
-public class Components {
+public class UIComponents {
     public bool WSIMInstructions;
     public bool GPRegisters;
     public bool SPRegisters;
@@ -13,7 +13,7 @@ public class Components {
 
     public bool Blockly;
 
-    public Components(bool WSIMInstructions = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Library = false, bool Blockly = false)
+    public UIComponents(bool WSIMInstructions = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Library = false, bool Blockly = false)
     {
         this.WSIMInstructions = WSIMInstructions;
         this.GPRegisters = GPRegisters;

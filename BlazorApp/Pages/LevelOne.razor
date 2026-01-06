@@ -2,10 +2,12 @@
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Level One" LevelChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" components="@Components" WSIMInstructions="@Instructions" ParallelStates="@parallelStates"/>
+<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
 
 @code {
     public Level? levelComponent;
+    required public WSIM WSIM;
+
     required public RexBoard board;
 
     protected override void OnAfterRender(bool firstRender)
@@ -13,16 +15,15 @@
         if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
         {
             board = levelComponent.wsimComponent.board;
+            WSIM = levelComponent.wsimComponent;
         }
     }
 
-    public List<ParallelState> parallelStates = new List<ParallelState>() {
-        new ParallelState(ParallelComponents.LeftSSD, 1, 9)
-    };
+    public bool needsReturn = true;
 
-    public Components Components = new Components(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, ParallelRegisters: true);
+    public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, ParallelRegisters: true);
 
-    public int step = 0;
+    public int section = 0;
 
     public RenderFragment Instructions =>
     @<div>
@@ -35,13 +36,14 @@
             <input id="inputOne" @oninput="OnInputChanged" placeholder="Enter address"/>
             <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne">✔</label>
 
-            @if (step >= 1)
+            @if (section >= 1)
             {
                 <li>That's correct!</li>
-                <li>Next, can you toggle the switches such that this value has the decimal value 10?</li>
+                <li id="switchOne">Next, can you toggle the switches such that this value has the decimal value 10?</li>
+                <label class="inputCheckmark" id="switchCheckmark" for="switchOne">✔</label>
             }
 
-            @if (step >= 2)
+            @if (section >= 2)
             {
                 <li> Great work! </li>
                 <li> Next, write some blockly code to light up the LEDs above the switches. </li>
@@ -49,14 +51,14 @@
                 <li> Can you light up all the LEDs at once? </li>
             }
 
-            @if (step >= 3)
+            @if (section >= 3)
             {
                 <li> Finally, can you load the value from the switches and store it into the leds? </li>
                 <li> You'll need to use both the lw and sw instructions. </li>
                 <li> Note that you can't move the value directly from one address to another, you'll need to temporarily store it in a register. </li>
             }
 
-            @if (step >= 4)
+            @if (section >= 4)
             {
             <li> To test that it is working properly, try switching different switches and watch the corresponding LED light up.  </li>
                 <li> You may need to add a loop back to the start to have it continually update.  </li>
@@ -69,28 +71,44 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
         {
-            if(step == 0) step++;
+            if(section == 0) section++;
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
         }
     }
 
     public async Task CheckBoard()
     {
-        if (board.Parallel.Switches == 10 && step == 1)
+
+        switch (section)
         {
-            step++;
-            StateHasChanged();
+            case 1:
+                if (WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 10)))
+                {
+                    await JSRuntime.InvokeVoidAsync("objectiveCheck", "switchCheckmark");
+                    section++;
+                    StateHasChanged();
+                }
+                break;
+            case 2:
+                if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
+                {
+                    section++;
+                    StateHasChanged();
+                }
+                break;
+            case 3:
+                if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) && WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
+                {
+                    section++;
+                    StateHasChanged();
+                }
+                break;
         }
-        if ((board.Parallel.Leds == 4294967295 || board.Parallel.Leds == 65535) && step == 2)
-        {
-            step++;
-            StateHasChanged();
-        }
-        if (board.Parallel.Leds == 65535 && board.Parallel.Switches == 65535 && step == 3)
-        {
-            step++;
-            StateHasChanged();
-        }
+    }
+
+    public async Task CheckBlockly()
+    {
+
     }
 
     public Toolbox toolbox = new Toolbox{

@@ -20,7 +20,7 @@
             <LevelSelector LevelName="@LevelName"/>
 
             <div class="col">
-                @if (Components.Blockly)
+                @if (UIComponents.Blockly)
                 {
                     <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)"/>
                 }
@@ -31,7 +31,7 @@
             </div>
 
             <div class="col d-flex flex-column h-100">
-                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" Registers="@Registers" components="@Components" WSIMInstructions="@WSIMInstructions" Library="@Library" parallelStates="@ParallelStates"/>
+                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" UIComponents="@UIComponents" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
             </div>
         </div>
     </div>
@@ -48,13 +48,7 @@
     required public Toolbox toolbox { get; set; }
 
     [Parameter]
-    public List<KeyValuePair<int, int>>? Registers { get; set; }
-
-    [Parameter]
-    public List<ParallelState>? ParallelStates { get; set; }
-
-    [Parameter]
-    required public Components Components { get; set; }
+    required public UIComponents UIComponents { get; set; }
 
     [Parameter]
     public RenderFragment? WSIMInstructions { get; set; }
@@ -63,7 +57,7 @@
     public RenderFragment? MainInstructions { get; set; }
 
     [Parameter]
-    public EventCallback LevelChanged { get; set; }
+    public EventCallback BoardChanged { get; set; }
 
     [Parameter]
     public string[]? Library { get; set; }
@@ -83,6 +77,6 @@
 
     async Task BoardHandler()
     {
-        await LevelChanged.InvokeAsync();
+        await BoardChanged.InvokeAsync();
     }
 }

@@ -2,7 +2,7 @@
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Hello World!" LevelName="levelHelloWorld" Registers="@registers" components="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
+<Level @ref="levelComponent" Title="Hello World!" LevelName="levelHelloWorld" UIComponents="@Components" MainInstructions="@MainInstructions" Library="@Library"/>
 
 @code {
     public Level? levelComponent;
@@ -21,7 +21,7 @@
         new KeyValuePair<int, int> (2, 10),
     };
 
-    public Components Components = new Components(Blockly: false, GPRegisters: true, SSDs: true, ParallelRegisters: true, Library: true, RAM: true);
+    public UIComponents Components = new UIComponents(Blockly: false, GPRegisters: true, SSDs: true, ParallelRegisters: true, Library: true, RAM: true);
 
     public int step = 0;
 
