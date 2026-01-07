@@ -305,6 +305,7 @@
         updateLEDs();
         updateSwitches();
         StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
 
         byte[] codeBytes;
 
@@ -429,7 +430,7 @@
         }
     }
 
-    //Used to check the output of the user's program
+    //Used to check the state of the WRAMP board
     public bool Verify(BoardCheck boardCheck)
     {
         if (boardCheck.component != null)
@@ -619,15 +620,17 @@
         //If there is a state to revert to
         if (pcStates.Count != 0)
         {
+            running = false;
+
             //Restore previous states
-            board.RAM.mMemory = memoryStates[^1].Keys!;
-            board.CPU.mGpRegisters.mRegisters = gpRegisterStates[^1].Keys!;
-            board.CPU.mSpRegisters.mRegisters = spRegisterStates[^1].Keys!;
+            board.RAM.mMemory = (uint[])memoryStates[^1].Keys!.Clone();
+            board.CPU.mGpRegisters.mRegisters = (uint[])gpRegisterStates[^1].Keys!.Clone();
+            board.CPU.mSpRegisters.mRegisters = (uint[])spRegisterStates[^1].Keys!.Clone();
             board.CPU.InterruptStatus = (uint)interruptStates[^1].Key!;
             board.CPU.mPC = (uint)pcStates[^1].Key!;
-            board.Parallel.mMemory = pRegisterStates[^1].Keys!;
+            board.Parallel.mMemory = (uint[])pRegisterStates[^1].Keys!.Clone();
 
-            //Highlight previous block (try catch used to account for library code which is un-highlightable)
+            //Highlight previous block (try catch used to account for library code which is un-highlightable due to not being in the Blockly workspace)
             try
             {
                 JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
@@ -670,22 +673,22 @@
 
     async Task toggleSwitch(int pos)
     {
-        board.Parallel.Switches ^= (1u << pos);
         StoreBoardState();
+        board.Parallel.Switches ^= (1u << pos);
         await BoardChanged.InvokeAsync();
     }
 
     async Task pressButton(int pos)
     {
+        StoreBoardState();
         board.Parallel.Buttons = (uint)1 << pos;
         await BoardChanged.InvokeAsync();
-        StoreBoardState();
     }
 
     void releaseButton()
     {
-        board.Parallel.Buttons = 0;
         StoreBoardState();
+        board.Parallel.Buttons = 0;
     }
 
     void updateSSDs()

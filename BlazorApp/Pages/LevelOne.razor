@@ -68,6 +68,10 @@
                         <td>All LEDs lit up</td>
                         <td><label class="inputCheckmark" id="checkmarkFour">✔</label></td>
                     </tr>
+                    <tr>
+                        <td>jr $ra used</td>
+                        <td><label class="inputCheckmark" id="checkmarkFive">✔</label></td>
+                    </tr>
                 </table>
             }
 
@@ -116,7 +120,9 @@
         {
             bool stepOne = false;
             bool stepTwo = false;
-            if (stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)))
+            bool returned = false;
+
+            if (stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
             {
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkThree");
             }
@@ -125,7 +131,7 @@
                 await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkThree");
             }
 
-            if (stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
+            if (stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)))
             {
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkFour");
             }
@@ -134,7 +140,17 @@
                 await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkFour");
             }
 
-            if (stepOne && stepTwo)
+            if (returned = (board.CPU.PC == 0xFFFFF))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkFive");
+            }
+            else if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
+            {
+                stepOne = stepTwo = false;
+                await JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
+            }
+
+            if (stepOne && stepTwo && returned)
             {
                 section++;
             }

@@ -56,6 +56,16 @@ window.objectiveUncheck = (id) =>
     }
 }
 
+window.objectiveUncheckAll = () =>
+{
+    const checkmarks = document.getElementsByClassName('inputCheckmark');
+
+    for (let i = 0; i < checkmarks.length; i++) {
+        id = checkmarks[i].id;
+        objectiveUncheck(id);
+    }
+}
+
 window.levelCompleted = () =>
 {
     id = window.location.pathname.substring(1);

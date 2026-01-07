@@ -455,7 +455,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmetic',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
+        message0: '%1 %2, %3, %4',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['add', 'add'], ['sub', 'sub'], ['mult', 'mult'], ['div', 'div'], ['rem', 'rem']]},
@@ -470,7 +470,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmeticUnsigned',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4',
+        message0: '%1 %2, %3, %4',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addu', 'addu'], ['subu', 'subu'], ['multu', 'multu'], ['divu', 'divu'], ['remu', 'remu']]},
@@ -485,7 +485,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmeticImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4 %5',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addi', 'addi'], ['subi', 'subi'], ['multi', 'multi'], ['divi', 'divi'], ['remi', 'remi']]},
@@ -501,7 +501,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmeticUnsignedImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2 %3 %4 %5',
+        message0: '%1 %2, %3, %4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addui', 'addui'], ['subui', 'subui'], ['multui', 'multui'], ['divui', 'divui'], ['remui', 'remui']]},
