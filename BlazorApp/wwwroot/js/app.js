@@ -1,4 +1,5 @@
-window.levelSelect = (id) => {
+window.levelSelect = (id) =>
+{
     let level = document.getElementById(id);
     level.classList.add("active");
 
@@ -9,14 +10,16 @@ window.levelSelect = (id) => {
     }
 }
 
-window.saveCode = async () => {
+window.saveCode = async () =>
+{
     code = document.getElementById("wsimCode").innerHTML;
     code = code.replaceAll("<br>", "\n");
     code = code.replaceAll("&emsp;", "\t")
     saveFile(code, "code.s");
 }
 
-window.saveFile = async (content, name) => {
+window.saveFile = async (content, name) =>
+{
     const file = new Blob([content], { type: 'text/plain' });
 
     const link = document.createElement('a');

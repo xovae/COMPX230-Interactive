@@ -1,18 +1,22 @@
-window.initBlockly = (tool) => {
+window.initBlockly = (tool) =>
+{
     toolbox = JSON.parse(tool);
     workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
 }
 
-window.generateCode = () => {
+window.generateCode = () =>
+{
     const code = wrampGenerator.workspaceToCode(workspace);
     return code;
 }
 
-window.highlightBlock = (id) => {
+window.highlightBlock = (id) =>
+{
     workspace.highlightBlock(id);
 }
 
-const fullToolbox = {
+const fullToolbox =
+{
     kind: 'categoryToolbox',
     contents:
     [
@@ -200,7 +204,8 @@ const fullToolbox = {
     ]
 };
 
-const customTheme = Blockly.Theme.defineTheme('customTheme', {
+const customTheme = Blockly.Theme.defineTheme('customTheme',
+{
     base: Blockly.Themes.Classic,
     startHats: true,
     categoryStyles:
@@ -835,7 +840,8 @@ Blockly.Extensions.register('immediateValidator',
 
 Blockly.common.defineBlocks(definitions);
 
-const supportedEvents = new Set ([
+const supportedEvents = new Set
+([
     Blockly.Events.BLOCK_CHANGE,
     Blockly.Events.BLOCK_CREATE,
     Blockly.Events.BLOCK_DELETE,
@@ -843,7 +849,15 @@ const supportedEvents = new Set ([
     Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE
 ]);
 
-function updateCode(event) {
+var dotNetReference = null;
+
+window.setDotNetRef = (dotnetRef) =>
+{
+    dotNetReference = dotnetRef;
+}
+
+function updateCode(event)
+{
     if (workspace.isDragging()) return;
     if (!supportedEvents.has(event.type)) return;
 
@@ -859,17 +873,34 @@ function updateCode(event) {
     code = code.replaceAll("\n", "<br>");
     code = code.replaceAll("\t", "&emsp;")
     codeArea.innerHTML = code;
+
+    if (dotNetReference != null)
+    {
+        dotNetReference.invokeMethodAsync('InvokeBoardChanged');
+    }
+}
+
+window.getGeneratedCode = () =>
+{
+    return document.getElementById('wsimCode').textContent;
 }
 
 window.initUpdate = () => {
     workspace.addChangeListener(updateCode);
 }
 
-window.saveWorkspace = () => {
+window.saveWorkspace = () =>
+{
     workspaceJSON = JSON.stringify(Blockly.serialization.workspaces.save(workspace));
     window.saveFile(workspaceJSON, "workspace.json");
 }
 
-window.loadWorkspace = (workspaceJSON) => {
+window.loadWorkspace = (workspaceJSON) =>
+{
     Blockly.serialization.workspaces.load(JSON.parse(workspaceJSON), workspace);
+}
+
+window.resetUI = () =>
+{
+    Blockly.hideChaff();
 }

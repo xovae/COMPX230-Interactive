@@ -16,10 +16,11 @@
         {
             board = levelComponent.wsimComponent.board;
             WSIM = levelComponent.wsimComponent;
+            JSRuntime.InvokeVoidAsync("resetUI");
         }
     }
 
-    public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, ParallelRegisters: true);
+    public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, SSDs: true, Switches: true, LEDs: true, GPRegisters: true, ParallelRegisters: true);
 
     public int section = 0;
 
@@ -48,13 +49,18 @@
 
             @if (section == 2)
             {
+                <li> Now try dragging a jr block from the Branch tab!</li>
+            }
+
+            @if (section == 3)
+            {
                 <li> Great work! </li>
                 <li> Next, write some blockly code to light up the LEDs above the switches. </li>
                 <li> You can write a value to these using the sw (store word) instruction and using the memory address 0x7300A or the label par_led</li>
                 <li> Can you light up all the LEDs at once?</li>
             }
 
-            @if (section == 3)
+            @if (section == 4)
             {
                 <li> Now, can you load the value from the switches and store it into the leds?</li>
                 <li> You'll need to use both the lw and sw instructions.</li>
@@ -75,13 +81,13 @@
                 </table>
             }
 
-            @if (section == 4)
+            @if (section == 5)
             {
                 <li> Finally, try making the far left SSD count from 1 to 10!</li>
                 <li> You may need to add a loop back to the start to have it continually update.</li>
             }
 
-            @if (section >= 5)
+            @if (section == 6)
             {
                 <li> Congrats, you did it! </li>
                 JSRuntime.InvokeVoidAsync("levelCompleted");
@@ -107,16 +113,25 @@
             {
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkTwo");
                 section++;
+                StateHasChanged();
             }
         }
         if (section == 2)
+        {
+            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+            if (code.Contains("jr $_"))
+            {
+                section++;
+            }
+        }
+        if (section == 3)
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
                 section++;
             }
         }
-        if (section == 3)
+        if (section == 4)
         {
             bool stepOne = false;
             bool stepTwo = false;
@@ -155,19 +170,14 @@
                 section++;
             }
         }
-        if (section == 4)
+        if (section == 5)
         {
-            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LeftLeftSSD, start: 1, 10)))
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, start: 1, 10, 1)))
             {
                 section++;
             }
         }
         StateHasChanged();
-    }
-
-    public async Task CheckBlockly()
-    {
-
     }
 
     public Toolbox toolbox = new Toolbox{

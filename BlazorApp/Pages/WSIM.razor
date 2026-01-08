@@ -257,16 +257,28 @@
     bool instructionsLoaded = false;
     bool running = false;
 
-    protected override void OnAfterRender(bool firstRender)
+    private DotNetObjectReference<WSIM>? dotNetReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             //Load SSDs on page load
             updateSSDs();
+
             //Initialise tooltips
-            JSRuntime.InvokeVoidAsync("initTooltips");
+            await JSRuntime.InvokeVoidAsync("initTooltips");
+
+            dotNetReference = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("setDotNetRef", dotNetReference);
+
             StateHasChanged();
         }
+    }
+
+    public void Dispose()
+    {
+        dotNetReference?.Dispose();
     }
 
     async Task OnCompileClicked()
@@ -490,12 +502,14 @@
 
     bool CheckStateList(BoardCheck boardCheck, List<BoardState> states, int componentIndex)
     {
+        StoreBoardState();
         if (boardCheck.start != null && boardCheck.end != null)
         {
             List<uint> values = getSummaryStateList(componentIndex, states);
 
             if (values.Count <= Math.Abs((int)(boardCheck.end - boardCheck.start)))
             {
+                ClearNewestState();
                 return false;
             }
 
@@ -504,6 +518,7 @@
             {
                 if (values[^pos] != i)
                 {
+                    ClearNewestState();
                     return false;
                 }
                 pos++;
@@ -513,6 +528,7 @@
         {
             if (states[^1].Keys![componentIndex] != boardCheck.value)
             {
+                ClearNewestState();
                 return false;
             }
         }
@@ -526,14 +542,17 @@
 
                 if (!answers.SequenceEqual(values))
                 {
+                    ClearNewestState();
                     return false;
                 }
             }
             else
             {
+                ClearNewestState();
                 return false;
             }
         }
+        ClearNewestState();
         return true;
     }
 
@@ -671,6 +690,35 @@
         }
     }
 
+    void ClearNewestState()
+    {
+        //Remove new state from list or decrement number of repeats
+        if (--memoryStates[^1].Repeats < 0)
+        {
+            memoryStates.RemoveAt(memoryStates.Count - 1);
+        }
+        if (--gpRegisterStates[^1].Repeats < 0)
+        {
+            gpRegisterStates.RemoveAt(gpRegisterStates.Count - 1);
+        }
+        if (--spRegisterStates[^1].Repeats < 0)
+        {
+            spRegisterStates.RemoveAt(spRegisterStates.Count - 1);
+        }
+        if (--interruptStates[^1].Repeats < 0)
+        {
+            interruptStates.RemoveAt(interruptStates.Count - 1);
+        }
+        if (--pRegisterStates[^1].Repeats < 0)
+        {
+            pRegisterStates.RemoveAt(pRegisterStates.Count - 1);
+        }
+        if (--pcStates[^1].Repeats < 0)
+        {
+            pcStates.RemoveAt(pcStates.Count - 1);
+        }
+    }
+
     async Task toggleSwitch(int pos)
     {
         StoreBoardState();
@@ -757,5 +805,11 @@
     void saveCode()
     {
         JSRuntime.InvokeVoidAsync("saveCode");
+    }
+
+    [JSInvokable]
+    public async Task InvokeBoardChanged()
+    {
+        await BoardChanged.InvokeAsync();
     }
 }

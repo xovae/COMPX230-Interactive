@@ -1,11 +1,17 @@
 @page "/"
+@inject IJSRuntime JSRuntime
 
 <Level Title="Sandbox" LevelName="sandbox" Toolbox="@toolbox" UIComponents="@Components"/>
 
 @code {
-    public List<KeyValuePair<int, int>> registers = new() {
-        new (13, 99999)
-    };
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSRuntime.InvokeVoidAsync("resetUI");
+        }
+    }
 
     public UIComponents Components = new UIComponents(Blockly: true, GPRegisters: true, SPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, LEDs: true, Switches: true, Buttons: true, SSDs: true);
 
