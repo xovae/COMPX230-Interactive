@@ -490,7 +490,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmeticImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addi', 'addi'], ['subi', 'subi'], ['multi', 'multi'], ['divi', 'divi'], ['remi', 'remi']]},
@@ -506,7 +506,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'arithmeticUnsignedImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['addui', 'addui'], ['subui', 'subui'], ['multui', 'multui'], ['divui', 'divui'], ['remui', 'remui']]},
@@ -522,7 +522,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'loadHighImmediate',
         style: 'arithmeticBlocks',
-        message0: '%1 %2, %3 %4',
+        message0: '%1 %2,%3 %4',
         args0:
         [
             {type: 'field_label_serializable', name: 'instruction', text: 'lhi'},
@@ -552,7 +552,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'bitwiseImmediate',
         style: 'logicBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['andi', 'andi'], ['ori', 'ori'], ['xori', 'xori']]},
@@ -583,7 +583,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'shiftImmediate',
         style: 'logicBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['slli', 'slli'], ['srli', 'srli'], ['srai', 'srai']]},
@@ -629,7 +629,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'setOnImmediate',
         style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['slti', 'slti'], ['sgti', 'sgti'], ['slei', 'slei'], ['sgei', 'sgei'], ['seqi', 'seqi'], ['snei', 'snei']]},
@@ -645,7 +645,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'setOnUnsignedImmediate',
         style: 'conditionalBlocks',
-        message0: '%1 %2, %3, %4 %5',
+        message0: '%1 %2, %3,%4 %5',
         args0:
         [
             {type: 'field_dropdown', name: 'instruction', options: [['sltui', 'sltui'], ['sgtui', 'sgtui'], ['sleui', 'sleui'], ['sgeui', 'sgeui'], ['sequi', 'sequi'], ['sneui', 'sneui']]},

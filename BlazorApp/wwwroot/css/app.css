@@ -76,6 +76,12 @@ pre {
     border: 1px black solid;
 }
 
+.compilePopover {
+    --bs-popover-border-color: rgb(184, 14, 9);
+    --bs-popover-body-padding-x: 1rem;
+    --bs-popover-body-padding-y: .5rem;
+}
+
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */
 .display-container {
 	position: relative;

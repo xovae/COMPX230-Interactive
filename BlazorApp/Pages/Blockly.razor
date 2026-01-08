@@ -48,37 +48,30 @@
             string[] highlightStatements = Regex.Matches(code, highlightBlockPattern).Cast<Match>().Select(m => m.Groups[1].Value.Trim()).ToArray();
             code = Regex.Replace(code, highlightBlockPattern, String.Empty);
 
-            if (!code.Contains("$_"))
+            //Get every label name and position for display in WSIM
+            string[] lines = code.Split(Environment.NewLine);
+            List<string> labels = new List<string>();
+            for (int i = 0; i < lines.Length; i++)
             {
-                //Get every label name and position for display in WSIM
-                string[] lines = code.Split(Environment.NewLine);
-                List<string> labels = new List<string>();
-                for (int i = 0; i < lines.Length; i++)
+                if (!Regex.IsMatch(lines[i], @"^([a-zA-Z0-9_.]+):$"))
                 {
-                    if (!Regex.IsMatch(lines[i], @"^([a-zA-Z0-9_.]+):$"))
+                    if (lines[i] != ".text" && lines[i] != ".data" && lines[i] != ".bss" && lines[i] != ".global main")
                     {
-                        if (lines[i] != ".text" && lines[i] != ".data" && lines[i] != ".bss" && lines[i] != ".global main")
-                        {
-                            labels.Add("");
-                        }
-                    }
-                    else
-                    {
-                        //Remove the previous whitespace entry (if it exists) to make the position of the label match up with it's proceeding instruction
-                        if (labels.Count > 1) labels.RemoveAt(labels.Count - 1);
-                        labels.Add(Regex.Replace(lines[i], @"^([a-zA-Z0-9_.]+):$", "$1"));
+                        labels.Add("");
                     }
                 }
-                await Exported.InvokeAsync((code, highlightStatements, labels));
+                else
+                {
+                    //Remove the previous whitespace entry (if it exists) to make the position of the label match up with it's proceeding instruction
+                    if (labels.Count > 1) labels.RemoveAt(labels.Count - 1);
+                    labels.Add(Regex.Replace(lines[i], @"^([a-zA-Z0-9_.]+):$", "$1"));
+                }
             }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("alert", "Declare all registers!");
-            }
+            await Exported.InvokeAsync((code, highlightStatements, labels));
         }
         else
         {
-            await JSRuntime.InvokeVoidAsync("alert", "You must declare a .text segment with global main, and a label for main!");
+            await JSRuntime.InvokeVoidAsync("triggerPopover", "You must declare a .text segment with global main, and a label for main!");
         }
     }
 

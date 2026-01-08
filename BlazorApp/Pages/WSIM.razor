@@ -9,7 +9,7 @@
     <h2>Controls</h2>
 
     <div class="btn-group me-2" role="group" aria-label="Code Controls">
-        <button type="button" class="btn btn-warning" @onclick="OnCompileClicked">Compile</button>
+        <button type="button" id="compileButton" class="btn btn-warning" @onclick="OnCompileClicked" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="compilePopover">Compile</button>
         <button type="button" class="btn btn-info" @onclick="saveCode">Save</button>
     </div>
 
@@ -266,16 +266,20 @@
             //Load SSDs on page load
             updateSSDs();
 
-            //Initialise tooltips
-            await JSRuntime.InvokeVoidAsync("initTooltips");
+            //Initialise tooltips and popovers
+            await JSRuntime.InvokeVoidAsync("initPopper");
 
+            //Create a DotNet object reference to allow InvokeBoardChanged() to be called from JS code
             dotNetReference = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("setDotNetRef", dotNetReference);
 
+            //Reset the Blockly UI to prevent any lingering UI between page changes.
+            await JSRuntime.InvokeVoidAsync("resetUI");
             StateHasChanged();
         }
     }
 
+    //Dispose the DotNet object reference as needed
     public void Dispose()
     {
         dotNetReference?.Dispose();
@@ -321,7 +325,7 @@
 
         byte[] codeBytes;
 
-        string codeWithEQUs = EQUString + "\n" + args.code;
+        string codeWithEQUs = args.code + "\n" + EQUString;
 
         if (Library != null)
         {
@@ -335,10 +339,11 @@
             codeBytes = Encoding.UTF8.GetBytes(codeWithEQUs);
         }
 
-        //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
         try
         {
+            //Call assembleAndLink from app.js to compile the .s file and retrieve the resulting .srec file as bytes
             byte[] srecBytes = await JSRuntime.InvokeAsync<byte[]>("assembleAndLink", "input.s", codeBytes);
+            await JSRuntime.InvokeVoidAsync("clearPopover");
             //Open a new memory stream, and pass to wsim for execution
             MemoryStream ms = new MemoryStream(srecBytes);
             finalAddress = await board.LoadSrecAsync(ms);

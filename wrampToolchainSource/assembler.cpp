@@ -149,8 +149,8 @@ void bailout()
 void error(char *filename, int line_no, char *msg, char *param)
 {
 	if (filename)
-		cerr << filename << ":" << current_line << ": ";
-	cerr << "ERROR: " << msg;
+		cerr << "Line " << current_line << ": ";
+	cerr << msg;
 
 	if (param)
 		cerr << "`" << param << "'";
@@ -163,7 +163,7 @@ void error(char *filename, int line_no, char *msg, char *param)
 void warning(char *filename, int line_no, char *msg, char *param)
 {
 	if (filename)
-		cerr << filename << ":" << current_line << ": ";
+		cerr << "Line " << current_line << ": ";
 	cerr << "WARNING: " << msg;
 
 	if (param)

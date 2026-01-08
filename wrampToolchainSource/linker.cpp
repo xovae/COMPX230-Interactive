@@ -164,7 +164,7 @@ extern "C" {
 		char *endptr = NULL;
 		char output_filename[] = "output.srec";
 		int num_files = 1;
-		char *input_filename[1] = {fileName}; 
+		char *input_filename[1] = {fileName};
 
 		// Setup the linker special symbols
 		label_entry *bss_size_symbol = get_label("bss_size");
@@ -391,8 +391,7 @@ extern "C" {
 					// Check that we have a match for the external reference
 					if (walk->label->resolved == false)
 					{
-						cerr << "ERROR: Undefined label '" << walk->label->name << "', referenced from file "
-							<< file[i].filename << endl;
+						cerr << "ERROR: Undefined label '" << walk->label->name << "'";
 						// Keep going, bail out later
 						error_flag = true;
 						//	  exit(1);
@@ -542,11 +541,11 @@ extern "C" {
 					if (j == 0){
 						switch (i){
 							case (TEXT):
-								//starting text should be correct					
+								//starting text should be correct
 								break;
 							case (DATA):
-								data_start = current_address;					
-								break;				
+								data_start = current_address;
+								break;
 						}
 					}
 
@@ -578,15 +577,15 @@ extern "C" {
 			}
 			switch (i){
 					case (TEXT):
-						text_end = current_address;			
+						text_end = current_address;
 						break;
 					case (BSS):
 						bss_end = bss_start + bss_size;
 
 						break;
 					case (DATA):
-						data_end = current_address;					
-						break;				
+						data_end = current_address;
+						break;
 				}
 		}
 
