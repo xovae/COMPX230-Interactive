@@ -1,5 +1,0 @@
-/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/CMakeFiles/wasm.dir
-/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/CMakeFiles/wlink.dir
-/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/CMakeFiles/wobj.dir
-/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/CMakeFiles/edit_cache.dir
-/home/jb469/Documents/COMPX230-Interactive/wasm-toolchain-master/CMakeFiles/rebuild_cache.dir
