@@ -19,21 +19,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-
 namespace RexSimulator.Hardware.Rex
 {
     public class SerialIO : MemoryDevice
     {
         #region Defines
         /// <summary>
-        /// Set this to the board's primary clock rate. It is used to determine how many clock cycles are required to transmit/receive serial data.
+        /// The number of clock cycles required to transmit/receive a single symbol. Random is used to simulate real serial delays
         /// </summary>
-        private readonly uint SYSTEM_CLOCK_RATE = 1;
+        public uint ClocksPerSymbol = 1;
+
         #endregion
 
         #region Member Variables
@@ -42,47 +37,6 @@ namespace RexSimulator.Hardware.Rex
         #endregion
 
         #region Accessors
-        /// <summary>
-        /// The baud rate of this device, in bits/second.
-        /// </summary>
-        protected uint BaudRate
-        {
-            get
-            {
-                return (uint)Math.Pow(2, Control & 0x00000007) * 300;
-            }
-        }
-
-        /// <summary>
-        /// The number of bits per symbol. Data bits + start bit + stop bit(s) + parity.
-        /// </summary>
-        protected uint BitsPerSymbol
-        {
-            get
-            {
-                uint dataBits = ((Control >> 6) & 0x00000003) + 5;
-                uint parity = (Control >> 4) & 0x00000003;
-                if (parity == 0x02 || parity == 0x03)
-                    parity = 1;
-                else
-                    parity = 0;
-
-                uint stopBits = ((Control >> 3) & 1) + 1;
-                return dataBits + parity + stopBits + 1; //1 start bit as well
-            }
-        }
-
-        /// <summary>
-        /// The number of clock cycles required to transmit/receive a single symbol.
-        /// </summary>
-        protected uint ClocksPerSymbol
-        {
-            get
-            {
-                return BitsPerSymbol * SYSTEM_CLOCK_RATE / BaudRate;
-            }
-        }
-
         /// <summary>
         /// The transmit register.
         /// </summary>
@@ -93,7 +47,7 @@ namespace RexSimulator.Hardware.Rex
             {
                 Status &= 0xFFFFFFFD;
                 mMemory[0] = value & 0xFF;
-                mClocksToTransmit = 100;
+                mClocksToTransmit = ClocksPerSymbol;
             }
         }
 
@@ -259,39 +213,33 @@ namespace RexSimulator.Hardware.Rex
         public void Tick()
         {
             //Only transmit once the serialisation delay is over
-            if (mClocksToTransmit > 0)
+            if (--mClocksToTransmit == 0)
             {
-                if (--mClocksToTransmit == 0)
+                if(SerialDataTransmitted != null)
+                SerialDataTransmitted(this, new SerialEventArgs(Transmit));
+                serialText += (char)Transmit;
+                if ((Control & 0x200u) != 0)
                 {
-                    if(SerialDataTransmitted != null)
-                    SerialDataTransmitted(this, new SerialEventArgs(Transmit));
-                    serialText += (char)Transmit;
-                    if ((Control & 0x200u) != 0)
-                    {
-                        uint oldIack = InterruptAck;
-                        Interrupt(true);
-                        InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
-                    }
-                    Status |= 0x00000002;
+                    uint oldIack = InterruptAck;
+                    Interrupt(true);
+                    InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
                 }
+                Status |= 0x00000002;
             }
 
-            if (mClocksToReceive > 0)
+            if (mClocksToReceive == 1)
             {
-                if (mClocksToReceive == 1)
+                mClocksToProcessRecv = 100000;
+                mMemory[1] = mRecvValue;
+                Status |= 0x00000001;
+                if ((Control & 0x100u) != 0)
                 {
-                    mClocksToProcessRecv = 100000;
-                    mMemory[1] = mRecvValue;
-                    Status |= 0x00000001;
-                    if ((Control & 0x100u) != 0)
-                    {
-                        uint oldIack = InterruptAck;
-                        Interrupt(true);
-                        InterruptAck = oldIack | 1;  // Set RDR Interrupt bit - redundant, but explicit
-                    }
+                    uint oldIack = InterruptAck;
+                    Interrupt(true);
+                    InterruptAck = oldIack | 1;  // Set RDR Interrupt bit - redundant, but explicit
                 }
-                mClocksToReceive--;
             }
+            mClocksToReceive--;
 
             if (mClocksToProcessRecv > 0)
                 mClocksToProcessRecv--;

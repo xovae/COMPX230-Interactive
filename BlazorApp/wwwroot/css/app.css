@@ -82,6 +82,10 @@ pre {
     --bs-popover-body-padding-y: .5rem;
 }
 
+#serial {
+    overflow-wrap: anywhere;
+}
+
 /* Seven-segment CSS - modified from https://codepen.io/0x04/pen/AEjQwB */
 .display-container {
 	position: relative;

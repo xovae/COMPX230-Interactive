@@ -19,11 +19,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace RexSimulator.Hardware.Rex
 {
     /// <summary>
@@ -90,7 +85,7 @@ namespace RexSimulator.Hardware.Rex
             if (tickCount-- == 0)
             {
                 tickCount = 2604; //about 2400 Hz, assuming a 6.25MHz system clock
-               
+
                 //Do timer events
                 if ((Control & 1) != 0) //if enabled
                 {

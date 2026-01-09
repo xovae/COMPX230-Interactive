@@ -19,16 +19,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace RexSimulator.Hardware.Wramp
 {
     /// <summary>
     /// The Arithmetic Logic Unit for the WRAMP processor.
-    /// 
+    ///
     /// How to use:
     /// 1) Set the inputs to the ALU (Rs, Rt, Func)
     /// 2) Read result (Result)
