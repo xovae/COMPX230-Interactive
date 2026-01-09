@@ -8,7 +8,7 @@
 
     required public SerialIO serial { get; set; }
 
-    private StringBuilder serialBuffer = new StringBuilder();
+    public StringBuilder serialBuffer = new StringBuilder();
     public string serialText => serialBuffer.ToString();
 
     protected override void OnParametersSet()

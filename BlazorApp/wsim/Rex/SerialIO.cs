@@ -130,6 +130,8 @@ namespace RexSimulator.Hardware.Rex
         public uint InterruptAck { get { return mMemory[4]; } set { mMemory[4] = value; } }
         #endregion
 
+        public string serialText = "";
+
         #region Events
         public class SerialEventArgs : EventArgs
         {
@@ -263,6 +265,7 @@ namespace RexSimulator.Hardware.Rex
                 {
                     if(SerialDataTransmitted != null)
                     SerialDataTransmitted(this, new SerialEventArgs(Transmit));
+                    serialText += (char)Transmit;
                     if ((Control & 0x200u) != 0)
                     {
                         uint oldIack = InterruptAck;
