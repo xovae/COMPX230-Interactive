@@ -4,6 +4,7 @@
 @using System.Text.RegularExpressions
 
 @inject IJSRuntime JSRuntime
+@implements IDisposable
 
 <div class="mb-2">
     <h2>Controls</h2>
@@ -192,7 +193,7 @@
         @if (UIComponents.SerialPort)
         {
             <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-                <SerialPort serial="@board.Serial1"/>
+                <SerialPort @ref="serialPort" serial="@board.Serial1"/>
             </div>
         }
         @if (UIComponents.Library && Library != null)
@@ -232,6 +233,8 @@
     required public string[] blockIDs;
     required public List<string> labels;
 
+    public SerialPort? serialPort;
+
     public static string EQUString = """
     .equ sp1_tx,		0x70000
     .equ sp1_rx,		0x70001
@@ -258,6 +261,7 @@
     bool running = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
+    private CancellationTokenSource? cts;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -283,6 +287,8 @@
     public void Dispose()
     {
         dotNetReference?.Dispose();
+        cts?.Cancel();
+        cts?.Dispose();
     }
 
     async Task OnCompileClicked()
@@ -320,6 +326,7 @@
         updateSSDs();
         updateLEDs();
         updateSwitches();
+        serialPort?.serialBuffer.Clear();
         StateHasChanged();
         await JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
 
@@ -364,7 +371,8 @@
     {
         if (instructionsLoaded == true)
         {
-            await WSIMWorker(true);
+            cts = new CancellationTokenSource();
+            await WSIMWorker(true, cts.Token);
         }
     }
 
@@ -373,7 +381,8 @@
     {
         if (instructionsLoaded == true)
         {
-            await WSIMWorker(false);
+            cts = new CancellationTokenSource();
+            await WSIMWorker(false, cts.Token);
         }
     }
 
@@ -383,67 +392,74 @@
         running = false;
     }
 
-    async Task WSIMWorker(bool stepping)
+    async Task WSIMWorker(bool stepping, CancellationToken token)
     {
         running = true;
-        while (running)
+        try
         {
-            //Only do one cycle if the step button was clicked
-            running ^= stepping;
-            //Catch any system exceptions
-            switch (board.CPU.InterruptStatus & (uint)0xF000)
+            while (running && !token.IsCancellationRequested)
             {
-                case (uint)ExceptionSource.GPF:
-                    running = false;
-                    if (board.CPU.PC > finalAddress)
-                    {
-                        await JSRuntime.InvokeVoidAsync("alert", "GPF thrown! Have you tried adding an $ra?");
+                //Only do one cycle if the step button was clicked
+                running ^= stepping;
+                //Catch any system exceptions
+                switch (board.CPU.InterruptStatus & (uint)0xF000)
+                {
+                    case (uint)ExceptionSource.GPF:
+                        running = false;
+                        if (board.CPU.PC > finalAddress)
+                        {
+                            await JSRuntime.InvokeVoidAsync("triggerPopover", "GPF thrown! Have you tried adding an $ra?");
+                            break;
+                        }
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", "GPF thrown!");
                         break;
-                    }
-                    await JSRuntime.InvokeVoidAsync("alert", "GPF thrown!");
-                    break;
-                case (uint)ExceptionSource.SYSCALL:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Syscall exception thrown!");
-                    break;
-                case (uint)ExceptionSource.BREAK:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Breakpoint exception thrown!");
-                    break;
-                case (uint)ExceptionSource.ARITH:
-                    running = false;
-                    await JSRuntime.InvokeVoidAsync("alert", "Arithmetic exception thrown!");
-                    break;
-                default:
-                    //Store board state
-                    StoreBoardState();
+                    case (uint)ExceptionSource.SYSCALL:
+                        running = false;
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", "Syscall exception thrown!");
+                        break;
+                    case (uint)ExceptionSource.BREAK:
+                        running = false;
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", "Breakpoint exception thrown!");
+                        break;
+                    case (uint)ExceptionSource.ARITH:
+                        running = false;
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", "Arithmetic exception thrown!");
+                        break;
+                    default:
+                        //Store board state
+                        StoreBoardState();
 
-                    //Execute next instruction
-                    while(!board.Tick());
+                        //Execute next instruction
+                        while(!board.Tick());
 
-                    //Invoke the EventCallback to allow the Level to check any changes to the board state to see if an objective has been completed
-                    await BoardChanged.InvokeAsync();
+                        //Invoke the EventCallback to allow the Level to check any changes to the board state to see if an objective has been completed
+                        await BoardChanged.InvokeAsync();
 
-                    //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
-                    try
-                    {
-                        await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
-                    }
-                    catch
-                    {
-                        await JSRuntime.InvokeVoidAsync("highlightBlock", null);
-                    }
+                        //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
+                        try
+                        {
+                            await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
+                        }
+                        catch
+                        {
+                            await JSRuntime.InvokeVoidAsync("highlightBlock", null);
+                        }
 
-                    //Update SSDs & LEDs
-                    updateSSDs();
-                    updateLEDs();
-                    updateSwitches();
+                        //Update SSDs & LEDs
+                        updateSSDs();
+                        updateLEDs();
+                        updateSwitches();
 
-                    //Update UI, and add a delay between instructions
-                    await InvokeAsync(StateHasChanged);
-                    await Task.Delay(100);
-                    break;
+                        //Update UI, and add a delay between instructions
+                        await InvokeAsync(StateHasChanged);
+                        await Task.Delay(100);
+                        break;
+                }
             }
+        }
+        catch (OperationCanceledException)
+        {
+
         }
     }
 

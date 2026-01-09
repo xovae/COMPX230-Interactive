@@ -725,7 +725,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
 Blockly.Extensions.register('labelValidator',
     function()
     {
-        const regexPattern = /^[a-zA-Z0-9_.]+$/;
+        const regexPattern = /^[a-zA-Z_][a-zA-Z0-9_.]*$/;
 
         field = this.getField('label');
 

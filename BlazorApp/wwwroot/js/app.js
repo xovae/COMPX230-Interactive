@@ -104,7 +104,10 @@ window.triggerPopover = (error) =>
 
 window.clearPopover = () =>
 {
-    popover.disable();
+    if (popover != null)
+    {
+        popover.disable();
+    }
 }
 
 window.initPopper = () =>
