@@ -815,8 +815,8 @@ Blockly.Extensions.register('immediateValidator',
         this.fieldImage = block.getField('format');
         block.fieldImmediate = block.getField('immediate');
 
-        const generalRegexPattern = /^(-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3})|0x[0-9a-fA-F]{1,4}|0b[0-1]{1,16}|\'[a-zA-Z]\')$/;
-        const decimalRegexPattern = /^-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3})$/;
+        const generalRegexPattern = /^(-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)|0x[0-9a-fA-F]{1,4}|0b[0-1]{1,16}|\'[a-zA-Z]\')$/;
+        const decimalRegexPattern = /^-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)$/;
         const hexRegexPattern = /^0x[0-9a-fA-F]{1,4}$/;
         const binaryRegexPattern = /^0b[0-1]{1,16}$/;
         const charRegexPattern = /^\'[a-zA-Z]\'$/;

@@ -1,21 +1,21 @@
 window.levelSelect = (id) =>
 {
     let level = document.getElementById(id);
-    level.classList.add("active");
+    level.classList.add('active');
 
-    let checkmark = document.getElementById(id + "Checkmark");
+    let checkmark = document.getElementById(id + 'Checkmark');
     if (checkmark != null)
     {
-        checkmark.style.color = "white";
+        checkmark.style.color = 'white';
     }
 }
 
 window.saveCode = async () =>
 {
-    code = document.getElementById("wsimCode").innerHTML;
-    code = code.replaceAll("<br>", "\n");
-    code = code.replaceAll("&emsp;", "\t")
-    saveFile(code, "code.s");
+    code = document.getElementById('wsimCode').innerHTML;
+    code = code.replaceAll('<br>', '\n');
+    code = code.replaceAll('&emsp;', '\t')
+    saveFile(code, 'code.s');
 }
 
 window.saveFile = async (content, name) =>
@@ -33,14 +33,14 @@ window.saveFile = async (content, name) =>
 
 window.quacker = () =>
 {
-    let audio = document.getElementById("duckQuack");
+    let audio = document.getElementById('duckQuack');
     audio.play();
 }
 
 window.objectiveCheck = (id) =>
 {
     let checkmark = document.getElementById(id);
-    let audio = document.getElementById("duckQuack");
+    let audio = document.getElementById('duckQuack');
     if (checkmark != null && checkmark.style.opacity == 0)
     {
         checkmark.style.opacity = 1;
@@ -51,7 +51,7 @@ window.objectiveCheck = (id) =>
 window.objectiveUncheck = (id) =>
 {
     let checkmark = document.getElementById(id);
-    let audio = document.getElementById("kcauQkcud");
+    let audio = document.getElementById('kcauQkcud');
     if (checkmark != null && checkmark.style.opacity == 1)
     {
         checkmark.style.opacity = 0;
@@ -85,7 +85,7 @@ window.levelCheck = () =>
         id = levelIDs[i].id;
         if (localStorage.getItem(id) != null)
         {
-            checkmarkID = id + "Checkmark";
+            checkmarkID = id + 'Checkmark';
             let checkmark = document.getElementById(checkmarkID);
             checkmark.style.opacity = 1;
         }
@@ -126,7 +126,7 @@ window.switchTheme = () =>
     const theme = htmlElement.getAttribute('data-bs-theme');
 
     //Flip theme to opposite
-    if (theme == "light")
+    if (theme == 'light' || theme == 'null')
     {
         setTheme('dark');
     }
@@ -152,6 +152,13 @@ window.initTheme = () =>
     const theme = htmlElement.getAttribute('data-bs-theme');
     const imgElement = document.getElementById('themeSwitcher');
     const imgName = 'img/' + theme + '.svg';
+    if (theme != 'null')
+    {
+        imgElement.src = imgName;
+    }
+    else
+    {
+        imgElement.src = 'img/light.svg';
+    }
 
-    imgElement.src = imgName;
 }

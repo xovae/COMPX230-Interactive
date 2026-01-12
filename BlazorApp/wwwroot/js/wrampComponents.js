@@ -19,7 +19,7 @@ window.changeLED = (id, value) => {
 	}
 	else
 	{
-		LED.style.backgroundColor = "black";
+		LED.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--bs-body-color');
 	}
 }
 

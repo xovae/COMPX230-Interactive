@@ -1,5 +1,4 @@
 @using RexSimulator.Hardware
-@using RexSimulator.Hardware.Wramp
 @using System.Text
 @using System.Text.RegularExpressions
 
@@ -36,8 +35,8 @@
                 <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                     <div class="accordion-body">
 
-                        <a class="float-end" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Physical Components can be accessed using these labels:<br>Switches: par_switch<br>LEDs: par_led<br>Buttons: par_btn<br>SSDs: par_ulssd, par_urssd, par_llssd, par_lrssd">
-                            <img class="float-end" src="img/questionmark.svg" alt="An icon of a question mark surrounded by a circle">
+                        <a class="float-end" id="tooltip" data-bs-toggle="tooltip" data-bs-html="true" data-bs-title="Physical Components can be accessed using these labels:<br>Switches: par_switch<br>LEDs: par_led<br>Buttons: par_btn<br>SSDs: par_ulssd, par_urssd, par_llssd, par_lrssd">
+                            <i class="bi bi-question-circle text-body"></i>
                         </a>
 
                         @if (UIComponents.LEDs || UIComponents.Switches)
