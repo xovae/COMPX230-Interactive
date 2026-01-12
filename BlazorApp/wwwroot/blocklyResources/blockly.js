@@ -1,7 +1,12 @@
-window.initBlockly = (tool) =>
+window.initBlockly = (tool, instances) =>
 {
     toolbox = JSON.parse(tool);
-    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: lightModeTheme});
+    if (instances != null)
+    {
+        instances = instances.replaceAll("\'", "\"");
+    }
+    Instances = JSON.parse(instances);
+    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: lightModeTheme, maxInstances: Instances});
 }
 
 window.generateCode = () =>
