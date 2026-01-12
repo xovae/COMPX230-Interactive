@@ -1,7 +1,7 @@
 window.initBlockly = (tool) =>
 {
     toolbox = JSON.parse(tool);
-    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: customTheme});
+    workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: lightModeTheme});
 }
 
 window.generateCode = () =>
@@ -204,7 +204,7 @@ const fullToolbox =
     ]
 };
 
-const customTheme = Blockly.Theme.defineTheme('customTheme',
+const lightModeTheme = Blockly.Theme.defineTheme('lightModeTheme',
 {
     base: Blockly.Themes.Classic,
     startHats: true,
@@ -269,6 +269,26 @@ const customTheme = Blockly.Theme.defineTheme('customTheme',
         {
             colourPrimary: '#bd31b1'
         }
+    }
+});
+
+const darkModeTheme = Blockly.Theme.defineTheme('darkModeTheme',
+{
+    base: lightModeTheme,
+    startHats: true,
+    componentStyles:
+    {
+        workspaceBackgroundColour: '#1e1e1e',
+        toolboxBackgroundColour: '#333',
+        toolboxForegroundColour: '#fff',
+        flyoutBackgroundColour: '#252526',
+        flyoutForegroundColour: '#ccc',
+        flyoutOpacity: 1,
+        scrollbarColour: '#797979',
+        insertionMarkerColour: '#fff',
+        insertionMarkerOpacity: 0.3,
+        scrollbarOpacity: 0.4,
+        cursorColour: '#d0d0d0',
     }
 });
 
@@ -903,4 +923,25 @@ window.loadWorkspace = (workspaceJSON) =>
 window.resetUI = () =>
 {
     Blockly.hideChaff();
+}
+
+window.switchBlocklyTheme = (themeName) =>
+{
+    if (themeName == 'light')
+    {
+        workspace.setTheme(lightModeTheme);
+    }
+    else if (themeName == 'dark')
+    {
+        workspace.setTheme(darkModeTheme);
+    }
+}
+
+window.initBlocklyTheme = () =>
+{
+    const themeType = localStorage.getItem('theme');
+    if (themeType != '')
+    {
+        switchBlocklyTheme(themeType);
+    }
 }

@@ -270,8 +270,9 @@
             //Load SSDs on page load
             updateSSDs();
 
-            //Initialise tooltips and popovers
+            //Initialise tooltips, popovers, and set the theme
             await JSRuntime.InvokeVoidAsync("initPopper");
+            await JSRuntime.InvokeVoidAsync("initTheme");
 
             //Create a DotNet object reference to allow InvokeBoardChanged() to be called from JS code
             dotNetReference = DotNetObjectReference.Create(this);

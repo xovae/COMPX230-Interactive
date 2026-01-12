@@ -41,7 +41,7 @@ window.objectiveCheck = (id) =>
 {
     let checkmark = document.getElementById(id);
     let audio = document.getElementById("duckQuack");
-    if (checkmark != null)
+    if (checkmark != null && checkmark.style.opacity == 0)
     {
         checkmark.style.opacity = 1;
         audio.play();
@@ -117,4 +117,41 @@ window.initPopper = () =>
 
     const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
     const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+}
+
+const htmlElement = document.documentElement;
+
+window.switchTheme = () =>
+{
+    const theme = htmlElement.getAttribute('data-bs-theme');
+
+    //Flip theme to opposite
+    if (theme == "light")
+    {
+        setTheme('dark');
+    }
+    else
+    {
+        setTheme('light');
+    }
+}
+
+window.setTheme = (themeType) =>
+{
+    const imgElement = document.getElementById('themeSwitcher');
+    const imgName = 'img/' + themeType + '.svg';
+
+    htmlElement.setAttribute('data-bs-theme', themeType);
+    localStorage.setItem('theme', themeType);
+    switchBlocklyTheme(themeType);
+    imgElement.src = imgName;
+}
+
+window.initTheme = () =>
+{
+    const theme = htmlElement.getAttribute('data-bs-theme');
+    const imgElement = document.getElementById('themeSwitcher');
+    const imgName = 'img/' + theme + '.svg';
+
+    imgElement.src = imgName;
 }

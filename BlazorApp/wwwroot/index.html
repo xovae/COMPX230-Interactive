@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <!-- Script to load in theme info before anything is loaded -->
+        <script>
+            (function () {
+                const themeType = localStorage.getItem('theme');
+                document.documentElement.setAttribute('data-bs-theme', themeType);
+            })();
+        </script>
+
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BlazorApp</title>
+        <title>WRAMP Sim</title>
         <base href="/" />
         <link rel="preload" id="webassembly" />
         <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />

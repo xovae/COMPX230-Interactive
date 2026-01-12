@@ -23,6 +23,7 @@
         {
             await JSRuntime.InvokeVoidAsync("initBlockly", Toolbox);
             await JSRuntime.InvokeVoidAsync("initUpdate");
+            await JSRuntime.InvokeVoidAsync("initBlocklyTheme");
             StateHasChanged();
         }
     }

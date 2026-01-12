@@ -9,6 +9,10 @@ html, body {
     margin-right: 10px;
 }
 
+#themeSwitcher {
+    height: 30px;
+}
+
 #blocklyDiv {
     height: 95%
 }
@@ -42,7 +46,7 @@ th, td {
 #mDeviceTable th {
     position: sticky;
     top: 0;
-    background-color: white;
+    background-color: var(--bs-body-bg);
 }
 
 .duck {
