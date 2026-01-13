@@ -32,6 +32,8 @@ window.levelCheck = () =>
     }
 }
 
+window.codeSaved = false;
+
 window.saveCode = async () =>
 {
     code = document.getElementById('wsimCode').innerHTML;
@@ -51,6 +53,20 @@ window.saveFile = async (content, name) =>
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(link.href);
+    codeSaved = true;
+}
+
+window.addEventListener('beforeunload', function (e) {
+    if (codeSaved == false)
+    {
+        triggerPopover('Save your Blockly workspace or WRAMP code first!');
+        e.preventDefault();
+    }
+});
+
+window.checkCodeSaved = () =>
+{
+    return codeSaved;
 }
 
 window.quacker = () =>
