@@ -106,21 +106,18 @@
 
     public async Task CheckBoard()
     {
+        string code = await GetUserCode();
         if (section == 1)
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 10)))
             {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkTwo");
+                CheckObjective(true, "checkmarkTwo");
                 section++;
             }
         }
         if (section == 2)
         {
-            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
-            if (code.Contains("jr $_"))
-            {
-                section++;
-            }
+            if (code.Contains("jr $_")) section++;
         }
         if (section == 3)
         {
@@ -133,35 +130,18 @@
         }
         if (section == 4)
         {
-            bool stepOne = false;
-            bool stepTwo = false;
-            bool returned = false;
+            bool stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535));
+            bool stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535));
+            bool returned = board.CPU.PC == 0xFFFFF;
 
-            if (stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535)))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkThree");
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkThree");
-            }
+            CheckObjective(stepOne, "checkmarkThree");
+            CheckObjective(stepTwo, "checkmarkFour");
+            CheckObjective(returned, "checkmarkFive");
 
-            if (stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)))
+            //If the user didn't use a jr $ra, reset all objectives.
+            if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
             {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkFour");
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkFour");
-            }
-
-            if (returned = (board.CPU.PC == 0xFFFFF))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkFive");
-            }
-            else if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
-            {
-                stepOne = stepTwo = false;
+                stepOne = stepTwo = returned = false;
                 await JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
             }
 
@@ -178,6 +158,16 @@
             }
         }
         StateHasChanged();
+    }
+
+    public void CheckObjective(bool goal, string checkmarkID)
+    {
+        JSRuntime.InvokeVoidAsync(goal ? "objectiveCheck" : "objectiveUncheck", checkmarkID);
+    }
+
+    public async Task<string> GetUserCode()
+    {
+        return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
     }
 
     public Toolbox toolbox = new Toolbox{

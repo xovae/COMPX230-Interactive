@@ -1,9 +1,63 @@
 @page "/"
+@using RexSimulator.Hardware
+@using System.Security.Permissions
+@inject IJSRuntime JSRuntime
 
-<Level Title="Sandbox" Toolbox="@toolbox" UIComponents="@Components"/>
+<Level @ref="levelComponent" Title="Sandbox" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@Components" WSIMInstructions="@Instructions"/>
 
 @code {
+    public Level? levelComponent;
+    required public WSIM WSIM;
+
+    required public RexBoard board;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        {
+            board = levelComponent.wsimComponent.board;
+            WSIM = levelComponent.wsimComponent;
+        }
+    }
+
     public UIComponents Components = new UIComponents(Blockly: true, GPRegisters: true, SPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, LEDs: true, Switches: true, Buttons: true, SSDs: true);
+
+    /// <summary>
+    /// This method is called on any changes to the WRAMP board, or the Blockly workspace. The state of the board can be accessed via the variable board or using
+    /// the method WSIM.Verify(), variables like running can be accessed via WSIM, and the user's code can be accessed by calling await GetUserCode()
+    /// </summary>
+    /// <returns></returns>
+    public async Task CheckBoard()
+    {
+
+    }
+
+    /// <summary>
+    /// Toggle a checkmark depending on the state of goal
+    /// </summary>
+    /// <param name="goal">Goal to be checked</param>
+    /// <param name="checkmarkID">ID of checkmark to be toggled</param>
+    public void CheckObjective(bool goal, string checkmarkID)
+    {
+        JSRuntime.InvokeVoidAsync(goal ? "objectiveCheck" : "objectiveUncheck", checkmarkID);
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <returns>WRAMP Code from the Blockly workspace</returns>
+    public async Task<string> GetUserCode()
+    {
+        return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+    }
+
+    public int section = 0;
+
+    public RenderFragment Instructions =>
+    @<div>
+
+    </div>;
+
+    public string maxInstances = "{ 'global': 1}";
 
     public Toolbox toolbox = new Toolbox{
         contents = new List<Category>() {

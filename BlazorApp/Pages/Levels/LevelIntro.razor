@@ -68,53 +68,26 @@
                 <li> Next, you can choose a different level in the sidebar on the left to continue. </li>
                 JSRuntime.InvokeVoidAsync("levelCompleted");
             }
-
         </ul>
-    </div>
-    ;
+    </div>;
 
     public async Task CheckBoard()
     {
-        if(section == 0)
+        string code = await GetUserCode();
+        if (section == 0)
         {
-            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
-            if (code.Contains(".text"))
-            {
-                section++;
-            }
+            if (code.Contains(".text")) section++;
         }
-        if(section == 1)
+        if (section == 1)
         {
-            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
-
             bool main = code.Contains("main:");
-            bool global = false;
-            bool returned = false;
+            bool global = code.Contains(".global main");
+            bool returned = code.Contains("jr $ra");
 
-
-            await JSRuntime.InvokeVoidAsync(main ? "objectiveCheck" : "objectiveUncheck", "checkmarkS1Main");
-
-            if (code.Contains(".global main"))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkS1Global");
-                global = true;
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkS1Global");
-                global = false;
-            }
-
-            if (code.Contains("jr $ra"))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkS1JR");
-                returned = true;
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkS1JR");
-                returned = false;
-            }
+            //Check objectives
+            CheckObjective(main, "checkmarkS1Main");
+            CheckObjective(global, "checkmarkS1Global");
+            CheckObjective(returned, "checkmarkS1JR");
 
             if (main && global && returned)
             {
@@ -123,40 +96,33 @@
         }
         if (section == 2)
         {
-            bool addi = false;
-            bool running = false;
-            bool register1 = false;
+            bool addi = code.Contains("addi");
+            bool running = WSIM.running;
+            bool register1 = WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 1, 1));
 
-            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+            CheckObjective(addi, "checkmark2Addi");
+            CheckObjective(register1, "checkmark2Register");
+            CheckObjective(running, "checkmark2Running");
 
-            if (code.Contains("addi"))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Addi");
-                addi = true;
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmark2Addi");
-                addi = false;
-            }
-
-            if (WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 1, 1)))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Register");
-                register1 = true;
-            }
-            if (WSIM.running == true)
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Running");
-                running = true;
-            }
             if (addi && running && register1)
             {
                 section++;
             }
         }
     }
-        public Toolbox toolbox = new Toolbox{
+
+    public void CheckObjective(bool goal, string checkmarkID)
+    {
+        JSRuntime.InvokeVoidAsync(goal ? "objectiveCheck" : "objectiveUncheck", checkmarkID);
+    }
+
+    public async Task<string> GetUserCode()
+    {
+        return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+    }
+
+
+    public Toolbox toolbox = new Toolbox{
         contents = new List<Category>() {
             new Category {
                 name = "Sections",

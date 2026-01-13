@@ -32,7 +32,7 @@ window.levelCheck = () =>
     }
 }
 
-window.codeSaved = false;
+window.codeSaved = true;
 
 window.saveCode = async () =>
 {
