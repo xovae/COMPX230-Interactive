@@ -1,0 +1,188 @@
+@page "/levelIntro"
+@using RexSimulator.Hardware
+@using System.Security.Permissions
+@inject IJSRuntime JSRuntime
+
+<Level @ref="levelComponent" Title="Introduction" BoardChanged="CheckBoard" LevelName="levelIntro" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
+
+@code {
+    public Level? levelComponent;
+    required public WSIM WSIM;
+
+    required public RexBoard board;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        {
+            board = levelComponent.wsimComponent.board;
+            WSIM = levelComponent.wsimComponent;
+        }
+    }
+
+    public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, GPRegisters: true);
+
+    public int section = 0;
+
+    public RenderFragment Instructions =>
+    @<div>
+        <h1>Writing WRAMP code using blockly!</h1>
+        <ul>
+            @if (section >= 0)
+            {
+                <li>On the left side of the screen is a blockly workspace.</li>
+                <li>You can click on the sections to find WRAMP code blocks, try adding a .text to the workspace.</li>
+                <li>This will be the start of your WRAMP code.</li>
+            }
+
+            @if (section >= 1)
+            {
+                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main">✔</label></li>
+                <li>You should also make the main label be visible from the outside by adding <code>.global main</code><label class="inputCheckmark" id="checkmarkS1Global">✔</label></li>
+                <li>Finally, to successfully finish your program should jump return to the $ra return address.<label class="inputCheckmark" id="checkmarkS1JR">✔</label></li>
+            }
+
+            @if (section >= 2)
+            {
+                <li> This will be the basic setup for all WRAMP programs. Try saving it now so you can reuse it later.</li>
+                <li> Finally, try to put the number 1 into register 1 using the addi block, then compile and run your code to see if it works properly. </li>
+                <table class="objectiveTable">
+                    <tr>
+                        <td>addi block added</td>
+                        <td><label class="inputCheckmark" id="checkmark2Addi">✔</label></td>
+                    </tr>
+                    <tr>
+                        <td>Program compiled and running</td>
+                        <td><label class="inputCheckmark" id="checkmark2Running">✔</label></td>
+                    </tr>
+                    <tr>
+                        <td>Register 1 contains value 1</td>
+                        <td><label class="inputCheckmark" id="checkmark2Register">✔</label></td>
+                    </tr>
+                </table>
+            }
+
+            @if (section >= 3)
+            {
+                <li> Great work! You've completed this level. </li>
+                <li> Next, you can choose a different level in the sidebar on the left to continue. </li>
+                JSRuntime.InvokeVoidAsync("levelCompleted");
+            }
+
+        </ul>
+    </div>
+    ;
+
+    public async Task CheckBoard()
+    {
+        if(section == 0)
+        {
+            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+            if (code.Contains(".text"))
+            {
+                section++;
+            }
+        }
+        if(section == 1)
+        {
+            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+
+            bool main = code.Contains("main:");
+            bool global = false;
+            bool returned = false;
+
+
+            await JSRuntime.InvokeVoidAsync(main ? "objectiveCheck" : "objectiveUncheck", "checkmarkS1Main");
+
+            if (code.Contains(".global main"))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkS1Global");
+                global = true;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkS1Global");
+                global = false;
+            }
+
+            if (code.Contains("jr $ra"))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkS1JR");
+                returned = true;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkS1JR");
+                returned = false;
+            }
+
+            if (main && global && returned)
+            {
+                section++;
+            }
+        }
+        if (section == 2)
+        {
+            bool addi = false;
+            bool running = false;
+            bool register1 = false;
+
+            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+
+            if (code.Contains("addi"))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Addi");
+                addi = true;
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmark2Addi");
+                addi = false;
+            }
+
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 1, 1)))
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Register");
+                register1 = true;
+            }
+            if (WSIM.running == true)
+            {
+                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Running");
+                running = true;
+            }
+            if (addi && running && register1)
+            {
+                section++;
+            }
+        }
+    }
+        public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" }
+                }
+            }
+        }
+    };
+
+    public string maxInstances = "{ 'textHead': 1}";
+}
