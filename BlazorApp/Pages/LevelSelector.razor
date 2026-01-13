@@ -7,30 +7,28 @@
     <div class="collapse collapse-horizontal show" id="levelSelect">
         <ul class="nav flex-column nav-pills">
             <li class="nav-item">
-                <a class="nav-link" id="sandbox" aria-current="page" href="/">Sandbox</a>
+                <a class="nav-link" href="/">Sandbox</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="levelIntro" href="/levelIntro">Introduction<label class="inputCheckmark float-end" id="levelIntroCheckmark">✔</label></a>
+                <a class="nav-link" href="/levelIntro">Introduction<label class="inputCheckmark float-end" id="levelIntroCheckmark">✔</label></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="levelOne" href="/levelOne">#1<label class="inputCheckmark float-end" id="levelOneCheckmark">✔</label></a>
+                <a class="nav-link" href="/levelOne">#1<label class="inputCheckmark float-end" id="levelOneCheckmark">✔</label></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="levelTwo" href="/levelTwo">#2<label class="inputCheckmark float-end" id="levelTwoCheckmark">✔</label></a>
+                <a class="nav-link" href="/levelTwo">#2<label class="inputCheckmark float-end" id="levelTwoCheckmark">✔</label></a>
             </li>
         </ul>
     </div>
 </div>
 
 @code {
-    [Parameter]
-    required public string LevelName { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("levelSelect", LevelName);
+            await JSRuntime.InvokeVoidAsync("levelSelect");
             await JSRuntime.InvokeVoidAsync("levelCheck");
         }
     }

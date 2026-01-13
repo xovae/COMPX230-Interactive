@@ -18,7 +18,7 @@
 
     <div class="container-fluid flex-grow-1 overflow-hidden pb-3">
         <div class="row h-100">
-            <LevelSelector LevelName="@LevelName"/>
+            <LevelSelector/>
 
             <div class="col">
                 @if (UIComponents.Blockly)
@@ -41,9 +41,6 @@
 @code {
     [Parameter]
     required public string Title { get; set; }
-
-    [Parameter]
-    required public string LevelName { get; set; }
 
     [Parameter]
     required public Toolbox toolbox { get; set; }

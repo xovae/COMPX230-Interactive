@@ -1,12 +1,34 @@
-window.levelSelect = (id) =>
+window.levelSelect = () =>
 {
-    let level = document.getElementById(id);
-    level.classList.add('active');
+    let pathName = window.location.pathname;
 
-    let checkmark = document.getElementById(id + 'Checkmark');
-    if (checkmark != null)
+    //Account for the edge case of the main page not having a path name
+    let levelID = (pathName == "/") ? "sandbox" : pathName.substring(1);
+    let level = (levelID == "sandbox") ? document.querySelector('a[href="/"') : document.querySelector('a[href="/' + levelID + '"]')
+
+    //Highlight the link as active, and set aria-active to the current link
+    level.classList.add('active');
+    level.setAttribute('aria-current', 'page');
+}
+
+window.levelCheck = () =>
+{
+    //Get all <a> tags that link to another level
+    const levelElements = document.querySelectorAll('a.nav-link');
+
+    for (let i = 0; i < levelElements.length; i++)
     {
-        checkmark.style.color = 'white';
+        href = levelElements[i].pathname.substring(1);
+        if (localStorage.getItem(href) != null)
+        {
+            //Show the checkmark
+            checkmarkID = href + 'Checkmark';
+            let checkmark = document.getElementById(checkmarkID);
+            checkmark.style.opacity = 1;
+
+            //Change to white for the currently selected level
+            if (levelElements[i].classList.contains('active')) checkmark.style.color = 'white';
+        }
     }
 }
 
@@ -77,22 +99,6 @@ window.levelCompleted = () =>
     id = window.location.pathname.substring(1);
     localStorage.setItem(id, true);
     levelCheck();
-}
-
-window.levelCheck = () =>
-{
-    const levelIDs = document.getElementsByTagName('a');
-
-    for (let i = 0; i < levelIDs.length; i++)
-    {
-        id = levelIDs[i].id;
-        if (localStorage.getItem(id) != null)
-        {
-            checkmarkID = id + 'Checkmark';
-            let checkmark = document.getElementById(checkmarkID);
-            checkmark.style.opacity = 1;
-        }
-    }
 }
 
 var popover;

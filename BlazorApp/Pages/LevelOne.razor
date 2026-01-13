@@ -2,7 +2,7 @@
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
+<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
 
 @code {
     public Level? levelComponent;
