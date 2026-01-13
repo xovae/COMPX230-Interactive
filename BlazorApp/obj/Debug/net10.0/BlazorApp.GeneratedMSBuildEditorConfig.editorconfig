@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelIntro.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxJbnRyby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelOne.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxPbmUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

@@ -1,8 +1,9 @@
 @page "/levelIntro"
 @using RexSimulator.Hardware
+@using System.Security.Permissions
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Introduction" BoardChanged="CheckBoard" LevelName="levelOne" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
+<Level @ref="levelComponent" Title="Introduction" BoardChanged="CheckBoard" LevelName="levelIntro" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
 
 @code {
     public Level? levelComponent;
@@ -32,14 +33,13 @@
                 <li>On the left side of the screen is a blockly workspace.</li>
                 <li>You can click on the sections to find WRAMP code blocks, try adding a .text to the workspace.</li>
                 <li>This will be the start of your WRAMP code.</li>
-
             }
 
             @if (section >= 1)
             {
-                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program. <label class="inputCheckmark" id="checkmarkS1Main">✔</label></li>
-                <li>You should also make the main label be visible from the outside by adding <code>.global main</code> <label class="inputCheckmark" id="checkmarkS1Global">✔</label></li>
-                <li>Finally, to successfully finish your program should jump return to the $ra return address. <label class="inputCheckmark" id="checkmarkS1JR">✔</label></li>
+                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main">✔</label></li>
+                <li>You should also make the main label be visible from the outside by adding <code>.global main</code><label class="inputCheckmark" id="checkmarkS1Global">✔</label></li>
+                <li>Finally, to successfully finish your program should jump return to the $ra return address.<label class="inputCheckmark" id="checkmarkS1JR">✔</label></li>
             }
 
             @if (section >= 2)
@@ -85,22 +85,14 @@
         }
         if(section == 1)
         {
-            bool main = false;
+            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+
+            bool main = code.Contains("main:");
             bool global = false;
             bool returned = false;
 
-            string code = await JSRuntime.InvokeAsync<string>("getGeneratedCode");
 
-            if (code.Contains("main:"))
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkS1Main");
-                main = true;
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("objectiveUncheck", "checkmarkS1Main");
-                main = false;
-            }
+            await JSRuntime.InvokeVoidAsync(main ? "objectiveCheck" : "objectiveUncheck", "checkmarkS1Main");
 
             if (code.Contains(".global main"))
             {
@@ -153,7 +145,7 @@
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Register");
                 register1 = true;
             }
-            if (board.CPU.mPC >= 1) // TODO: change objective to compile button clicked? Currently checking PC isn't working.
+            if (WSIM.running == true)
             {
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmark2Running");
                 running = true;

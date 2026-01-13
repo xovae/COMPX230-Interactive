@@ -257,7 +257,7 @@
     uint finalAddress = 50;
 
     bool instructionsLoaded = false;
-    bool running = false;
+    public bool running = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
     private CancellationTokenSource? cts;
@@ -328,7 +328,7 @@
         updateSwitches();
         serialPort?.serialBuffer.Clear();
         StateHasChanged();
-        await JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
+        await BoardChanged.InvokeAsync();
 
         byte[] codeBytes;
 
