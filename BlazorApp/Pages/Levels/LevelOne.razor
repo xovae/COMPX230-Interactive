@@ -123,9 +123,19 @@
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
-                section++;
-                //Artificially set the PC back incase the user didn't add a jr $ra
-                board.CPU.PC = 0;
+                //Artificially set the Interrupt status back for the next step in case the user didn't add a jr $ra
+                if (!code.Contains("jr $ra"))
+                {
+                    if ((board.CPU.InterruptStatus & (uint)0xF000) == 0x1000 && WSIM.running == false)
+                    {
+                        board.CPU.InterruptStatus &= 0xEFFF;
+                        section++;
+                    }
+                }
+                else
+                {
+                    section++;
+                }
             }
         }
         if (section == 4)
@@ -138,6 +148,7 @@
             CheckObjective(stepTwo, "checkmarkFour");
             CheckObjective(returned, "checkmarkFive");
 
+            Console.WriteLine(board.CPU.InterruptStatus);
             //If the user didn't use a jr $ra, reset all objectives.
             if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
             {

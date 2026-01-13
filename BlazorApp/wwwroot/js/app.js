@@ -94,7 +94,6 @@ window.objectiveUncheck = (id) =>
 
     if (checkmark.classList.contains('visible'))
     {
-        console.log('removing visible...');
         checkmark.classList.remove('visible');
         document.getElementById('kcauQkcud')?.play();
     }
@@ -133,6 +132,13 @@ window.clearPopover = () =>
     {
         popover.disable();
     }
+}
+
+window.clearPopovers = () =>
+{
+    document.querySelectorAll('.popover').forEach(popoverElement => {
+        popoverElement.remove();
+    });
 }
 
 window.initPopper = () =>
