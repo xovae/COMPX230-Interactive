@@ -81,6 +81,10 @@ pre {
     color: green;
 }
 
+.inputCheckmark.visible {
+    opacity: 1;
+}
+
 .objectiveTable td {
     border: 1px solid var(--bs-body-color);
 }

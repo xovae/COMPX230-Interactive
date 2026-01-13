@@ -216,8 +216,10 @@ namespace RexSimulator.Hardware.Rex
             if (--mClocksToTransmit == 0)
             {
                 if(SerialDataTransmitted != null)
-                SerialDataTransmitted(this, new SerialEventArgs(Transmit));
-                serialText += (char)Transmit;
+                {
+                    SerialDataTransmitted(this, new SerialEventArgs(Transmit));
+                    serialText += (char)Transmit;
+                }
                 if ((Control & 0x200u) != 0)
                 {
                     uint oldIack = InterruptAck;

@@ -868,7 +868,6 @@ Blockly.common.defineBlocks(definitions);
 const supportedEvents = new Set
 ([
     Blockly.Events.BLOCK_CHANGE,
-    Blockly.Events.BLOCK_CREATE,
     Blockly.Events.BLOCK_DELETE,
     Blockly.Events.BLOCK_MOVE,
     Blockly.Events.BLOCK_FIELD_INTERMEDIATE_CHANGE
@@ -881,10 +880,16 @@ window.setDotNetRef = (dotnetRef) =>
     dotNetReference = dotnetRef;
 }
 
+let prevEvents = null;
+
 function updateCode(event)
 {
-    if (workspace.isDragging()) return;
     if (!supportedEvents.has(event.type)) return;
+
+    if (event.group === prevEvents) return;
+    prevEvents = event.group;
+
+    if (workspace.isDragging()) return;
 
     const codeArea = document.getElementById('wsimCode');
     const highlightRegex = /highlightBlock\('[^']+'\)\n/g;

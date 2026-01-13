@@ -291,7 +291,7 @@
         cts?.Dispose();
     }
 
-    async Task OnCompileClicked()
+    public async Task OnCompileClicked()
     {
         if (UIComponents.Blockly)
         {
@@ -426,6 +426,13 @@
                         await JSRuntime.InvokeVoidAsync("triggerPopover", "Arithmetic exception thrown!");
                         break;
                     default:
+                        //Stop if the user used jr $ra
+                        if (board.CPU.PC == 0xFFFFF)
+                        {
+                            running = false;
+                            break;
+                        }
+
                         //Store board state
                         StoreBoardState();
 
@@ -457,10 +464,7 @@
                 }
             }
         }
-        catch (OperationCanceledException)
-        {
-
-        }
+        catch (OperationCanceledException) {}
     }
 
     //Used to check the state of the WRAMP board

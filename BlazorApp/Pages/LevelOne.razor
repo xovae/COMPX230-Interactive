@@ -112,7 +112,6 @@
             {
                 await JSRuntime.InvokeVoidAsync("objectiveCheck", "checkmarkTwo");
                 section++;
-                StateHasChanged();
             }
         }
         if (section == 2)
@@ -128,6 +127,7 @@
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
                 section++;
+                await WSIM.OnCompileClicked();
             }
         }
         if (section == 4)
@@ -171,7 +171,7 @@
         }
         if (section == 5)
         {
-            if (WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, start: 1, 10, 1)))
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LeftLeftSSD, start: 1, 10, 1)))
             {
                 section++;
             }

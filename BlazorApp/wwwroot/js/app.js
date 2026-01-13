@@ -39,23 +39,26 @@ window.quacker = () =>
 
 window.objectiveCheck = (id) =>
 {
-    let checkmark = document.getElementById(id);
-    let audio = document.getElementById('duckQuack');
-    if (checkmark != null && checkmark.style.opacity == 0)
+    const checkmark = document.getElementById(id);
+    if (!checkmark) return;
+
+    if (!checkmark.classList.contains('visible'))
     {
-        checkmark.style.opacity = 1;
-        audio.play();
+        checkmark.classList.add('visible');
+        document.getElementById('duckQuack')?.play();
     }
 }
 
 window.objectiveUncheck = (id) =>
 {
-    let checkmark = document.getElementById(id);
-    let audio = document.getElementById('kcauQkcud');
-    if (checkmark != null && checkmark.style.opacity == 1)
+    const checkmark = document.getElementById(id);
+    if (!checkmark) return;
+
+    if (checkmark.classList.contains('visible'))
     {
-        checkmark.style.opacity = 0;
-        audio.play();
+        console.log('removing visible...');
+        checkmark.classList.remove('visible');
+        document.getElementById('kcauQkcud')?.play();
     }
 }
 
