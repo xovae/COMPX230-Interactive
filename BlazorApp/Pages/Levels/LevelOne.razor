@@ -127,7 +127,8 @@
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
                 section++;
-                await WSIM.OnCompileClicked();
+                //Artificially set the PC back incase the user didn't add a jr $ra
+                board.CPU.PC = 0;
             }
         }
         if (section == 4)

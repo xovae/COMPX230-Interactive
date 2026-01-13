@@ -40,52 +40,52 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelIntro.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxJbnRyby5yYXpvcg==
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Levels/LevelIntro.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxzL0xldmVsSW50cm8ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelOne.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxPbmUucmF6b3I=
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Levels/LevelOne.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxzL0xldmVsT25lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Levels/LevelTwo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxzL0xldmVsVHdvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Levels/Sandbox.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxzL1NhbmRib3gucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelSelector.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxTZWxlY3Rvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/LevelTwo.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTGV2ZWxUd28ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Memory.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWVtb3J5LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/NotFound.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTm90Rm91bmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/PeripheralMemory.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGVyaXBoZXJhbE1lbW9yeS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Registers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUmVnaXN0ZXJzLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/Sandbox.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2FuZGJveC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/SerialPort.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2VyaWFsUG9ydC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/SSD.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU1NELnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/WSIM.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvV1NJTS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/wsimComponents/Memory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvd3NpbUNvbXBvbmVudHMvTWVtb3J5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/wsimComponents/PeripheralMemory.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvd3NpbUNvbXBvbmVudHMvUGVyaXBoZXJhbE1lbW9yeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/wsimComponents/Registers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvd3NpbUNvbXBvbmVudHMvUmVnaXN0ZXJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/wsimComponents/SerialPort.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvd3NpbUNvbXBvbmVudHMvU2VyaWFsUG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/jb469/Documents/COMPX230-Interactive/BlazorApp/Pages/wsimComponents/SSD.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvd3NpbUNvbXBvbmVudHMvU1NELnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/jb469/Documents/COMPX230-Interactive/BlazorApp/_Imports.razor]

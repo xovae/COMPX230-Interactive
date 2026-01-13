@@ -311,24 +311,7 @@
         labels = args.labels;
 
         //Reset board
-        board.Reset();
-        running = false;
-
-        //Remove any stored states
-        memoryStates.Clear();
-        gpRegisterStates.Clear();
-        spRegisterStates.Clear();
-        pcStates.Clear();
-        interruptStates.Clear();
-        pRegisterStates.Clear();
-
-        //Update UI
-        updateSSDs();
-        updateLEDs();
-        updateSwitches();
-        serialPort?.serialBuffer.Clear();
-        StateHasChanged();
-        await BoardChanged.InvokeAsync();
+        Reset();
 
         byte[] codeBytes;
 
@@ -364,6 +347,28 @@
         catch {
             labels.Clear();
         }
+    }
+
+    public void Reset()
+    {
+        board.Reset();
+        running = false;
+
+        //Remove any stored states
+        memoryStates.Clear();
+        gpRegisterStates.Clear();
+        spRegisterStates.Clear();
+        pcStates.Clear();
+        interruptStates.Clear();
+        pRegisterStates.Clear();
+
+        //Update UI
+        updateSSDs();
+        updateLEDs();
+        updateSwitches();
+        serialPort?.serialBuffer.Clear();
+        StateHasChanged();
+        BoardChanged.InvokeAsync();
     }
 
     //Executes a single instruction
