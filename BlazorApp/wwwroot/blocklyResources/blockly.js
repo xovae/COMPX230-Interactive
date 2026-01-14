@@ -1,4 +1,4 @@
-window.initBlockly = (tool, instances) =>
+window.initBlockly = (tool, instances, snippet) =>
 {
     toolbox = JSON.parse(tool);
     if (instances != null)
@@ -7,6 +7,11 @@ window.initBlockly = (tool, instances) =>
     }
     Instances = JSON.parse(instances);
     workspace = Blockly.inject('blocklyDiv', {toolbox: toolbox, theme: lightModeTheme, maxInstances: Instances});
+
+    if (snippet != null)
+    {
+        loadWorkspace(snippet);
+    }
 }
 
 window.generateCode = () =>

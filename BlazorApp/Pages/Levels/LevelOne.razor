@@ -2,7 +2,7 @@
 @using RexSimulator.Hardware
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
+<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" Snippet="@snippet" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
 
 @code {
     public Level? levelComponent;
@@ -220,4 +220,8 @@
     };
 
     public string maxInstances = "{ 'textHead': 1}";
+
+    public string snippet = """
+        {"blocks":{"languageVersion":0,"blocks":[{"type":"textHead","id":"*4p.gQmetkk+!Wm1!!kx","x":117,"y":21,"fields":{"instruction":".text"},"next":{"block":{"type":"global","id":"(T)!t~zEEwtWUX]]#s?@","fields":{"instruction":".global main"},"next":{"block":{"type":"label","id":"90].4xui,q_T{DPyc5ch","fields":{"label":"main"},"next":{"block":{"type":"arithmeticImmediate","id":"[v;$]DeWKi[D[3[Bou,x","fields":{"instruction":"addi","register1":"$1","register2":"$0","immediate":"65535"},"next":{"block":{"type":"storeWord","id":"U^`Ur(!-VsJ`rKvr%Hb]","fields":{"instruction":"sw","register1":"$1","offset":"par_led","register2":"$0"},"next":{"block":{"type":"jumpRegister","id":"MztpJP^=1XLK+BY.ZFO=","fields":{"instruction":"jr","register":"$ra"}}}}}}}}}}}}]}}
+    """;
 }

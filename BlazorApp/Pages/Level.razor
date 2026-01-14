@@ -23,7 +23,7 @@
             <div class="col">
                 @if (UIComponents.Blockly)
                 {
-                    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)" maxInstances="@maxInstances"/>
+                    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)" maxInstances="@maxInstances" Snippet="@Snippet"/>
                 }
                 else if (MainInstructions != null)
                 {
@@ -47,6 +47,9 @@
 
     [Parameter]
     public string? maxInstances { get; set; }
+
+    [Parameter]
+    public string? Snippet { get; set; }
 
     [Parameter]
     required public UIComponents UIComponents { get; set; }
