@@ -2,11 +2,15 @@
 @using System.Runtime.InteropServices
 @inject IJSRuntime JSRuntime
 
-<div class="btn-group mb-2" role="group" aria-label="Code Controls">
-    <button type="button" class="btn btn-warning" @onclick="saveWorkspace">Save</button>
-    <label class="btn btn-info">Load
-        <InputFile hidden id="workspaceInput" OnChange="loadWorkspace"/>
-    </label>
+<div class="mb-2" aria-label="Blockly Controls">
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-warning" @onclick="saveWorkspace">Save</button>
+        <label class="btn btn-info">Load
+            <InputFile hidden id="workspaceInput" OnChange="loadWorkspace"/>
+        </label>
+    </div>
+
+    <button type="button" class="btn btn-danger ms-2" @onclick="resetWorkspace">Reset</button>
 </div>
 
 <div id="blocklyDiv"></div>
@@ -103,5 +107,10 @@
             }
         }
         catch {}
+    }
+
+    async Task resetWorkspace()
+    {
+        await JSRuntime.InvokeVoidAsync("resetWorkspace");
     }
 }
