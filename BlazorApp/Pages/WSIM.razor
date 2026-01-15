@@ -411,24 +411,23 @@
                 {
                     case (uint)ExceptionSource.GPF:
                         running = false;
-                        if (board.CPU.PC > finalAddress)
-                        {
-                            await JSRuntime.InvokeVoidAsync("triggerPopover", "GPF thrown! Have you tried adding an $ra?");
-                            break;
-                        }
-                        await JSRuntime.InvokeVoidAsync("triggerPopover", "GPF thrown!");
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", board.CPU.PC > finalAddress ? "GPF thrown! Have you tried adding an $ra?" : "GPF thrown");
+                        await BoardChanged.InvokeAsync();
                         break;
                     case (uint)ExceptionSource.SYSCALL:
                         running = false;
                         await JSRuntime.InvokeVoidAsync("triggerPopover", "Syscall exception thrown!");
+                        await BoardChanged.InvokeAsync();
                         break;
                     case (uint)ExceptionSource.BREAK:
                         running = false;
                         await JSRuntime.InvokeVoidAsync("triggerPopover", "Breakpoint exception thrown!");
+                        await BoardChanged.InvokeAsync();
                         break;
                     case (uint)ExceptionSource.ARITH:
                         running = false;
                         await JSRuntime.InvokeVoidAsync("triggerPopover", "Arithmetic exception thrown!");
+                        await BoardChanged.InvokeAsync();
                         break;
                     default:
                         //Stop if the user used jr $ra

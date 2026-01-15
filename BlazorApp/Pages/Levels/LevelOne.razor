@@ -148,7 +148,6 @@
             CheckObjective(stepTwo, "checkmarkFour");
             CheckObjective(returned, "checkmarkFive");
 
-            Console.WriteLine(board.CPU.InterruptStatus);
             //If the user didn't use a jr $ra, reset all objectives.
             if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
             {
