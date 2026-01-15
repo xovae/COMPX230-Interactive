@@ -288,10 +288,10 @@ namespace RexSimulator.Hardware
                 Parallel.Write();
                 ROM.Write();
                 ret = true;
+                Serial1.Tick();
+                Serial2.Tick();
             }
             Timer.Tick();
-            Serial1.Tick();
-            Serial2.Tick();
 
             return ret;
         }

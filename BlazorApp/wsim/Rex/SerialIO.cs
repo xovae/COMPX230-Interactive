@@ -27,7 +27,7 @@ namespace RexSimulator.Hardware.Rex
         /// <summary>
         /// The number of clock cycles required to transmit/receive a single symbol. Random is used to simulate real serial delays
         /// </summary>
-        public uint ClocksPerSymbol = 1;
+        public uint ClocksPerSymbol = 2;
 
         #endregion
 
@@ -208,7 +208,7 @@ namespace RexSimulator.Hardware.Rex
         }
 
         /// <summary>
-        /// Must be called on every clock tick. Used to perfom internal operations.
+        /// Must be called on every clock tick. Used to perform internal operations.
         /// </summary>
         public void Tick()
         {
