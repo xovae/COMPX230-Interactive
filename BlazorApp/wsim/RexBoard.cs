@@ -75,8 +75,8 @@ namespace RexSimulator.Hardware
 
             //Memory and Memory-mapped IO
             RAM = new MemoryDevice(0x00000, 0x04000, mAddressBus, mDataBus, "Memory (RAM)");
-            Serial1 = new SerialIO(0x70000, 5, mAddressBus, mDataBus, "Serial Port 1");
-            Serial2 = new SerialIO(0x71000, 5, mAddressBus, mDataBus, "Serial Port 2");
+            Serial1 = new SerialIO(0x70000, 9, mAddressBus, mDataBus, "Serial Port 1");
+            Serial2 = new SerialIO(0x71000, 9, mAddressBus, mDataBus, "Serial Port 2");
             Timer = new Rex.Timer(0x72000, 4, mAddressBus, mDataBus, "Timer");
             Parallel = new ParallelIO(0x73000, 11, mAddressBus, mDataBus, "Parallel Port");
             ROM = new MemoryDevice(0x80000, 0x40000, mAddressBus, mDataBus, "Memory (ROM)");

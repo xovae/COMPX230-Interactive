@@ -28,12 +28,15 @@ namespace RexSimulator.Hardware.Rex
         /// The number of clock cycles required to transmit/receive a single symbol. Random is used to simulate real serial delays
         /// </summary>
         public uint ClocksPerSymbol = 2;
+        public string serialText = "";
 
         #endregion
 
         #region Member Variables
-        private uint mClocksToTransmit = 0, mClocksToReceive = 0, mClocksToProcessRecv = 0;
-        private uint mRecvValue;
+        public uint mClocksToTransmit { get { return mMemory[5]; } set { mMemory[5] = value; }}
+        public uint mClocksToReceive { get { return mMemory[6]; } set { mMemory[6] = value; }}
+        public uint mClocksToProcessRecv { get { return mMemory[7]; } set { mMemory[7] = value; }}
+        public uint mRecvValue { get { return mMemory[8]; } set { mMemory[8] = value; }}
         #endregion
 
         #region Accessors
@@ -83,8 +86,6 @@ namespace RexSimulator.Hardware.Rex
         /// </summary>
         public uint InterruptAck { get { return mMemory[4]; } set { mMemory[4] = value; } }
         #endregion
-
-        public string serialText = "";
 
         #region Events
         public class SerialEventArgs : EventArgs
@@ -159,6 +160,7 @@ namespace RexSimulator.Hardware.Rex
             {
                 mMemory[i] = 0;
             }
+            serialText = "";
             Control = 0xC7; //8 data bits, no parity, 1 stop bit, 38400 baud
             Status = 0x02;
             Interrupt(false);
@@ -213,35 +215,37 @@ namespace RexSimulator.Hardware.Rex
         public void Tick()
         {
             //Only transmit once the serialisation delay is over
-            if (--mClocksToTransmit == 0)
+            if (mClocksToTransmit > 0)
             {
-                if(SerialDataTransmitted != null)
+                if (--mClocksToTransmit == 0)
                 {
-                    SerialDataTransmitted(this, new SerialEventArgs(Transmit));
                     serialText += (char)Transmit;
+                    if ((Control & 0x200u) != 0)
+                    {
+                        uint oldIack = InterruptAck;
+                        Interrupt(true);
+                        InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
+                    }
+                    Status |= 0x00000002;
                 }
-                if ((Control & 0x200u) != 0)
-                {
-                    uint oldIack = InterruptAck;
-                    Interrupt(true);
-                    InterruptAck = oldIack | 2;  // Set TDS Interrupt bit
-                }
-                Status |= 0x00000002;
             }
 
-            if (mClocksToReceive == 1)
+            if (mClocksToReceive > 0)
             {
-                mClocksToProcessRecv = 100000;
-                mMemory[1] = mRecvValue;
-                Status |= 0x00000001;
-                if ((Control & 0x100u) != 0)
+                if (mClocksToReceive == 1)
                 {
-                    uint oldIack = InterruptAck;
-                    Interrupt(true);
-                    InterruptAck = oldIack | 1;  // Set RDR Interrupt bit - redundant, but explicit
+                    mClocksToProcessRecv = 100000;
+                    mMemory[1] = mRecvValue;
+                    Status |= 0x00000001;
+                    if ((Control & 0x100u) != 0)
+                    {
+                        uint oldIack = InterruptAck;
+                        Interrupt(true);
+                        InterruptAck = oldIack | 1;  // Set RDR Interrupt bit - redundant, but explicit
+                    }
                 }
+                mClocksToReceive--;
             }
-            mClocksToReceive--;
 
             if (mClocksToProcessRecv > 0)
                 mClocksToProcessRecv--;

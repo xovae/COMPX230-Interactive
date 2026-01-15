@@ -1,6 +1,7 @@
 @using RexSimulator.Hardware
 @using System.Text
 @using System.Text.RegularExpressions
+@using RexSimulator.Hardware.Rex
 
 @inject IJSRuntime JSRuntime
 @implements IDisposable
@@ -192,7 +193,8 @@
         @if (UIComponents.SerialPort)
         {
             <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-                <SerialPort @ref="serialPort" serial="@board.Serial1"/>
+                @* <SerialPort @ref="serialPort" serial="@board.Serial1"/> *@
+                <p>@board.Serial1.serialText</p>
             </div>
         }
         @if (UIComponents.Library && Library != null)
@@ -225,14 +227,21 @@
     public List<BoardState> memoryStates = new List<BoardState>();
     public List<BoardState> gpRegisterStates = new List<BoardState>();
     public List<BoardState> spRegisterStates = new List<BoardState>();
+    public List<BoardState> serialStates = new List<BoardState>();
     public List<BoardState> interruptStates = new List<BoardState>();
     public List<BoardState> pRegisterStates = new List<BoardState>();
     public List<BoardState> pcStates = new List<BoardState>();
 
+    @* TODO: Add serial backup states *@
+    @* TODO: Add .equ block *@
+    @* TODO: Look at RAM stack display  *@
+    @* TODO: Add ability to disable WSIM section for empty webpage *@
+    @* TODO: Option to not display code *@
+    @* TODO: Option to put in custom render fragement instead of WSIM component *@
+    @* TODO: Allow tabs + new blockly blocks to be shown and hidden mid level *@
+
     required public string[] blockIDs;
     required public List<string> labels;
-
-    public SerialPort? serialPort;
 
     public static string EQUString = """
     .equ sp1_tx,		0x70000
@@ -276,6 +285,9 @@
             //Create a DotNet object reference to allow InvokeBoardChanged() to be called from JS code
             dotNetReference = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("setDotNetRef", dotNetReference);
+
+            board.Serial1.SerialDataTransmitted -= storeSerial;
+            board.Serial1.SerialDataTransmitted += storeSerial;
 
             //Reset the Blockly UI to prevent any lingering UI between page changes.
             await JSRuntime.InvokeVoidAsync("resetUI");
@@ -358,6 +370,7 @@
         memoryStates.Clear();
         gpRegisterStates.Clear();
         spRegisterStates.Clear();
+        serialStates.Clear();
         pcStates.Clear();
         interruptStates.Clear();
         pRegisterStates.Clear();
@@ -366,7 +379,6 @@
         updateSSDs();
         updateLEDs();
         updateSwitches();
-        serialPort?.serialBuffer.Clear();
         StateHasChanged();
         BoardChanged.InvokeAsync();
     }
@@ -411,7 +423,7 @@
                 {
                     case (uint)ExceptionSource.GPF:
                         running = false;
-                        await JSRuntime.InvokeVoidAsync("triggerPopover", board.CPU.PC > finalAddress ? "GPF thrown! Have you tried adding an $ra?" : "GPF thrown");
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", board.CPU.PC > finalAddress ? "GPF thrown! Have you tried adding an $ra?" : "GPF thrown!");
                         await BoardChanged.InvokeAsync();
                         break;
                     case (uint)ExceptionSource.SYSCALL:
@@ -614,7 +626,7 @@
         //Store board state, either creating a new entry if it is unique, or incrementing the repeat value for the previous state
         if (memoryStates.Count == 0 || !memoryStates[^1].Keys.SequenceEqual(board.RAM.mMemory))
         {
-            memoryStates.Add(new ((uint[])board.RAM.mMemory.Clone()));
+            memoryStates.Add(new BoardState ((uint[])board.RAM.mMemory.Clone()));
         }
         else
         {
@@ -622,7 +634,7 @@
         }
         if (gpRegisterStates.Count == 0 || !gpRegisterStates[^1].Keys.SequenceEqual(board.CPU.mGpRegisters.mRegisters))
         {
-            gpRegisterStates.Add(new ((uint[])board.CPU.mGpRegisters.mRegisters.Clone()));
+            gpRegisterStates.Add(new BoardState ((uint[])board.CPU.mGpRegisters.mRegisters.Clone()));
         }
         else
         {
@@ -630,15 +642,23 @@
         }
         if (spRegisterStates.Count == 0 || !spRegisterStates[^1].Keys.SequenceEqual(board.CPU.mSpRegisters.mRegisters))
         {
-            spRegisterStates.Add(new ((uint[])board.CPU.mSpRegisters.mRegisters.Clone()));
+            spRegisterStates.Add(new BoardState ((uint[])board.CPU.mSpRegisters.mRegisters.Clone()));
         }
         else
         {
             spRegisterStates[^1].Repeats++;
         }
+        if (serialStates.Count == 0 || serialStates[^1].String != board.Serial1.serialText || !serialStates[^1].Keys.SequenceEqual(board.Serial1.mMemory))
+        {
+            serialStates.Add(new BoardState(board.Serial1.serialText, (uint[])board.Serial1.mMemory.Clone()));
+        }
+        else
+        {
+            serialStates[^1].Repeats++;
+        }
         if (interruptStates.Count == 0 || interruptStates[^1].Key != board.CPU.InterruptStatus)
         {
-            interruptStates.Add(new BoardState(board.CPU.InterruptStatus));
+            interruptStates.Add(new BoardState (board.CPU.InterruptStatus));
         }
         else
         {
@@ -662,6 +682,10 @@
         }
     }
 
+    void storeSerial(object? sender, SerialIO.SerialEventArgs e)
+    {
+    }
+
     //Go back one board state
     void Undo()
     {
@@ -677,6 +701,9 @@
             board.CPU.InterruptStatus = (uint)interruptStates[^1].Key!;
             board.CPU.mPC = (uint)pcStates[^1].Key!;
             board.Parallel.mMemory = (uint[])pRegisterStates[^1].Keys!.Clone();
+
+            board.Serial1.serialText = serialStates[^1].String!;
+            board.Serial1.mMemory = (uint[])serialStates[^1].Keys!.Clone();
 
             //Highlight previous block (try catch used to account for library code which is un-highlightable due to not being in the Blockly workspace)
             try
@@ -697,6 +724,10 @@
             if (--spRegisterStates[^1].Repeats < 0)
             {
                 spRegisterStates.RemoveAt(spRegisterStates.Count - 1);
+            }
+            if (--serialStates[^1].Repeats < 0)
+            {
+                serialStates.RemoveAt(serialStates.Count - 1);
             }
             if (--interruptStates[^1].Repeats < 0)
             {
