@@ -126,14 +126,6 @@ window.triggerPopover = (error) =>
     popover.show();
 }
 
-window.clearPopover = () =>
-{
-    if (popover != null)
-    {
-        popover.disable();
-    }
-}
-
 window.clearPopovers = () =>
 {
     document.querySelectorAll('.popover').forEach(popoverElement => {

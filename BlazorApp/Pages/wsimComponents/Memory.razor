@@ -4,15 +4,12 @@
 
 @code {
     [Parameter]
-
     required public MemoryDevice mDevice { get; set; }
 
     [Parameter]
-
     required public SimpleWrampCpu CPU { get; set; }
 
     [Parameter]
-
     required public uint wordsLoaded { get; set; }
 
     [Parameter]
@@ -24,7 +21,7 @@
         public uint address;
         public uint value;
         public IR ir = new IR();
-        public string label;
+        public string? label;
         public MemoryPos(string pointer, uint address, uint value, string label)
         {
             this.pointer = pointer;
@@ -32,6 +29,11 @@
             this.value = value;
             ir.Instruction = value;
             this.label = label;
+        }
+
+        public MemoryPos()
+        {
+            pointer = ".";
         }
     }
 }
@@ -41,7 +43,7 @@
 {
     //Print instructions with a small buffer of null addresses at the end
     List<MemoryPos> mPos = new List<MemoryPos>();
-    @for (uint i = mDevice.BaseAddress; i < (mDevice.BaseAddress + wordsLoaded + 5); i++)
+    @for (uint i = mDevice.BaseAddress; i < (mDevice.BaseAddress + wordsLoaded); i++)
     {
         if (mDevice.Name == "Memory (RAM)")
         {
@@ -69,18 +71,32 @@
         }
     }
 
+    @for (uint i = 0; i < 3; i++)
+    {
+        mPos.Add(new MemoryPos());
+    }
 
     //Print the stack
     uint sp = CPU.mGpRegisters[RegisterFile.GpRegister.sp];
     if (sp != 0xFFFFFFFF)
     {
-        uint topOfStack = sp;
-        while(mDevice[topOfStack--] != 0xFFFFFFFF)
-        for (uint i = topOfStack; i <= CPU.mGpRegisters[RegisterFile.GpRegister.sp]; i++)
+        //Find the bounds of the current stack
+        uint bottomOfStack = sp;
+        while(mDevice[bottomOfStack + 1] != 0xFFFFFFFF)
         {
-            mPos.Add(new MemoryPos("", i, mDevice[i], ""));
+            bottomOfStack++;
         }
+
+        //Add all stack items
         mPos.Add(new MemoryPos("$sp", sp, mDevice[sp], ""));
+        Console.WriteLine("0x" + bottomOfStack.ToString("X8"));
+        if (sp != bottomOfStack)
+        {
+            for (uint i = sp + 1; i <= bottomOfStack; i++)
+            {
+                mPos.Add(new MemoryPos("", i, mDevice[i], ""));
+            }
+        }
     }
 
     <table class="wsimTable" id="mDeviceTable">
@@ -96,11 +112,18 @@
         <tbody>
             <Virtualize Items="mPos" Context="item">
                 <tr>
-                    <td>@item.pointer</td>
-                    <td>@item.address.ToString("X8")</td>
-                    <td>@item.value.ToString("X8")</td>
-                    <td>@item.ir.ToString()</td>
-                    <td>@item.label</td>
+                    @if (item.pointer != ".")
+                    {
+                        <td>@item.pointer</td>
+                        <td>@item.address.ToString("X8")</td>
+                        <td>@item.value.ToString("X8")</td>
+                        <td>@item.ir.ToString()</td>
+                        <td>@item.label</td>
+                    }
+                    else
+                    {
+                        <td class="text-center" colspan="5">.</td>
+                    }
                 </tr>
             </Virtualize>
         </tbody>
