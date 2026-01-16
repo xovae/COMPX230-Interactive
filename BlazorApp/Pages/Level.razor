@@ -1,5 +1,6 @@
 ﻿@using System.Text.Json
 
+@* Page Title *@
 <PageTitle>@Title</PageTitle>
 
 <div class="flex-column d-flex vh-100">
@@ -20,6 +21,7 @@
         <div class="row h-100">
             <LevelSelector/>
 
+            @* Delete below HTML code for an empty level template *@
             <div class="col">
                 @if (UIComponents.Blockly)
                 {
@@ -38,6 +40,7 @@
     </div>
 </div>
 
+@* Delete for blank level template *@
 @code {
     [Parameter]
     required public string Title { get; set; }

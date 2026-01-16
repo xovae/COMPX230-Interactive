@@ -98,14 +98,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
-            </li>
         }
-        else
+        @if (UIComponents.Code)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="true">Code</button>
+                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
             </li>
         }
         @if (UIComponents.GPRegisters)
@@ -156,13 +153,10 @@
             <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
                 @WSIMInstructions
             </div>
-            <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
-                <p id="wsimCode"></p>
-            </div>
         }
-        else
+        @if (UIComponents.Code)
         {
-            <div class="tab-pane fade show active" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
+            <div class="tab-pane fade" id="code-tab-pane" role="tabpanel" aria-labelledby="code-tab" tabindex="0">
                 <p id="wsimCode"></p>
             </div>
         }
@@ -232,14 +226,6 @@
     public List<BoardState> pRegisterStates = new List<BoardState>();
     public List<BoardState> pcStates = new List<BoardState>();
 
-    @* TODO: Add serial backup states *@
-    @* TODO: Add .equ block *@
-    @* TODO: Look at RAM stack display  *@
-    @* TODO: Add ability to disable WSIM section for empty webpage *@
-    @* TODO: Option to not display code *@
-    @* TODO: Option to put in custom render fragement instead of WSIM component *@
-    @* TODO: Allow tabs + new blockly blocks to be shown and hidden mid level *@
-
     required public string[] blockIDs;
     required public List<string> labels;
 
@@ -288,10 +274,6 @@
 
             board.Serial1.SerialDataTransmitted -= storeSerial;
             board.Serial1.SerialDataTransmitted += storeSerial;
-
-            //Reset the Blockly UI to prevent any lingering UI between page changes.
-            await JSRuntime.InvokeVoidAsync("resetUI");
-            StateHasChanged();
         }
     }
 
@@ -301,6 +283,10 @@
         dotNetReference?.Dispose();
         cts?.Cancel();
         cts?.Dispose();
+
+        //Reset the Blockly UI to prevent any lingering UI between page changes.
+        JSRuntime.InvokeVoidAsync("resetUI");
+        StateHasChanged();
     }
 
     public async Task OnCompileClicked()
