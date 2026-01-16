@@ -122,6 +122,10 @@ const fullToolbox =
                 {
                     kind: 'block',
                     type: 'space'
+                },
+                {
+                    kind: 'block',
+                    type: 'equ'
                 }
             ]
         },
@@ -501,6 +505,22 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
         previousStatement: null,
         nextStatement: null,
         tooltip: 'Allocate a chunk of space of the inputted size in the .bss section'
+    },
+    {
+        type: 'equ',
+        style: 'memoryBlocks',
+        message0: '%1 %2,%3 %4',
+        args0:
+        [
+            {type: 'field_label_serializable', name: 'instruction', text: '.equ'},
+            {type: 'field_input', name: 'alias'},
+            {type: 'field_image', name: 'format', src: 'blocklyResources/img/change_white.svg', width: 20, height: 20},
+            {type: 'field_input', name: 'immediate'}
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        tooltip: 'Create a named constant, which serves as an alias to the value provided.',
+        extensions: ['immediateValidator']
     },
     {   type: 'arithmetic',
         style: 'arithmeticBlocks',

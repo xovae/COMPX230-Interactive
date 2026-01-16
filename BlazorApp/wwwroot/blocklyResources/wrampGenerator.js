@@ -70,6 +70,13 @@ wrampGenerator.forBlock['dataHead'] = textBlock;
 
 wrampGenerator.forBlock['bssHead'] = textBlock;
 
+wrampGenerator.forBlock['equ'] = function(block, generator) {
+  const instruction = block.getFieldValue('instruction');
+  const alias = block.getFieldValue('alias');
+  const immediate = block.getFieldValue('immediate');
+  return `${instruction} ${alias}, ${immediate}`
+}
+
 wrampGenerator.forBlock['label'] = function(block, generator) {
   const label = block.getFieldValue('label');
   return `LABEL${label}:`;
