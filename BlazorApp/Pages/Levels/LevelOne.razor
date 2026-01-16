@@ -1,5 +1,7 @@
 @page "/levelOne"
 @using RexSimulator.Hardware
+@using System.Text.Json
+
 @inject IJSRuntime JSRuntime
 
 <Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" Snippet="@snippet" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
@@ -121,7 +123,7 @@
         }
         if (section == 3)
         {
-            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
+            if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
                 //Artificially set the Interrupt status back for the next step in case the user didn't add a jr $ra
                 if (!code.Contains("jr $ra"))
@@ -140,6 +142,9 @@
         }
         if (section == 4)
         {
+            WSIM.UIComponents.GPRegisters = false;
+            await UpdateToolbox(newToolbox);
+
             bool stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535));
             bool stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535));
             bool returned = board.CPU.PC == 0xFFFFF;
@@ -180,7 +185,48 @@
         return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
     }
 
+    public async Task UpdateToolbox(Toolbox toolbox)
+    {
+        await JSRuntime.InvokeVoidAsync("updateToolbox", JsonSerializer.Serialize(toolbox));
+    }
+
     public Toolbox toolbox = new Toolbox{
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" },
+                    new Block { type = "jump" }
+                }
+            },
+            new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "storeWord" }
+                }
+            },
+            new Category {
+                name = "Arithmetic",
+                categorystyle = "arithmeticCategory",
+                contents = new List<Block>() {
+                    new Block { type = "arithmeticImmediate" }
+                }
+            }
+        }
+    };
+
+    public Toolbox newToolbox = new Toolbox{
         contents = new List<Category>() {
             new Category {
                 name = "Sections",
@@ -205,14 +251,6 @@
                 contents = new List<Block>() {
                     new Block { type = "loadWord" },
                     new Block { type = "storeWord" }
-                }
-            },
-            new Category {
-                name = "Arithmetic",
-                categorystyle = "arithmeticCategory",
-                contents = new List<Block>() {
-                    new Block { type = "arithmeticImmediate" },
-                    new Block { type = "loadHighImmediate" }
                 }
             }
         }

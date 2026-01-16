@@ -1,6 +1,7 @@
 @page "/"
 @using RexSimulator.Hardware
-@using System.Security.Permissions
+@using System.Text.Json
+
 @inject IJSRuntime JSRuntime
 
 <Level @ref="levelComponent" Title="Sandbox" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@Components" WSIMInstructions="@Instructions"/>
@@ -48,6 +49,16 @@
     public async Task<string> GetUserCode()
     {
         return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
+    }
+
+    /// <summary>
+    /// Update the Blockly toolbox
+    /// </summary>
+    /// <param name="toolbox"></param>
+    /// <returns></returns>
+    public async Task UpdateToolbox(Toolbox toolbox)
+    {
+        await JSRuntime.InvokeVoidAsync("updateToolbox", JsonSerializer.Serialize(toolbox));
     }
 
     public int section = 0;

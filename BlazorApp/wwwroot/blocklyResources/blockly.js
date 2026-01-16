@@ -986,6 +986,11 @@ window.loadWorkspace = (workspaceJSON) =>
     updateCode(Blockly.Events.BLOCK_CREATE);
 }
 
+window.updateToolbox = (toolbox) =>
+{
+    workspace.updateToolbox(JSON.parse(toolbox));
+}
+
 window.resetWorkspace = () =>
 {
     if (presetWorkspace != null)
