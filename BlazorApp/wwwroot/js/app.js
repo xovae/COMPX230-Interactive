@@ -185,3 +185,32 @@ window.initTheme = () =>
     }
 
 }
+
+window.changeFormat = (id) =>
+{
+    const decimalRegexPattern = /^-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)$/;
+    const hexRegexPattern = /^0x[0-9a-fA-F]{1,4}$/;
+    const binaryRegexPattern = /^[0-1]{16}$/;
+
+    let element = document.getElementById(id);
+    let value = element.innerText;
+
+    //0: Decimal, 1: Hex, 2: Binary
+    if (decimalRegexPattern.test(value)) format = 0;
+    if (hexRegexPattern.test(value)) format = 1;
+    if (binaryRegexPattern.test(value)) format = 2;
+    format = (format + 1) % 3;
+
+    switch(format)
+    {
+        case 0:
+            element.innerText = parseInt(value, 2);
+            break;
+        case 1:
+            element.innerText = '0x' + parseInt(value).toString(16);
+            break;
+        case 2:
+            element.innerText = parseInt(value).toString(2).padStart(16, '0');
+            break;
+    }
+}

@@ -39,6 +39,10 @@ html, body {
     rotate: -90deg;
 }
 
+.format {
+    width: 25px;
+}
+
 th, td {
     padding: 0 5px;
 }
