@@ -1,0 +1,103 @@
+@using RexSimulator.Hardware
+@using RexSimulator.Hardware.Wramp
+@using System.Reflection.Metadata
+@using System.Runtime.CompilerServices
+@using System.Text.RegularExpressions
+@inject IJSRuntime JSRuntime
+
+<div class="accordion my-2">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed text-end" type="button" data-bs-toggle="collapse" data-bs-target="#visualiser" aria-expanded="false" aria-controls="visualiser">
+                Visualiser
+            </button>
+        </h2>
+        <div id="visualiser" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                @if (CodeStatements?.Count() > Board.CPU.PC)
+                {
+                    <table class="mx-auto w-50">
+                        <thead>
+                            <tr>
+                                <th class="text-center" colspan="3">@CodeStatements?[Board.CPU.PC]</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="table-group-divider">
+                            @if (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex))
+                            {
+                                <tr>
+                                    <td>$@ir.Rd:</td>
+                                    <td id="visualiseOne">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rd], 2).PadLeft(16, '0').Substring(0, 16)</td>
+                                    <td><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseOne")'></i></td>
+                                </tr>
+                                <tr>
+                                    <td>$@ir.Rs:</td>
+                                    <td class="w-50" id="visualiseTwo">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(16, '0').Substring(0, 16)</td>
+                                    <td><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseTwo")'></i></td>
+                                </tr>
+                                <tr>
+                                    @if (ir.OpCode == IR.Opcode.arith_i)
+                                    {
+                                        <td>Immediate:</td>
+                                    }
+                                    else
+                                    {
+                                        <td>Rt</td>
+                                    }
+                                    <td id="visualiseThree">@Convert.ToString(ir.Immed16, 2).PadLeft(16, '0')</td>
+                                    <td><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseThree")'></i></td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr class="h-100 w-100 text-center">
+                                    <td>&emsp;</td>
+                                </tr>
+                                <tr class="h-100 w-100 text-center">
+                                    <td>&emsp;</td>
+                                </tr>
+                                <tr class="h-100 w-100 text-center">
+                                    <td>&emsp;</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex))
+                    {
+                        <button type="button" class="btn btn-info d-block mx-auto mt-1" @onclick="VisualiseInstruction">Visualise</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-info d-block mx-auto mt-1" disabled>Visualise</button>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    required public IR ir { get; set; }
+
+    [Parameter]
+    required public string[] CodeStatements { get; set; }
+
+    [Parameter]
+    required public RexBoard Board { get; set; }
+
+
+    public string shiftRegex = @"sl(li||l)|sr(l|li|a|ai)";
+    public string arithmeticRegex = @"(add|sub|mult|div|rem)u?i?|lhi";
+
+    void changeFormat(string id)
+    {
+        JSRuntime.InvokeVoidAsync("changeFormat", id);
+    }
+
+    void VisualiseInstruction()
+    {
+        JSRuntime.InvokeVoidAsync("visualiseInstruction", Regex.IsMatch(ir.ToString(), arithmeticRegex) ? "arithmetic" : "shift");
+    }
+}

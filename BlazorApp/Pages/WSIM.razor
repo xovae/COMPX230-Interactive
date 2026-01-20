@@ -95,56 +95,7 @@
 
     @if (UIComponents.Visualiser)
     {
-        <div class="accordion my-2">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed text-end" type="button" data-bs-toggle="collapse" data-bs-target="#visualiser" aria-expanded="false" aria-controls="visualiser">
-                        Visualiser
-                    </button>
-                </h2>
-                <div id="visualiser" class="accordion-collapse collapse">
-                    <div class="accordion-body">
-                        @if (codeStatements?.Count() > board.CPU.PC)
-                        {
-                            <table class="mx-auto w-50">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center" colspan="2">@codeStatements?[board.CPU.PC]</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="table-group-divider">
-                                    @if (ir.OpCode == IR.Opcode.arith_i || ir.OpCode == IR.Opcode.arith_r || ir.OpCode == IR.Opcode.test_i_special || ir.OpCode == IR.Opcode.test_r_special)
-                                    {
-                                        <tr>
-                                            <td>$@ir.Rd:</td>
-                                            <td id="visualiseOne">@Convert.ToString(board.CPU.mGpRegisters[ir.Rd], 2).PadLeft(16, '0').Substring(0, 16)</td>
-                                            <td><img class="format" @onclick='() => changeFormat("visualiseOne")' src="img/change.svg" alt=""></td>
-                                        </tr>
-                                        <tr>
-                                            <td>$@ir.Rs:</td>
-                                            <td id="visualiseTwo">@Convert.ToString(board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(16, '0').Substring(0, 16)</td>
-                                            <td><img class="format" @onclick='() => changeFormat("visualiseTwo")' src="img/change.svg" alt=""></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Immediate:</td>
-                                            <td id="visualiseThree">@Convert.ToString(ir.Immed16, 2).PadLeft(16, '0')</td>
-                                            <td><img class="format" @onclick='() => changeFormat("visualiseThree")' src="img/change.svg" alt=""></td>
-                                        </tr>
-                                    }
-                                    else
-                                    {
-                                        <tr><td>$@ir.Rd:</td></tr>
-                                        <tr><td>$@ir.Rs:</td></tr>
-                                        <tr><td>Immediate:</td></tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Visualise ir=@ir CodeStatements=@codeStatements Board=@board/>
     }
 
     <ul class="nav nav-tabs" role="tablist">
@@ -914,10 +865,5 @@
     public async Task InvokeBoardChanged()
     {
         await BoardChanged.InvokeAsync();
-    }
-
-    void changeFormat(string id)
-    {
-        JSRuntime.InvokeVoidAsync("changeFormat", id);
     }
 }

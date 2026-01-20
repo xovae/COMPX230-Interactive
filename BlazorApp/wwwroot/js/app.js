@@ -214,3 +214,8 @@ window.changeFormat = (id) =>
             break;
     }
 }
+
+window.visualiseInstruction = (type) =>
+{
+
+}
