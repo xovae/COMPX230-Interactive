@@ -1,8 +1,5 @@
-@using BlazorApp.Pages.Levels
 @using RexSimulator.Hardware
 @using RexSimulator.Hardware.Wramp
-@using System.Reflection.Metadata
-@using System.Runtime.CompilerServices
 @using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 
@@ -15,9 +12,9 @@
         </h2>
         <div id="visualiser" class="accordion-collapse collapse">
             <div class="accordion-body">
-                @if (CodeStatements?.Count() > Board.CPU.PC && (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex)))
-                {
-                    <table class="mx-auto w-25">
+                <table class="table-sm mx-auto w-35">
+                    @if (CodeStatements?.Count() > Board.CPU.PC && (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex)))
+                    {
                         <thead>
                             <tr>
                                 <th class="text-center" colspan="3">@CodeStatements?[Board.CPU.PC]</th>
@@ -25,53 +22,98 @@
                         </thead>
 
                         <tbody class="table-group-divider">
+                                @* Rs *@
                                 <tr>
-                                    <td class="w-25">$@ir.Rd:</td>
-                                    <td class="w-50" id="visualiseOne">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rd], 2).PadLeft(16, '0').Substring(0, 16)</td>
-                                    <td class="format"><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseOne")'></i></td>
+                                    <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSource")'></i></td>
+                                    <td class="w-25">$@ir.Rs:</td>
+                                    <td class="text-end" id="visualiseSource">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2)</td>
                                 </tr>
+
+                                @* i / Rt *@
                                 <tr>
-                                    <td>$@ir.Rs:</td>
-                                    <td id="visualiseTwo">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(16, '0').Substring(0, 16)</td>
-                                    <td class="format"><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseTwo")'></i></td>
-                                </tr>
-                                <tr>
+                                    <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseImmed")'></i></td>
                                     @if (ir.OpCode == IR.Opcode.arith_i)
                                     {
-                                        <td>Immediate:</td>
+                                        <td>i:</td>
+
+                                        if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
+                                        {
+                                            <td class="text-end" id="visualiseImmed">@Convert.ToString(ir.Immed16, 2)</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-end" id="visualiseImmed">
+                                                @(ir.ToString().Contains("sr") ? ">>" : "<<")
+                                                @ir.Immed16
+                                            </td>
+                                        }
                                     }
                                     else
                                     {
-                                        <td>Rt</td>
+                                        <td>$@ir.Rt:</td>
+                                        <td class="text-end" id="visualiseImmed">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2)</td>
                                     }
-                                    <td id="visualiseThree">@Convert.ToString(ir.Immed16, 2).PadLeft(16, '0')</td>
-                                    <td class="format"><i class="bi bi-arrow-counterclockwise" @onclick='() => changeFormat("visualiseThree")'></i></td>
+                                </tr>
+
+                                @* Rd *@
+                                <tr class="border-top">
+                                    <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseDest")'></i></td>
+                                    <td>$@ir.Rd:</td>
+
+                                    @if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
+                                    {
+                                        if (ir.OpCode == IR.Opcode.arith_i)
+                                        {
+                                            <td class="text-end" id="visualiseDest">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2)</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-end" id="visualiseDest">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2)</td>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //TODO: Fix sign-extending (currently ending up with 31-bit values)
+                                        switch (ir.Func)
+                                        {
+                                            case IR.Function.sll:
+                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                break;
+                                            case IR.Function.srl:
+                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                break;
+                                            case IR.Function.sra:
+                                                <td class="text-end" id="visualiseDest">@Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                break;
+                                        }
+                                    }
+                                </tr>
+
+                                <tr>
+                                    <td colspan="3" class="text-center">
+                                        <button type="button" class="btn btn-info mt-1" @onclick="VisualiseInstruction">Visualise</button>
+                                    </td>
                                 </tr>
                         </tbody>
-                    </table>
-                    @if (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex))
-                    {
-                        <button type="button" class="btn btn-info d-block mx-auto mt-1" @onclick="VisualiseInstruction">Visualise</button>
                     }
-                    else
-                    {
-                        <button type="button" class="btn btn-info d-block mx-auto mt-1" disabled>Visualise</button>
-                    }
-                }
                 else
                 {
-                    <table class="mx-auto w-25 text-center">
-                        <thead>
-                            <tr><th>Instruction cannot be visualised</th></tr>
-                        </thead>
-                        <tbody class="table-group-divider">
-                            <tr><td>&emsp;</td></tr>
-                            <tr><td>&emsp;</td></tr>
-                            <tr><td>&emsp;</td></tr>
-                        </tbody>
-                    </table>
-                    <button type="button" class="btn btn-info d-block mx-auto mt-1" disabled>Visualise</button>
+                    <thead class="text-center">
+                        <tr><th>Instruction cannot be visualised</th></tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                        <tr><td>&emsp;</td></tr>
+                        <tr><td>&emsp;</td></tr>
+                        <tr><td>&emsp;</td></tr>
+                        <tr>
+                            <td colspan="3" class="text-center">
+                                <button type="button" class="btn btn-info mt-1" disabled>Visualise</button>
+                            </td>
+                        </tr>
+                    </tbody>
+
                 }
+                </table>
             </div>
         </div>
     </div>

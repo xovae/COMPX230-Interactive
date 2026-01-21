@@ -450,7 +450,14 @@
                         while(!board.Tick());
 
                         //Update visualiser
-                        ir.Instruction = board.RAM.mMemory[board.CPU.PC];
+                        if (UIComponents.Visualiser)
+                        {
+                            try
+                            {
+                                ir.Instruction = board.RAM.mMemory[board.CPU.PC];
+                            }
+                            catch {}
+                        }
 
                         //Invoke the EventCallback to allow the Level to check any changes to the board state to see if an objective has been completed
                         await BoardChanged.InvokeAsync();
@@ -740,7 +747,16 @@
             updateSSDs();
             updateSwitches();
             StateHasChanged();
-            ir.Instruction = board.RAM.mMemory[board.CPU.PC];
+
+            if (UIComponents.Visualiser)
+            {
+                //Update visualiser
+                try
+                {
+                    ir.Instruction = board.RAM.mMemory[board.CPU.PC];
+                }
+                catch {}
+            }
         }
     }
 
