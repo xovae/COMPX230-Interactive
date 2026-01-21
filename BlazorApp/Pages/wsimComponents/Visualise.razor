@@ -12,7 +12,7 @@
         </h2>
         <div id="visualiser" class="accordion-collapse collapse">
             <div class="accordion-body">
-                <table class="table-sm mx-auto w-35">
+                <table class="table-sm mx-auto w-50">
                     @if (CodeStatements?.Count() > Board.CPU.PC && (Regex.IsMatch(ir.ToString(), shiftRegex) || Regex.IsMatch(ir.ToString(), arithmeticRegex)))
                     {
                         <thead>
@@ -73,17 +73,16 @@
                                     }
                                     else
                                     {
-                                        //TODO: Fix sign-extending (currently ending up with 31-bit values)
                                         switch (ir.Func)
                                         {
                                             case IR.Function.sll:
                                                 <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
                                                 break;
                                             case IR.Function.srl:
-                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0')</td>
                                                 break;
                                             case IR.Function.sra:
-                                                <td class="text-end" id="visualiseDest">@Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                <td class="text-end" id="visualiseDest">@Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : ' ')</td>
                                                 break;
                                         }
                                     }

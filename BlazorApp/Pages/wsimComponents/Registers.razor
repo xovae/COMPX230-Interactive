@@ -25,16 +25,16 @@
         <tbody>
             @for (uint i = 1; i <= 15; i++)
             {
-                uint val;
+                int val;
                 <tr>
                     @if (registerType == RegisterType.GP)
                     {
-                        val = CPU.mGpRegisters[i];
+                        val = (int)CPU.mGpRegisters[i];
                         <td>@GPRegisterNames[i]</td>
                     }
                     else
                     {
-                        val = CPU.mSpRegisters[i];
+                        val = (int)CPU.mSpRegisters[i];
                         <td>@SPRegisterNames[i]</td>
                     }
                     <td>@val</td>
