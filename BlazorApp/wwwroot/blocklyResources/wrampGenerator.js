@@ -53,6 +53,12 @@ function memoryBlocks(block, generator) {
   return `${instruction} ${string}`;
 }
 
+function asciiBlocks(block, generator) {
+  const instruction = block.getFieldValue('instruction');
+  const string = block.getFieldValue('string');
+  return `${instruction} "${string}"`
+}
+
 wrampGenerator.scrub_ = function(block, code, thisOnly) {
   const nextBlock =
       block.nextConnection && block.nextConnection.targetBlock();
@@ -113,9 +119,9 @@ wrampGenerator.forBlock['loadAddress'] = function(block, generator) {
 
 wrampGenerator.forBlock['word'] = memoryBlocks;
 
-wrampGenerator.forBlock['asciiz'] = memoryBlocks;
+wrampGenerator.forBlock['asciiz'] = asciiBlocks;
 
-wrampGenerator.forBlock['ascii'] = memoryBlocks;
+wrampGenerator.forBlock['ascii'] = asciiBlocks;
 
 wrampGenerator.forBlock['space'] = memoryBlocks;
 

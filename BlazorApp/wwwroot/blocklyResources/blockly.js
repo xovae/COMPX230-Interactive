@@ -472,10 +472,10 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'asciiz',
         style: 'memoryBlocks',
-        message0: '%1 %2',
+        message0: '%1 "%2"',
         args0:
         [
-            {type: 'field_label_serializable', name: 'instruction', text: '.asciiz'},
+            {type: 'field_label_serializable', name: 'instruction', text: '.asciiz '},
             {type: 'field_input', name: 'string'}
         ],
         previousStatement: null,
@@ -484,7 +484,7 @@ const definitions = Blockly.common.createBlockDefinitionsFromJsonArray([
     },
     {   type: 'ascii',
         style: 'memoryBlocks',
-        message0: '%1 %2',
+        message0: '%1 "%2"',
         args0:
         [
             {type: 'field_label_serializable', name: 'instruction', text: '.ascii'},

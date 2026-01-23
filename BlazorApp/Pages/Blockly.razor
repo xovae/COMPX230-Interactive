@@ -130,9 +130,9 @@
                 }
             }
             //Trim extra entry for each list
-            textLabels.RemoveAt(textLabels.Count - 1);
-            dataLabels.RemoveAt(dataLabels.Count - 1);
-            bssLabels.RemoveAt(bssLabels.Count - 1);
+            if (textLabels.Count > 1) textLabels.RemoveAt(textLabels.Count - 1);
+            if (dataLabels.Count > 1) dataLabels.RemoveAt(dataLabels.Count - 1);
+            if (bssLabels.Count > 1) bssLabels.RemoveAt(bssLabels.Count - 1);
 
             //Combine all segments in order for display in the RAM tab
             labels = textLabels.Concat(dataLabels).Concat(bssLabels).ToList();
