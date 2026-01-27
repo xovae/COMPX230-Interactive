@@ -59,7 +59,7 @@
             {
                 if (board.RAM.mMemory[i] == 11) correctValueStored = true;
             }
-            
+
             if (code.Contains("addi $1, $1, 1") && correctValueStored) section = 7;
         }
     }
@@ -71,7 +71,7 @@
         {
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputCheckmarkA");
             if (section == 3) section = 4;
-            
+
         }
     }
 
@@ -104,11 +104,15 @@
     }
 
     public int section = 0;
+    public int block = 0;
 
-    public RenderFragment Instructions =>
+    
+
+    public RenderFragment Block1 =>
     @<div>
-    <h1>.data and .bss</h1>
+    <h1>Loading and storing .data</h1>
     <ul>
+    
         @if (section >= 0)
                 {
         <li>In this exercise we'll be taking a closer look at <code>.data</code> and <code>.bss</code></li>
@@ -191,7 +195,75 @@
                 JSRuntime.InvokeVoidAsync("levelCompleted");
                 }
     </ul>
+    </div>
+    ;
+
+    public RenderFragment UnlockDiv =>
+    @<div>
+    <ul><li>The section hasn't been unlocked yet</li>
+    <li>You can press "Back" below or press "Unlock" to jump to this section now</li>
+    </ul>
+   
+        <p></p>
+        <button class="unlock" @onclick="Unlock">
+            Unlock
+        </button>
     </div>;
+    public RenderFragment Block2 =>
+    @<div>
+    <h1>Handling Strings with .ascii</h1>
+    <ul>
+    @if (section < 7) {
+        @UnlockDiv
+    }
+                {
+        @if (section >= 7)
+                {
+        <li>In this exercise we'll be taking a closer look at <code>.data</code> and <code>.bss</code></li>
+        <li>These are two sections of a WRAMP program, similar to <code>.text</code></li>
+        <li>The <code>.text</code> section is where you put all your WRAMP assembly code</li>
+        <li>The <code>.data</code> section is where you can reserve memory and give it some initial values</li>
+        <li>Try adding a <code>.data</code> section now, by dragging it from the toolbox to the bottom of the program, after the last line of assembly code.</li>
+                }
+ </ul>
+    </div>
+    ;
+
+public RenderFragment Instructions => @<div> 
+   @switch (block) {
+   case 0:
+        @Block1
+        break;
+   case 1:
+       @Block2
+        break;
+   }
+   
+    <div class="nav-buttons">
+        <button @onclick="Prev" disabled="@(block == 0)">Back</button>
+        <button @onclick="Next" disabled="@(block == 1)">Next</button>
+    </div>
+   
+</div>;
+
+@code {
+    void Next()
+    {
+        if (block < 1)
+            block++;
+    }
+
+    void Prev()
+    {
+        if (block > 0)
+            block--;
+    }
+    void Unlock()
+    {
+        if (block == 1)
+            section = 7;
+    }
+}
 
     public string maxInstances = "{ 'global': 1}";
 
