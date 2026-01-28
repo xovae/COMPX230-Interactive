@@ -96,7 +96,7 @@ namespace RexSimulator.Hardware.Rex
                 this.Data = value;
             }
         }
-        public event EventHandler<SerialEventArgs>? SerialDataTransmitted;
+
         #endregion
 
         #region Constructor
