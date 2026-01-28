@@ -17,7 +17,7 @@
                     {
                         <thead>
                             <tr>
-                                <th class="text-center" colspan="3">@CodeStatements?[Board.CPU.PC]</th>
+                                <th class="text-center" colspan="4">@CodeStatements?[Board.CPU.PC]</th>
                             </tr>
                         </thead>
 
@@ -26,7 +26,8 @@
                                 <tr>
                                     <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSource")'></i></td>
                                     <td class="w-25">$@ir.Rs:</td>
-                                    <td class="text-end" id="visualiseSource">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2)</td>
+                                    <td></td>
+                                    <td class="text-end" id="visualiseSource">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(32, '0'))</td>
                                 </tr>
 
                                 @* i / Rt *@
@@ -38,12 +39,15 @@
 
                                         if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
                                         {
-                                            <td class="text-end" id="visualiseImmed">@Convert.ToString(ir.Immed16, 2)</td>
+                                            <td></td>
+                                            <td class="text-end" id="visualiseImmed">0b@(Convert.ToString(ir.Immed16, 2).PadLeft(32, '0'))</td>
                                         }
                                         else
                                         {
-                                            <td class="text-end" id="visualiseImmed">
+                                            <td>
                                                 @(ir.ToString().Contains("sr") ? ">>" : "<<")
+                                            </td>
+                                            <td class="text-end" id="visualiseImmed">
                                                 @ir.Immed16
                                             </td>
                                         }
@@ -51,7 +55,8 @@
                                     else
                                     {
                                         <td>$@ir.Rt:</td>
-                                        <td class="text-end" id="visualiseImmed">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2)</td>
+                                        <td></td>
+                                        <td class="text-end" id="visualiseImmed">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, '0'))</td>
                                     }
                                 </tr>
 
@@ -59,16 +64,17 @@
                                 <tr class="border-top">
                                     <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseDest")'></i></td>
                                     <td>$@ir.Rd:</td>
+                                    <td></td>
 
                                     @if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
                                     {
                                         if (ir.OpCode == IR.Opcode.arith_i)
                                         {
-                                            <td class="text-end" id="visualiseDest">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2)</td>
+                                            <td class="text-end" id="visualiseDest">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'))</td>
                                         }
                                         else
                                         {
-                                            <td class="text-end" id="visualiseDest">@Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2)</td>
+                                            <td class="text-end" id="visualiseDest">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'))</td>
                                         }
                                     }
                                     else
@@ -76,13 +82,13 @@
                                         switch (ir.Func)
                                         {
                                             case IR.Function.sll:
-                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2)</td>
+                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0'))</td>
                                                 break;
                                             case IR.Function.srl:
-                                                <td class="text-end" id="visualiseDest">@Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0')</td>
+                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0').PadLeft(32, '0'))</td>
                                                 break;
                                             case IR.Function.sra:
-                                                <td class="text-end" id="visualiseDest">@Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : ' ')</td>
+                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : '0'))</td>
                                                 break;
                                         }
                                     }
