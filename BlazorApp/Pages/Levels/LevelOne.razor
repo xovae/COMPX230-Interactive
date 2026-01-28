@@ -36,7 +36,7 @@
                 <li>Which memory address contains the value of the switches?</li>
 
                 <input id="inputOne" @oninput="OnInputChanged" placeholder="Enter address"/>
-                <label class="inputCheckmark" id="checkmarkOne" for="inputOne">✔</label>
+                <label class="inputCheckmark" id="checkmarkOne" for="inputOne"><i class="bi bi-check-lg"></i></label>
             }
 
             @if (section == 1)
@@ -44,7 +44,7 @@
                 <li>That's correct!</li>
                 <li>
                     Next, can you toggle the switches such that this value has the decimal value 10?
-                    <label class="inputCheckmark" id="checkmarkTwo">✔</label>
+                    <label class="inputCheckmark" id="checkmarkTwo"><i class="bi bi-check-lg"></i></label>
                 </li>
             }
 
@@ -69,15 +69,15 @@
                 <table class="objectiveTable">
                     <tr>
                         <td>All switches enabled</td>
-                        <td><label class="inputCheckmark" id="checkmarkThree">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmarkThree"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                     <tr>
                         <td>All LEDs lit up</td>
-                        <td><label class="inputCheckmark" id="checkmarkFour">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmarkFour"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                     <tr>
                         <td>jr $ra used</td>
-                        <td><label class="inputCheckmark" id="checkmarkFive">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmarkFive"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                 </table>
             }

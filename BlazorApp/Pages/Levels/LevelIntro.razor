@@ -37,9 +37,9 @@
 
             @if (section >= 1)
             {
-                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main">✔</label></li>
-                <li>You should also make the main label be visible from the outside by adding <code>.global main</code><label class="inputCheckmark" id="checkmarkS1Global">✔</label></li>
-                <li>Finally, to successfully finish your program should jump return to the $ra return address.<label class="inputCheckmark" id="checkmarkS1JR">✔</label></li>
+                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main"><i class="bi bi-check-lg"></i></label></li>
+                <li>You should also make the main label be visible from the outside by adding <code>.global main</code><label class="inputCheckmark" id="checkmarkS1Global"><i class="bi bi-check-lg"></i></label></li>
+                <li>Finally, to successfully finish your program should jump return to the $ra return address.<label class="inputCheckmark" id="checkmarkS1JR"><i class="bi bi-check-lg"></i></label></li>
             }
 
             @if (section >= 2)
@@ -49,15 +49,15 @@
                 <table class="objectiveTable">
                     <tr>
                         <td>addi block added</td>
-                        <td><label class="inputCheckmark" id="checkmark2Addi">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmark2Addi"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                     <tr>
                         <td>Program compiled and running</td>
-                        <td><label class="inputCheckmark" id="checkmark2Running">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmark2Running"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                     <tr>
                         <td>Register 1 contains value 1</td>
-                        <td><label class="inputCheckmark" id="checkmark2Register">✔</label></td>
+                        <td><label class="inputCheckmark" id="checkmark2Register"><i class="bi bi-check-lg"></i></label></td>
                     </tr>
                 </table>
             }
