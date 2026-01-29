@@ -27,36 +27,24 @@
                                     <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSource")'></i></td>
                                     <td class="w-25">$@ir.Rs:</td>
                                     <td></td>
-                                    <td class="text-end" id="visualiseSource">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(32, '0'))</td>
+                                    <td class="text-end" id="visualiseSource"></td>
                                 </tr>
 
                                 @* i / Rt *@
                                 <tr>
-                                    <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseImmed")'></i></td>
                                     @if (ir.OpCode == IR.Opcode.arith_i)
                                     {
+                                        <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseImmed")'></i></td>
                                         <td>i:</td>
-
-                                        if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
-                                        {
-                                            <td></td>
-                                            <td class="text-end" id="visualiseImmed">0b@(Convert.ToString(ir.Immed16, 2).PadLeft(32, '0'))</td>
-                                        }
-                                        else
-                                        {
-                                            <td>
-                                                @(ir.ToString().Contains("sr") ? ">>" : "<<")
-                                            </td>
-                                            <td class="text-end" id="visualiseImmed">
-                                                @ir.Immed16
-                                            </td>
-                                        }
+                                        <td id="visualiseSign"></td>
+                                        <td class="text-end" id="visualiseImmed"></td>
                                     }
                                     else
                                     {
+                                        <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSourceTwo")'></i></td>
                                         <td>$@ir.Rt:</td>
-                                        <td></td>
-                                        <td class="text-end" id="visualiseImmed">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, '0'))</td>
+                                        <td id="visualiseSign"></td>
+                                        <td class="text-end" id="visualiseSourceTwo"></td>
                                     }
                                 </tr>
 
@@ -65,59 +53,21 @@
                                     <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseDest")'></i></td>
                                     <td>$@ir.Rd:</td>
                                     <td></td>
-
-                                    @if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
-                                    {
-                                        if (ir.OpCode == IR.Opcode.arith_i)
-                                        {
-                                            <td class="text-end" id="visualiseDest">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'))</td>
-                                        }
-                                        else
-                                        {
-                                            <td class="text-end" id="visualiseDest">0b@(Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'))</td>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        switch (ir.Func)
-                                        {
-                                            case IR.Function.sll:
-                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0'))</td>
-                                                break;
-                                            case IR.Function.srl:
-                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0').PadLeft(32, '0'))</td>
-                                                break;
-                                            case IR.Function.sra:
-                                                <td class="text-end" id="visualiseDest">0b@(Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : '0'))</td>
-                                                break;
-                                        }
-                                    }
-                                </tr>
-
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        <button type="button" class="btn btn-info mt-1" @onclick="VisualiseInstruction">Visualise</button>
-                                    </td>
+                                    <td class="text-end" id="visualiseDest"></td>
                                 </tr>
                         </tbody>
                     }
-                else
-                {
-                    <thead class="text-center">
-                        <tr><th>Instruction cannot be visualised</th></tr>
-                    </thead>
-                    <tbody class="table-group-divider">
-                        <tr><td>&emsp;</td></tr>
-                        <tr><td>&emsp;</td></tr>
-                        <tr><td>&emsp;</td></tr>
-                        <tr>
-                            <td colspan="3" class="text-center">
-                                <button type="button" class="btn btn-info mt-1" disabled>Visualise</button>
-                            </td>
-                        </tr>
-                    </tbody>
-
-                }
+                    else
+                    {
+                        <thead class="text-center">
+                            <tr><th>Instruction cannot be visualised</th></tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            <tr><td>&emsp;</td></tr>
+                            <tr><td>&emsp;</td></tr>
+                            <tr><td>&emsp;</td></tr>
+                        </tbody>
+                    }
                 </table>
             </div>
         </div>
@@ -134,17 +84,58 @@
     [Parameter]
     required public RexBoard Board { get; set; }
 
-
     public string shiftRegex = @"sl(li||l)|sr(l|li|a|ai)";
     public string arithmeticRegex = @"(add|sub|mult|div|rem)u?i?|lhi";
 
     void changeFormat(string id)
     {
-        JSRuntime.InvokeVoidAsync("changeFormat", id);
+        JSRuntime.InvokeVoidAsync("changeFormat", id, ir.ToString());
     }
 
-    void VisualiseInstruction()
+    @* Todo: fix bug with fields not being correctly restored after an undo (likely due to OnParametersSetAsync not triggering multiple times like how it does during normal operation) *@
+    protected override Task OnParametersSetAsync()
     {
-        JSRuntime.InvokeVoidAsync("visualiseInstruction", Regex.IsMatch(ir.ToString(), arithmeticRegex) ? "arithmetic" : "shift");
+        @* Rs *@
+        JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSource", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(32, '0'));
+
+        @* i / Rt *@
+        if (ir.OpCode == IR.Opcode.arith_i)
+        {
+            JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseImmed", Regex.IsMatch(ir.ToString(), arithmeticRegex) ? "0b" + Convert.ToString(ir.Immed16, 2).PadLeft(16, '0') : ir.Immed16);
+        }
+        else
+        {
+            JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSourceTwo", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, '0'));
+        }
+
+        @* Rd *@
+        if (Regex.IsMatch(ir.ToString(), arithmeticRegex))
+        {
+            if (ir.OpCode == IR.Opcode.arith_i)
+            {
+                JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
+            }
+            else
+            {
+                JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
+            }
+        }
+        else
+        {
+            switch (ir.Func)
+            {
+                case IR.Function.sll:
+                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0'));
+                    break;
+                case IR.Function.srl:
+                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0').PadLeft(32, '0'));
+                    break;
+                case IR.Function.sra:
+                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : '0'));
+                    break;
+            }
+        }
+
+        return base.OnParametersSetAsync();
     }
 }

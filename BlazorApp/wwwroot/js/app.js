@@ -186,7 +186,7 @@ window.initTheme = () =>
 
 }
 
-window.changeFormat = (id) =>
+window.changeFormat = (id, instruction) =>
 {
     const decimalRegexPattern = /^-?(6[0-5]{2}[0-3][0-5]|[1-5][0-9]{4}|[1-9][0-9]{0,3}|0)$/;
     const hexRegexPattern = /^0x[0-9a-fA-F]{1,4}$/;
@@ -202,6 +202,13 @@ window.changeFormat = (id) =>
     if (binaryRegexPattern.test(value)) format = 2;
     if (charRegexPattern.test(value)) format = 3;
     format = (format + 1) % 4;
+
+    formatConvert(format, id, element, value, instruction);
+}
+
+function formatConvert(format, id, element, value, instruction)
+{
+    const charRegexPattern = /^\'([ -~]|\\a|\\n|\\r)\'$/;
 
     switch(format)
     {
@@ -223,13 +230,28 @@ window.changeFormat = (id) =>
             }
             break;
         case 1:
-            element.innerText = `0x${(parseInt(value) >>> 0).toString(16).toUpperCase().padStart(4, '0')}`;
+            if (id == 'visualiseImmed')
+            {
+                let string = (parseInt(value) >>> 0).toString(16).toUpperCase();
+                if (string.length > 6)
+                {
+                    element.innerText = `0x${string.substring(4)}`;
+                }
+                else
+                {
+                    element.innerText = `0x${string}`;
+                }
+            }
+            else
+            {
+                element.innerText = `0x${(parseInt(value) >>> 0).toString(16).toUpperCase().padStart(8, '0')}`;
+            }
             break;
         case 2:
-            element.innerText = `0b${parseInt(value).toString(2).padStart(32, '0')}`;
+            element.innerText = `0b${parseInt(value).toString(2).padStart((id == 'visualiseImmed') ? 16 : 32, '0')}`;
             break;
         case 3:
-            value = getSignedInt(value.replace("0b", ""));
+            value = getSignedInt(value.replace("0b", ""), instruction);
             switch (value)
             {
                 case 7:
@@ -245,6 +267,7 @@ window.changeFormat = (id) =>
                     string = `\'${String.fromCharCode(value)}\'`;
                     break;
             }
+
             if (charRegexPattern.test(string))
             {
                 element.innerText = (string);
@@ -253,13 +276,16 @@ window.changeFormat = (id) =>
             {
                 element.innerText = (value);
             }
+
+            break;
+        default:
             break;
     }
 }
 
-window.getSignedInt = (bits) =>
+window.getSignedInt = (bits, instruction) =>
 {
-    if (bits[0] === '1')
+    if (bits[0] === '1' && instruction != null && !instruction.includes('ui'))
     {
         let inverse = '';
         for (i = 0; i < bits.length; i++)
@@ -274,7 +300,8 @@ window.getSignedInt = (bits) =>
     }
 }
 
-window.visualiseInstruction = (type) =>
+window.updateVisualiser = (id, value) =>
 {
-
+    let element = document.getElementById(id);
+    element.innerText = value;
 }
