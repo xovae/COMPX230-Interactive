@@ -12,4 +12,4 @@ To publish to Github Pages:
 
 3. Run `dotnet publish -c Release` in BlazorApp/
 
-4. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to a new Github repo
+4. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
