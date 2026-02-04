@@ -194,6 +194,8 @@ window.changeFormat = (id, instruction) =>
     const charRegexPattern = /^\'([ -~]|\\a|\\n|\\r)\'$/;
 
     let element = document.getElementById(id);
+    if (!element) return;
+
     let value = element.innerText;
 
     //0: Decimal, 1: Hex, 2: Binary, 3: Char
@@ -203,13 +205,7 @@ window.changeFormat = (id, instruction) =>
     if (charRegexPattern.test(value)) format = 3;
     format = (format + 1) % 4;
 
-    formatConvert(format, id, element, value, instruction);
-}
-
-function formatConvert(format, id, element, value, instruction)
-{
-    const charRegexPattern = /^\'([ -~]|\\a|\\n|\\r)\'$/;
-
+    //Display the value
     switch(format)
     {
         case 0:
@@ -276,12 +272,12 @@ function formatConvert(format, id, element, value, instruction)
             {
                 element.innerText = (value);
             }
-
             break;
         default:
             break;
     }
 }
+
 
 window.getSignedInt = (bits, instruction) =>
 {
@@ -303,5 +299,40 @@ window.getSignedInt = (bits, instruction) =>
 window.updateVisualiser = (id, value) =>
 {
     let element = document.getElementById(id);
+    if (!element) return;
     element.innerText = value;
+}
+
+window.updateSign = (instruction) =>
+{
+    const sign = document.getElementById('visualiseSign');
+    if (!sign) return;
+
+    //Display the appropriate sign for the current instruction
+    switch (true)
+    {
+        case instruction.includes('add'):
+            sign.innerText = '+';
+            break;
+        case instruction.includes('sub'):
+            sign.innerText = '-';
+            break;
+        case instruction.includes('mult'):
+            sign.innerText = '*';
+            break;
+        case instruction.includes('div'):
+            sign.innerText = '÷';
+            break;
+        case instruction.includes('rem'):
+            sign.innerText = '%';
+            break;
+        case instruction.includes('sr'):
+            sign.innerText = '>>';
+            break;
+        case instruction.includes('sl'):
+            sign.innerText = '<<';
+            break;
+        default:
+            break;
+    }
 }

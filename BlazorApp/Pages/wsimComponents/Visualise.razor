@@ -21,11 +21,11 @@
                             </tr>
                         </thead>
 
-                        <tbody class="table-group-divider">
+                        <tbody class="table-group-divider" @key="ir.ToString()">
                                 @* Rs *@
                                 <tr>
                                     <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSource")'></i></td>
-                                    <td class="w-25">$@ir.Rs:</td>
+                                    <td>$@ir.Rs:</td>
                                     <td></td>
                                     <td class="text-end" id="visualiseSource"></td>
                                 </tr>
@@ -36,14 +36,14 @@
                                     {
                                         <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseImmed")'></i></td>
                                         <td>i:</td>
-                                        <td id="visualiseSign"></td>
+                                        <td class="text-center" id="visualiseSign"></td>
                                         <td class="text-end" id="visualiseImmed"></td>
                                     }
                                     else
                                     {
                                         <td class="format"><i class="bi bi-arrow-clockwise" @onclick='() => changeFormat("visualiseSourceTwo")'></i></td>
                                         <td>$@ir.Rt:</td>
-                                        <td id="visualiseSign"></td>
+                                        <td class="text-center" id="visualiseSign"></td>
                                         <td class="text-end" id="visualiseSourceTwo"></td>
                                     }
                                 </tr>
@@ -60,12 +60,10 @@
                     else
                     {
                         <thead class="text-center">
-                            <tr><th>Instruction cannot be visualised</th></tr>
+                            <tr><th>The current instruction cannot be visualised</th></tr>
                         </thead>
-                        <tbody class="table-group-divider">
-                            <tr><td>&emsp;</td></tr>
-                            <tr><td>&emsp;</td></tr>
-                            <tr><td>&emsp;</td></tr>
+                        <tbody class="table-group-divider text-center">
+                            <tr><td>When an arithmetic or shifting instruction is about to execute, this component will display the instruction, the registers involved and their contents, and the result of the operation in the destination register!</td></tr>
                         </tbody>
                     }
                 </table>
@@ -87,25 +85,39 @@
     public string shiftRegex = @"sl(li||l)|sr(l|li|a|ai)";
     public string arithmeticRegex = @"(add|sub|mult|div|rem)u?i?|lhi";
 
+    private bool needVisualiseUpdate = false;
+
     void changeFormat(string id)
     {
         JSRuntime.InvokeVoidAsync("changeFormat", id, ir.ToString());
     }
 
-    @* Todo: fix bug with fields not being correctly restored after an undo (likely due to OnParametersSetAsync not triggering multiple times like how it does during normal operation) *@
     protected override Task OnParametersSetAsync()
     {
+        needVisualiseUpdate = true;
+        return base.OnParametersSetAsync();
+    }
+
+    @* Todo: fix bug with fields not being correctly restored after an undo (likely due to OnParametersSetAsync not triggering multiple times like how it does during normal operation) *@
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!needVisualiseUpdate) return;
+        needVisualiseUpdate = false;
+
+        @* Sign *@
+        await JSRuntime.InvokeVoidAsync("updateSign", ir.ToString());
+
         @* Rs *@
-        JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSource", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(32, '0'));
+        await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSource", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs], 2).PadLeft(32, '0'));
 
         @* i / Rt *@
         if (ir.OpCode == IR.Opcode.arith_i)
         {
-            JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseImmed", Regex.IsMatch(ir.ToString(), arithmeticRegex) ? "0b" + Convert.ToString(ir.Immed16, 2).PadLeft(16, '0') : ir.Immed16);
+            await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseImmed", Regex.IsMatch(ir.ToString(), arithmeticRegex) ? "0b" + Convert.ToString(ir.Immed16, 2).PadLeft(16, '0') : ir.Immed16);
         }
         else
         {
-            JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSourceTwo", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, '0'));
+            await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseSourceTwo", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, '0'));
         }
 
         @* Rd *@
@@ -113,11 +125,11 @@
         {
             if (ir.OpCode == IR.Opcode.arith_i)
             {
-                JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
+                await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + ir.Immed16, 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
             }
             else
             {
-                JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
+                await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", "0b" + Convert.ToString(Board.CPU.mGpRegisters[ir.Rs] + Board.CPU.mGpRegisters[ir.Rt], 2).PadLeft(32, (ir.Immed16 & 0x8000) == 0x8000 ? '1' : '0'));
             }
         }
         else
@@ -125,17 +137,15 @@
             switch (ir.Func)
             {
                 case IR.Function.sll:
-                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0'));
+                    await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] << (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0'));
                     break;
                 case IR.Function.srl:
-                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0').PadLeft(32, '0'));
+                    await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString((Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, '0').PadLeft(32, '0'));
                     break;
                 case IR.Function.sra:
-                    JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : '0'));
+                    await JSRuntime.InvokeVoidAsync("updateVisualiser", "visualiseDest", Convert.ToString(((uint)Board.CPU.mGpRegisters[ir.Rs] >> (ir.OpCode == IR.Opcode.arith_i ? (int)ir.Immed16 : (int)Board.CPU.mGpRegisters[ir.Rt])), 2).PadLeft(32, (Board.CPU.mGpRegisters[ir.Rs] & 0x80000000) == 0x80000000 ? '1' : '0'));
                     break;
             }
         }
-
-        return base.OnParametersSetAsync();
     }
 }
