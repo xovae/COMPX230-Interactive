@@ -14,4 +14,4 @@ To publish to Github Pages:
 
 4. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
 
-`See https://xovae.github.io/WRAMP-SIM/ for an example build.`
+`See [here](https://xovae.github.io/WRAMP-SIM/) for an example build.`
