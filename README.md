@@ -10,7 +10,7 @@ To publish to Github Pages:
   *.html binary
   ```
 
-3. Run `dotnet publish -c Release`
+3. Run `dotnet publish -c Release` in COMPX230-Interactive/BlazorApp/
 
 4. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
 
