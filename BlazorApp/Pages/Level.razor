@@ -25,7 +25,7 @@
 
             @* Delete below HTML code for an empty level template *@
             <div class="col">
-                @if (UIComponents.Blockly)
+                @if (UIComponents.Blockly && MainInstructions == null)
                 {
                     <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)" maxInstances="@maxInstances" Snippet="@Snippet"/>
                 }

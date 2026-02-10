@@ -231,14 +231,14 @@ namespace RexSimulator.Hardware.Rex
                             cursor = 0;
                             break;
                         case 7:
-                            if (BellCharTransmitted != null) BellCharTransmitted();
+                            BellCharTransmitted?.Invoke();
                             break;
                         default:
                             if (cursor < serialOutput.Length)
                             {
                                 if (Transmit == 10)
                                 {
-                                    serialOutput.Insert(cursor, "<br>");
+                                    serialOutput.Insert(cursor, '\n');
                                 }
                                 else
                                 {
@@ -249,7 +249,7 @@ namespace RexSimulator.Hardware.Rex
                             {
                                 if (Transmit == 10)
                                 {
-                                    serialOutput.Append("<br>");
+                                    serialOutput.Append('\n');
                                 }
                                 else
                                 {
@@ -260,7 +260,6 @@ namespace RexSimulator.Hardware.Rex
                             break;
                     }
                     serialText = serialOutput.ToString();
-                    Console.WriteLine(serialText);
                     if ((Control & 0x200u) != 0)
                     {
                         uint oldIack = InterruptAck;
