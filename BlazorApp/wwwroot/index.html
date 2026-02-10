@@ -20,8 +20,6 @@
         <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
         <link href="BlazorApp.styles.css" rel="stylesheet" />
         <script type="importmap"></script>
-        <audio src="audio/duckQuack.wav" id="duckQuack"></audio>
-        <audio src="audio/kcauQkcud.mp3" id="kcauQkcud"></audio>
     </head>
 
     <body>
@@ -51,5 +49,29 @@
         <script src="wrampToolchain/toolchainWrapper.js" type="module"></script>
         <script src="js/app.js"></script>
         <script src="js/wrampComponents.js"></script>
+
+        <!-- Audio Resources -->
+        <audio src="audio/duckQuack.wav" id="duckQuack"></audio>
+        <audio src="audio/kcauQkcud.mp3" id="kcauQkcud"></audio>
+
+        <!-- Credits Modal -->
+        <div class="modal fade" id="creditsModal" tabindex="-1" aria-labelledby="creditsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="creditsModalLabel">Project Credits</h1>
+                    <img class="logo ms-2" onclick="evilquacker()" src="img/reginald.png" alt="Photo of a duck head">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li><p>WRAMP Simulator made by Jamie Boulton (<a href="https://github.com/xovae/COMPX230-Interactive">https://github.com/xovae/COMPX230-Interactive</a>) for a 2nd year Software Engineering work placement</p></li>
+                        <li><p>WRAMP logic adapted from <a href="https://github.com/wandwramp/wsim">https://github.com/wandwramp/wsim</a></p></li>
+                        <li><p>WRAMP toolchain (wasm and wlink) adapted from <a href="https://github.com/wandwramp/toolchain">https://github.com/wandwramp/toolchain</a></p></li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
