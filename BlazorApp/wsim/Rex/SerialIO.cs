@@ -19,6 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ########################################################################
 */
+
+using System.Text;
+
 namespace RexSimulator.Hardware.Rex
 {
     public class SerialIO : MemoryDevice
@@ -28,6 +31,8 @@ namespace RexSimulator.Hardware.Rex
         /// The number of clock cycles required to transmit/receive a single symbol. Random is used to simulate real serial delays
         /// </summary>
         public uint ClocksPerSymbol = 2;
+        public int cursor = 0;
+        public StringBuilder serialOutput = new();
         public string serialText = "";
 
         #endregion
@@ -88,15 +93,15 @@ namespace RexSimulator.Hardware.Rex
         #endregion
 
         #region Events
-        public class SerialEventArgs : EventArgs
-        {
-            public readonly uint Data;
-            public SerialEventArgs(uint value)
-            {
-                this.Data = value;
-            }
-        }
-
+        // public class SerialEventArgs : EventArgs
+        // {
+        //     public readonly uint Data;
+        //     public SerialEventArgs(uint value)
+        //     {
+        //         this.Data = value;
+        //     }
+        // }
+        public event Action? BellCharTransmitted;
         #endregion
 
         #region Constructor
@@ -161,6 +166,7 @@ namespace RexSimulator.Hardware.Rex
                 mMemory[i] = 0;
             }
             serialText = "";
+            serialOutput.Clear();
             Control = 0xC7; //8 data bits, no parity, 1 stop bit, 38400 baud
             Status = 0x02;
             Interrupt(false);
@@ -219,7 +225,42 @@ namespace RexSimulator.Hardware.Rex
             {
                 if (--mClocksToTransmit == 0)
                 {
-                    serialText += (char)Transmit;
+                    switch (Transmit)
+                    {
+                        case 13:
+                            cursor = 0;
+                            break;
+                        case 7:
+                            if (BellCharTransmitted != null) BellCharTransmitted();
+                            break;
+                        default:
+                            if (cursor < serialOutput.Length)
+                            {
+                                if (Transmit == 10)
+                                {
+                                    serialOutput.Insert(cursor, "<br>");
+                                }
+                                else
+                                {
+                                    serialOutput[cursor] = (char)Transmit;
+                                }
+                            }
+                            else
+                            {
+                                if (Transmit == 10)
+                                {
+                                    serialOutput.Append("<br>");
+                                }
+                                else
+                                {
+                                    serialOutput.Append((char)Transmit);
+                                }
+                            }
+                            cursor++;
+                            break;
+                    }
+                    serialText = serialOutput.ToString();
+                    Console.WriteLine(serialText);
                     if ((Control & 0x200u) != 0)
                     {
                         uint oldIack = InterruptAck;

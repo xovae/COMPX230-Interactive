@@ -1,3 +1,4 @@
+@* Change to update the page URL subdomain *@
 @page "/"
 @using RexSimulator.Hardware
 @using System.Text.Json
@@ -12,12 +13,17 @@
 
     required public RexBoard board;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        if (firstRender)
         {
-            board = levelComponent.wsimComponent.board;
-            WSIM = levelComponent.wsimComponent;
+            if (levelComponent != null && levelComponent.wsimComponent != null)
+            {
+                board = levelComponent.wsimComponent.board;
+                WSIM = levelComponent.wsimComponent;
+            }
+            section = await JSRuntime.InvokeAsync<int>("getSection");
+            StateHasChanged();
         }
     }
 
@@ -44,6 +50,22 @@
     }
 
     /// <summary>
+    /// Uncheck all objectives
+    /// </summary>
+    public void UncheckAllObjectives()
+    {
+        JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
+    }
+
+    /// <summary>
+    /// Mark the current level as completed. Adds a checkmark next to the level name on the level selector
+    /// </summary>
+    public void LevelCompleted()
+    {
+        JSRuntime.InvokeVoidAsync("levelCompleted");
+    }
+
+    /// <summary>
     /// </summary>
     /// <returns>WRAMP Code from the Blockly workspace</returns>
     public async Task<string> GetUserCode()
@@ -61,12 +83,22 @@
         await JSRuntime.InvokeVoidAsync("updateToolbox", JsonSerializer.Serialize(toolbox));
     }
 
-    public int section = 0;
+    public int Section
+    {
+        get { return section; }
+        set
+        {
+            section = value;
+            JSRuntime.InvokeVoidAsync("storeSection", section);
+        }
+    }
 
-    @* tick icon: <i class="bi bi-check-lg"></i> *@
+    private int section = 0;
+
     public RenderFragment Instructions =>
     @<div>
-
+        @* Checkmark icon *@
+        <Checkmark id="" forInput=""/>
     </div>;
 
     public string maxInstances = "{ 'global': 1}";

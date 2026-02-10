@@ -11,38 +11,53 @@
 
     required public RexBoard board;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        if (firstRender)
         {
-            board = levelComponent.wsimComponent.board;
-            WSIM = levelComponent.wsimComponent;
+            if (levelComponent != null && levelComponent.wsimComponent != null)
+            {
+                board = levelComponent.wsimComponent.board;
+                WSIM = levelComponent.wsimComponent;
+            }
+            section = await JSRuntime.InvokeAsync<int>("getSection");
+            StateHasChanged();
         }
     }
 
     public UIComponents UIComponents = new UIComponents(Blockly: true, WSIMInstructions: true, Code: true, GPRegisters: true);
 
-    public int section = 0;
+    public int Section
+    {
+        get { return section; }
+        set
+        {
+            section = value;
+            JSRuntime.InvokeVoidAsync("storeSection", section);
+        }
+    }
+
+    private int section = 0;
 
     public RenderFragment Instructions =>
     @<div>
         <h1>Writing WRAMP code using blockly!</h1>
         <ul>
-            @if (section >= 0)
+            @if (Section >= 0)
             {
                 <li>On the left side of the screen is a blockly workspace.</li>
                 <li>You can click on the sections to find WRAMP code blocks, try adding a .text to the workspace.</li>
                 <li>This will be the start of your WRAMP code.</li>
             }
 
-            @if (section >= 1)
+            @if (Section >= 1)
             {
-                <li>Every WRAMP program needs a .text section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main"><i class="bi bi-check-lg"></i></label></li>
+                <li>Every WRAMP program needs a .text Section and a "main" label that identifies the start of the program.<label class="inputCheckmark" id="checkmarkS1Main"><i class="bi bi-check-lg"></i></label></li>
                 <li>You should also make the main label be visible from the outside by adding <code>.global main</code><label class="inputCheckmark" id="checkmarkS1Global"><i class="bi bi-check-lg"></i></label></li>
                 <li>Finally, to successfully finish your program should jump return to the $ra return address.<label class="inputCheckmark" id="checkmarkS1JR"><i class="bi bi-check-lg"></i></label></li>
             }
 
-            @if (section >= 2)
+            @if (Section >= 2)
             {
                 <li> This will be the basic setup for all WRAMP programs. Try saving it now so you can reuse it later.</li>
                 <li> Finally, try to put the number 1 into register 1 using the addi block, then compile and run your code to see if it works properly. </li>
@@ -62,7 +77,7 @@
                 </table>
             }
 
-            @if (section >= 3)
+            @if (Section >= 3)
             {
                 <li> Great work! You've completed this level. </li>
                 <li> Next, you can choose a different level in the sidebar on the left to continue. </li>
@@ -74,11 +89,11 @@
     public async Task CheckBoard()
     {
         string code = await GetUserCode();
-        if (section == 0)
+        if (Section == 0)
         {
-            if (code.Contains(".text")) section++;
+            if (code.Contains(".text")) Section++;
         }
-        if (section == 1)
+        if (Section == 1)
         {
             bool main = code.Contains("main:");
             bool global = code.Contains(".global main");
@@ -91,10 +106,10 @@
 
             if (main && global && returned)
             {
-                section++;
+                Section++;
             }
         }
-        if (section == 2)
+        if (Section == 2)
         {
             bool addi = code.Contains("addi");
             bool running = WSIM.running;
@@ -106,7 +121,7 @@
 
             if (addi && running && register1)
             {
-                section++;
+                Section++;
             }
         }
     }

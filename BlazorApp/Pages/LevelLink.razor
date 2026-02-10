@@ -1,0 +1,11 @@
+<li class="nav-item">
+    <NavLink class="nav-link" href="@href" Match="NavLinkMatch.All">@name<label class="inputCheckmark float-end">✔</label></NavLink>
+</li>
+
+@code {
+    [Parameter]
+    required public string href { get; set; }
+
+    [Parameter]
+    required public string name { get; set; }
+}

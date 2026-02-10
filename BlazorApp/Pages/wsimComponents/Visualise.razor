@@ -98,7 +98,6 @@
         return base.OnParametersSetAsync();
     }
 
-    @* Todo: fix bug with fields not being correctly restored after an undo (likely due to OnParametersSetAsync not triggering multiple times like how it does during normal operation) *@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!needVisualiseUpdate) return;

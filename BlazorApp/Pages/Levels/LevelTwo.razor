@@ -8,17 +8,32 @@
     public Level? levelComponent;
     required public RexBoard board;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && levelComponent != null && levelComponent.wsimComponent != null)
+        if (firstRender)
         {
-            board = levelComponent.wsimComponent.board;
+            if (levelComponent != null && levelComponent.wsimComponent != null)
+            {
+                board = levelComponent.wsimComponent.board;
+            }
+            section = await JSRuntime.InvokeAsync<int>("getSection");
+            StateHasChanged();
         }
     }
 
     public UIComponents Components = new UIComponents(GPRegisters: true, SSDs: true, ParallelRegisters: true, Library: true, RAM: true);
 
-    public int section = 0;
+    public int Section
+    {
+        get { return section; }
+        set
+        {
+            section = value;
+            JSRuntime.InvokeVoidAsync("storeSection", section);
+        }
+    }
+
+    private int section = 0;
 
     public RenderFragment MainInstructions =>
     @<div>
@@ -34,7 +49,7 @@
             <label class="inputCheckmark" id="inputOneCheckmark" for="inputOne"><i class="bi bi-check-lg"></i></label>
 
 
-            @if (section >= 1)
+            @if (Section >= 1)
             {
                 <li>That's right!</li>
                 <li>This simulation is slow so that you can see each SSD update individually</li>
@@ -47,7 +62,7 @@
                 <input id="inputTwo" @oninput="OnInputAddressChanged" placeholder="Enter message"/>
                 <label class="inputCheckmark" id="inputTwoCheckmark" for="inputTwo"><i class="bi bi-check-lg"></i></label>
             }
-            @if (section >= 2)
+            @if (Section >= 2)
             {
                 <li>Correct!</li>
                 <li>The 'Disassembly' column shows the WRAMP instruction that is disassembled from the value 0x00000076</li>
@@ -62,7 +77,7 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput.Trim().ToUpper() == "HELLO 230" || userInput.Trim().ToUpper() == "HELLO230")
         {
-            if(section == 0) section++;
+            if(Section == 0) Section++;
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputOneCheckmark");
         }
     }
@@ -72,7 +87,7 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput.Trim() == "10" || userInput.Trim() == "00000010" || userInput.Trim() == "0x00000010")
         {
-            if (section == 1) section++;
+            if (Section == 1) Section++;
             JSRuntime.InvokeVoidAsync("objectiveCheck", "inputTwoCheckmark");
         }
     }

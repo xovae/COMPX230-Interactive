@@ -193,7 +193,7 @@
         @if (UIComponents.SerialPort)
         {
             <div class="tab-pane fade" id="serial-tab-pane" role="tabpanel" aria-labelledby="serial-tab" tabindex="0">
-                <p>@board.Serial1.serialText</p>
+                <p>@((MarkupString)board.Serial1.serialText)</p>
             </div>
         }
         @if (UIComponents.Library && Library != null)
@@ -260,6 +260,7 @@
     IR ir = new IR();
     bool instructionsLoaded = false;
     public bool running = false;
+    public bool compiled = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
     private CancellationTokenSource? cts;
@@ -278,6 +279,8 @@
             //Create a DotNet object reference to allow InvokeBoardChanged() to be called from JS code
             dotNetReference = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("setDotNetRef", dotNetReference);
+
+            board.Serial1.BellCharTransmitted += quack;
         }
     }
 
@@ -345,6 +348,7 @@
             if (finalAddress != 0)
             {
                 instructionsLoaded = true;
+                compiled = true;
                 await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[0]);
                 ir.Instruction = board.RAM.mMemory[0];
             }
@@ -359,6 +363,7 @@
     {
         board.Reset();
         running = false;
+        compiled = false;
 
         //Remove any stored states
         memoryStates.Clear();
