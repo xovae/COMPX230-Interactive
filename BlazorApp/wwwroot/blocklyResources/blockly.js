@@ -1021,13 +1021,16 @@ window.updateToolbox = (toolbox) =>
 
 window.resetWorkspace = () =>
 {
-    if (presetWorkspace != null)
+    if (confirm('Do you want to clear your workspace?') == true)
     {
-        loadWorkspace(presetWorkspace);
-    }
-    else
-    {
-        workspace.clear();
+        if (presetWorkspace != null)
+        {
+            loadWorkspace(presetWorkspace);
+        }
+        else
+        {
+            workspace.clear();
+        }
     }
 }
 
