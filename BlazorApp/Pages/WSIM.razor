@@ -99,7 +99,7 @@
     }
 
     <ul class="nav nav-tabs" role="tablist">
-        @if (UIComponents.WSIMInstructions && WSIMInstructions != null)
+        @if (WSIMInstructions != null)
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
@@ -142,7 +142,7 @@
                 <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
             </li>
         }
-        @if (UIComponents.Library && Library != null)
+        @if (Library != null && Library[0] != "libraryName.s")
         {
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
@@ -154,7 +154,7 @@
     </ul>
 
     <div class="tab-content">
-        @if (UIComponents.WSIMInstructions && WSIMInstructions != null)
+        @if (WSIMInstructions != null)
         {
             <div class="tab-pane fade show active" id="instructions-tab-pane" role="tabpanel" aria-labelledby="instructions-tab" tabindex="0">
                 @WSIMInstructions
@@ -196,7 +196,7 @@
                 <p>@((MarkupString)(board.Serial1.serialText.Replace("\n", "<br>")))</p>
             </div>
         }
-        @if (UIComponents.Library && Library != null)
+        @if (Library != null && Library[0] != "libraryName.s")
         {
             <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
                 <pre>@((MarkupString)Library[1])</pre>

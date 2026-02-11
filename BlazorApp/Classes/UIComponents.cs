@@ -1,5 +1,4 @@
 public class UIComponents {
-    public bool WSIMInstructions;
     public bool Code;
     public bool GPRegisters;
     public bool SPRegisters;
@@ -10,14 +9,12 @@ public class UIComponents {
     public bool Switches;
     public bool Buttons;
     public bool SSDs;
-    public bool Library;
 
     public bool Visualiser;
     public bool Blockly;
 
-    public UIComponents(bool WSIMInstructions = false, bool Code = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Library = false, bool Visualiser = false, bool Blockly = false)
+    public UIComponents(bool Code = false, bool GPRegisters = false, bool SPRegisters = false, bool RAM = false, bool ParallelRegisters = false, bool SerialPort = false, bool LEDs = false, bool Switches = false, bool Buttons = false, bool SSDs = false, bool Visualiser = false, bool Blockly = false)
     {
-        this.WSIMInstructions = WSIMInstructions;
         this.Code = Code;
         this.GPRegisters = GPRegisters;
         this.SPRegisters = SPRegisters;
@@ -28,7 +25,6 @@ public class UIComponents {
         this.Switches = Switches;
         this.Buttons = Buttons;
         this.SSDs = SSDs;
-        this.Library = Library;
         this.Visualiser = Visualiser;
         this.Blockly = Blockly;
     }
