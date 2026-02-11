@@ -1,3 +1,5 @@
+[Documentation](https://docs.google.com/document/d/1PfS8LhXyryfwarSDEQpU_k0BBFOBnWBuuwXw4IigPFk/edit?tab=t.0)
+
 To publish to Github Pages: 
 
 1. Add a file called .nojekyll to the root of the repo.
