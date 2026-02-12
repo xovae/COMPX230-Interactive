@@ -2,7 +2,6 @@
 @using System.Text
 @using System.Text.RegularExpressions
 @using RexSimulator.Hardware.Rex
-@using System.Reflection.Emit
 @using RexSimulator.Hardware.Wramp
 
 @inject IJSRuntime JSRuntime
@@ -13,16 +12,15 @@
 
     <div class="btn-group me-2" role="group" aria-label="Code Controls">
         <button type="button" id="compileButton" class="btn btn-warning" @onclick="OnCompileClicked" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="compilePopover">Compile</button>
-        <button type="button" class="btn btn-info" @onclick="saveCode">Save</button>
+        <button type="button" class="btn btn-info" @onclick="saveCode">Download Code</button>
     </div>
 
     <div class="btn-group" role="group" aria-label="WRAMP Controls">
-        <button type="button" class="btn btn-warning" @onclick="Undo">Undo</button>
-        <button type="button" class="btn btn-success" @onclick="Run" hidden="@running">Run</button>
+        <button type="button" class="btn btn-warning" @onclick="Undo" disabled="@(pcStates.Count == 0)">&lt;-- Undo</button>
+        <button type="button" class="btn btn-success" @onclick="Run" disabled="@(!firstCompilation)" hidden="@running">Run</button>
         <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
-        <button type="button" class="btn btn-info" @onclick="Step">Step</button>
+        <button type="button" class="btn btn-info" @onclick="Step" disabled="@(!firstCompilation || running || (board.CPU.InterruptStatus & (uint)0xF000) != 0)">Step --&gt;</button>
     </div>
-
 </div>
 
 <div class="overflow-scroll">
@@ -73,7 +71,7 @@
                                 @for (int i = 0; i < 3; i++)
                                 {
                                     int pos = i;
-                                    <button type="button" class="btn btn-primary me-2" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton">Button</button>
+                                    <button type="button" class="btn me-2 wrampButton" @onmousedown="() => pressButton(pos)" @onmouseup="releaseButton"></button>
                                 }
                             </div>
                         }
@@ -260,7 +258,7 @@
     IR ir = new IR();
     bool instructionsLoaded = false;
     public bool running = false;
-    public bool compiled = false;
+    public bool firstCompilation = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
     private CancellationTokenSource? cts;
@@ -374,7 +372,7 @@
             if (finalAddress != 0)
             {
                 instructionsLoaded = true;
-                compiled = true;
+                firstCompilation = true;
                 if (UIComponents.Blockly) await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[0]);
                 ir.Instruction = board.RAM.mMemory[0];
             }
@@ -387,9 +385,12 @@
 
     public void Reset()
     {
+        //Preserve the state of the switches
+        uint switches = board.Parallel.Switches;
         board.Reset();
+        board.Parallel.Switches = switches;
         running = false;
-        compiled = false;
+        firstCompilation = false;
 
         //Remove any stored states
         memoryStates.Clear();
@@ -448,7 +449,7 @@
                 {
                     case (uint)ExceptionSource.GPF:
                         running = false;
-                        await JSRuntime.InvokeVoidAsync("triggerPopover", board.CPU.PC > finalAddress ? "GPF thrown! Have you tried adding an $ra?" : "GPF thrown!");
+                        await JSRuntime.InvokeVoidAsync("triggerPopover", board.CPU.PC > finalAddress ? "GPF thrown! Have you tried adding a jr $ra block?" : "GPF thrown!");
                         await BoardChanged.InvokeAsync();
                         break;
                     case (uint)ExceptionSource.SYSCALL:

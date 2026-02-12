@@ -16,7 +16,7 @@
             {
                 board = levelComponent.wsimComponent.board;
             }
-            section = await JSRuntime.InvokeAsync<int>("getSection");
+            _section = await JSRuntime.InvokeAsync<int>("getSection");
             StateHasChanged();
         }
     }
@@ -25,15 +25,15 @@
 
     public int Section
     {
-        get { return section; }
+        get { return _section; }
         set
         {
-            section = value;
-            JSRuntime.InvokeVoidAsync("storeSection", section);
+            _section = value;
+            JSRuntime.InvokeVoidAsync("storeSection", _section);
         }
     }
 
-    private int section = 0;
+    private int _section = 0;
 
     public RenderFragment MainInstructions =>
     @<div>

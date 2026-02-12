@@ -12,7 +12,7 @@
 
     @* Checkmark icon
     <Checkmark id="" forInput=""/> *@
-    @* Update int Section whenever the *@
+    @* Update int Section whenever the user reaches the next step*@
     public RenderFragment? Instructions;
 
     public RenderFragment? MainInstructions;
@@ -32,7 +32,7 @@
     /// the method WSIM.Verify(), variables like running can be accessed via WSIM, and the user's code can be accessed by calling await GetUserCode()
     /// </summary>
     /// <returns></returns>
-    public async Task CheckBoard()
+    public async void CheckBoard()
     {
 
     }
@@ -160,7 +160,7 @@
     }
 
     /// <summary>
-    /// Uncheck all objectives
+    /// Hide all visible checkmarks
     /// </summary>
     public void UncheckAllObjectives()
     {

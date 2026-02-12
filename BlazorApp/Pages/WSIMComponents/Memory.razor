@@ -89,7 +89,6 @@
 
         //Add all stack items
         mPos.Add(new MemoryPos("$sp", sp, mDevice[sp], ""));
-        Console.WriteLine("0x" + bottomOfStack.ToString("X8"));
         if (sp != bottomOfStack)
         {
             for (uint i = sp + 1; i <= bottomOfStack; i++)
@@ -115,7 +114,7 @@
                     @if (item.pointer != ".")
                     {
                         <td>@item.pointer</td>
-                        <td>@item.address.ToString("X8")</td>
+                        <td>0x@(item.address.ToString("X8").Substring(4, 4))</td>
                         <td>@item.value.ToString("X8")</td>
                         <td>@item.ir.ToString()</td>
                         <td>@item.label</td>

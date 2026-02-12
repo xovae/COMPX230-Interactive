@@ -3,8 +3,9 @@
 
 <div class="mb-2" aria-label="Blockly Controls">
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-warning" @onclick="saveWorkspace">Save</button>
-        <label class="btn btn-info">Load
+        <button type="button" class="btn btn-warning" @onclick="saveWorkspace">Save Workspace</button>
+        <label class="btn btn-info">
+            Load Workspace
             <InputFile hidden id="workspaceInput" OnChange="loadWorkspace"/>
         </label>
     </div>
@@ -40,7 +41,8 @@
 
     public async Task Export()
     {
-        string code = await JSRuntime.InvokeAsync<string>("generateCode");
+        bool b = true;
+        string code = await JSRuntime.InvokeAsync<string>("generateCode", b);
         await JSRuntime.InvokeVoidAsync("updateCode", "Compile");
         string highlightBlockPattern = @"highlightBlock\('([^']+)'\)\n\t";
         string intRegex = @"[0-9]+";

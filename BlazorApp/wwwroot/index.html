@@ -58,19 +58,37 @@
         <div class="modal fade" id="creditsModal" tabindex="-1" aria-labelledby="creditsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="creditsModalLabel">Project Credits</h1>
-                    <img class="logo ms-2" onclick="evilquacker()" src="img/reginald.png" alt="Photo of a duck head">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="creditsModalLabel">Project Credits</h1>
+                        <img class="logo ms-2" onclick="evilquacker()" src="img/reginald.png" alt="Photo of a duck head">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul>
+                            <li><p>WRAMP Simulator made by Jamie Boulton (<a href="https://github.com/xovae/COMPX230-Interactive">https://github.com/xovae/COMPX230-Interactive</a>) for a 2nd year Software Engineering work placement</p></li>
+                            <li><p>WRAMP logic adapted from <a href="https://github.com/wandwramp/wsim">https://github.com/wandwramp/wsim</a></p></li>
+                            <li><p>WRAMP toolchain (wasm and wlink) adapted from <a href="https://github.com/wandwramp/toolchain">https://github.com/wandwramp/toolchain</a></p></li>
+                            <li><a href="https://g.co/dev/blockly"><img class="w-25" src="img/blocklyLogo.png" alt="A puzzle piece with the text 'Built with Blockly' alongside it"></a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <ul>
-                        <li><p>WRAMP Simulator made by Jamie Boulton (<a href="https://github.com/xovae/COMPX230-Interactive">https://github.com/xovae/COMPX230-Interactive</a>) for a 2nd year Software Engineering work placement</p></li>
-                        <li><p>WRAMP logic adapted from <a href="https://github.com/wandwramp/wsim">https://github.com/wandwramp/wsim</a></p></li>
-                        <li><p>WRAMP toolchain (wasm and wlink) adapted from <a href="https://github.com/wandwramp/toolchain">https://github.com/wandwramp/toolchain</a></p></li>
-                        <li><a href="https://g.co/dev/blockly"><img class="w-25" src="img/blocklyLogo.png" alt="A puzzle piece with the text 'Built with Blockly' alongside it"></a></li>
-                    </ul>
-                </div>
+            </div>
+        </div>
+
+        <!-- Delete level progress Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteModalLabel">What levels do you want to clear progress for?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="deleteModalBody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="deleteLevelProgress()">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>

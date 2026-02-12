@@ -20,7 +20,7 @@
                 board = levelComponent.wsimComponent.board;
                 WSIM = levelComponent.wsimComponent;
             }
-            section = await JSRuntime.InvokeAsync<int>("getSection");
+            _section = await JSRuntime.InvokeAsync<int>("getSection");
             StateHasChanged();
         }
     }
@@ -29,15 +29,15 @@
 
     public int Section
     {
-        get { return section; }
+        get { return _section; }
         set
         {
-            section = value;
-            JSRuntime.InvokeVoidAsync("storeSection", section);
+            _section = value;
+            JSRuntime.InvokeVoidAsync("storeSection", _section);
         }
     }
 
-    private int section = 0;
+    private int _section = 0;
 
     public RenderFragment Instructions =>
     @<div>
@@ -61,7 +61,7 @@
             {
                 <li> This will be the basic setup for all WRAMP programs. Try saving it now so you can reuse it later.</li>
                 <li> Finally, try to put the number 1 into register 1 using the addi block, then compile and run your code to see if it works properly. </li>
-                <table class="objectiveTable">
+                <table class="table objectiveTable">
                     <tr>
                         <td>addi block added</td>
                         <td><label class="inputCheckmark" id="checkmark2Addi"><i class="bi bi-check-lg"></i></label></td>

@@ -4,9 +4,6 @@
     <button class="btn btn-primary my-2" type="button" data-bs-toggle="collapse" data-bs-target="#levelSelect" aria-expanded="true" aria-controls="levelSelect">
         ☰
     </button>
-    <button class="btn btn-danger float-end my-2 ms-4" @onclick="ResetLevels">
-        Reset
-    </button>
     <div class="collapse collapse-horizontal show" id="levelSelect">
         <ul class="nav flex-column nav-pills">
             @* Sandbox - Home Page - position in list as needed *@
@@ -16,6 +13,9 @@
             <LevelLink href="levelIntro" name="Introduction"/>
             <LevelLink href="levelOne" name="#1"/>
             <LevelLink href="levelTwo" name="#2"/>
+            <button class="btn btn-danger float-end my-2 ms-4" @onclick="ResetLevels" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                Reset Level Progress
+            </button>
         </ul>
     </div>
 </div>
