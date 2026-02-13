@@ -211,6 +211,9 @@
     public EventCallback BoardChanged { get; set; }
 
     [Parameter]
+    public EventCallback BoardCompiled { get; set; }
+
+    [Parameter]
     required public UIComponents UIComponents { get; set; }
 
     [Parameter]
@@ -259,6 +262,7 @@
     bool instructionsLoaded = false;
     public bool running = false;
     public bool firstCompilation = false;
+    public bool codeCompiled = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
     private CancellationTokenSource? cts;
@@ -277,6 +281,7 @@
             //Create a DotNet object reference to allow InvokeBoardChanged() to be called from JS code
             dotNetReference = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("setDotNetRef", dotNetReference);
+            await JSRuntime.InvokeVoidAsync("setAppDotNetRef", dotNetReference);
 
             board.Serial1.BellCharTransmitted += quack;
         }
@@ -304,6 +309,7 @@
         {
             await Compile(("", [], new List<String>()));
         }
+        await BoardCompiled.InvokeAsync();
     }
 
     //Take a .s file onclickfrom the user and compile it to an SREC for use in the wsim
@@ -373,6 +379,7 @@
             {
                 instructionsLoaded = true;
                 firstCompilation = true;
+                codeCompiled = true;
                 if (UIComponents.Blockly) await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[0]);
                 ir.Instruction = board.RAM.mMemory[0];
             }
@@ -391,6 +398,7 @@
         board.Parallel.Switches = switches;
         running = false;
         firstCompilation = false;
+        codeCompiled = false;
 
         //Remove any stored states
         memoryStates.Clear();

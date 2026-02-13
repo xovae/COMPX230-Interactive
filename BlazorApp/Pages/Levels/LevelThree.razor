@@ -1,10 +1,12 @@
 @* Change to update the page URL subdomain *@
-@page "/"
+@page "/levelBranching"
 @using RexSimulator.Hardware
+@using System.Text.Json
+@using System.Reflection.PortableExecutable
 
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Sandbox" BoardChanged="CheckBoard" BoardCompiled="@BoardCompiled" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@Components" WSIMInstructions="@Instructions" MainInstructions="@MainInstructions" Library="@Library" startingWorkspace="@startingWorkspace"/>
+<Level @ref="levelComponent" Title="Branching" BoardChanged="CheckBoard" BoardCompiled="@BoardCompiled" Toolbox="@toolbox" maxInstances="@maxInstances" UIComponents="@Components" WSIMInstructions="@Instructions" startingWorkspace="@startingWorkspace"/>
 
 @code {
     public UIComponents Components = new UIComponents(Blockly: true, Visualiser: true, Code: true, GPRegisters: true, SPRegisters: true, RAM: true, ParallelRegisters: true, SerialPort: true, LEDs: true, Switches: true, Buttons: true, SSDs: true);
@@ -12,27 +14,63 @@
     @* Checkmark icon
     <Checkmark id="" forInput=""/> *@
     @* Update int Section whenever the user reaches the next step*@
-    public RenderFragment? Instructions => null;
+    public RenderFragment? Instructions => @<div>
+        @switch (lc.Block)
+        {
+            case 0:
+                @BlockOne;
+                break;
+        }
 
-    public RenderFragment? MainInstructions => null;
+        <button class="btn btn-primary" @onclick="lc.PrevBlock" disabled="@(lc.Block == 0)">Prev</button>
+        <button class="btn btn-primary" @onclick="lc.NextBlock" disabled="@(lc.Block == 100)">Next</button>
+    </div>;
+
+    public RenderFragment BlockOne => @<div>
+        <p>Can you create an infinite loop, constantly incrementing the value of $1 from 0 upwards?</p>
+        <span>e.g.<code>  while(true) reg1++;</code></span>
+        <br />
+        <br />
+
+        <table class="table objectiveTable text-center">
+            <tr>
+                <td>Jump instruction present</td>
+                <td><Checkmark id="checkmarkOne"/></td>
+            </tr>
+            <tr>
+                <td>Increase $1 from 0 up to 10</td>
+                <td><Checkmark id="checkmarkTwo"/></td>
+            </tr>
+            <tr>
+                <td>Program currently running</td>
+                <td><Checkmark id="checkmarkThree"/></td>
+            </tr>
+        </table>
+    </div>;
 
     public string maxInstances = "{ 'global': 1}";
 
-    public string[] Library = { "libraryName.s", """
-
-    """};
-
     public string startingWorkspace = """
-    {}
+    {"blocks":{"languageVersion":0,"blocks":[{"type":"textHead","id":"j.+Uj-+zg/uMGN]AFqv,","x":131,"y":47,"fields":{"instruction":".text"},"next":{"block":{"type":"global","id":"i0m/ymZEQ1!Cy`cL%Yui","fields":{"instruction":".global main"},"next":{"block":{"type":"label","id":"{5F--BdF]Y0ecZz@a6MV","fields":{"label":"main"},"next":{"block":{"type":"jumpRegister","id":"Kw#Onn.I7f)gzK]_*utL","fields":{"instruction":"jr","register":"$ra"}}}}}}}}]}}
     """;
 
-    /// <summary>
-    /// This method is called anytime the WRAMP board is compiled.
-    /// </summary>
     public async void BoardCompiled()
     {
+        if (lc.Section == 0)
+        {
+            step2 = false;
+        }
+        if (lc.Section == 1)
+        {
+            Random rand = new Random();
+            board.CPU.mGpRegisters[7] = (uint)rand.Next(-32767, 32767);
+        }
 
     }
+
+    bool step1 = false;
+    bool step2 = false;
+    bool step3 = false;
 
     /// <summary>
     /// This method is called on any changes to the WRAMP board, or the Blockly workspace. The state of the board can be accessed via the variable board or using
@@ -42,6 +80,32 @@
     public async void CheckBoard()
     {
         string userCode = await lc.GetUserCode();
+
+        if (lc.Section == 0)
+        {
+            step1 = userCode.Contains("j ");
+            if(WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 0, 10, 1)))
+            {
+                step2 = true;
+            }
+            step3 = WSIM.running;
+
+            lc.CheckObjective(step1, "checkmarkOne");
+            lc.CheckObjective(step2, "checkmarkTwo");
+            lc.CheckObjective(step3, "checkmarkThree");
+
+            if (step1 && step2 && step3 && lc.Section == 0)
+            {
+                lc.Section = 1;
+                lc.Block = 1;
+            }
+        }
+        if (lc.Section > 0)
+        {
+            lc.CheckObjective(true, "checkmarkOne");
+            lc.CheckObjective(true, "checkmarkTwo");
+            lc.CheckObjective(true, "checkmarkThree");
+        }
     }
 
     public Toolbox toolbox = new Toolbox{
@@ -51,9 +115,7 @@
                 categorystyle = "sectionCategory",
                 contents = new List<Block>() {
                     new Block { type = "textHead" },
-                    new Block { type = "global" },
-                    new Block { type = "dataHead" },
-                    new Block { type = "bssHead" }
+                    new Block { type = "global" }
                 }
             },
             new Category {
@@ -67,38 +129,11 @@
                 }
             },
             new Category {
-                name = "Memory",
-                categorystyle = "memoryCategory",
-                contents = new List<Block>() {
-                    new Block { type = "loadWord" },
-                    new Block { type = "storeWord" },
-                    new Block { type = "loadAddress" },
-                    new Block { type = "word" },
-                    new Block { type = "asciiz" },
-                    new Block { type = "ascii" },
-                    new Block { type = "space" },
-                    new Block { type = "equ" }
-                }
-            },
-            new Category {
                 name = "Arithmetic",
                 categorystyle = "arithmeticCategory",
                 contents = new List<Block>() {
                     new Block { type = "arithmetic" },
-                    new Block { type = "arithmeticUnsigned" },
                     new Block { type = "arithmeticImmediate" },
-                    new Block { type = "arithmeticUnsignedImmediate" },
-                    new Block { type = "loadHighImmediate" },
-                }
-            },
-            new Category {
-                name = "Logic",
-                categorystyle = "logicCategory",
-                contents = new List<Block>() {
-                    new Block { type = "bitwise" },
-                    new Block { type = "bitwiseImmediate" },
-                    new Block { type = "shift" },
-                    new Block { type = "shiftImmediate" },
                 }
             },
             new Category {
@@ -110,31 +145,14 @@
                     new Block { type = "setOnImmediate" },
                     new Block { type = "setOnUnsignedImmediate" },
                 }
-            },
-            new Category {
-                name = "Special",
-                categorystyle = "specialCategory",
-                contents = new List<Block>() {
-                    new Block { type = "moveGeneralToSpecial" },
-                    new Block { type = "moveSpecialToGeneral" },
-                    new Block { type = "break" },
-                    new Block { type = "syscall" },
-                    new Block { type = "returnFromException" },
-                }
             }
         }
     };
 
-
     public Level? levelComponent;
-
-    @* Object containing Block and Section variables *@
     public LevelComponents lc = new LevelComponents();
-
-    @* WSIM Component *@
     required public WSIM WSIM;
 
-    @* RexBoard component *@
     required public RexBoard board;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -152,4 +170,6 @@
             StateHasChanged();
         }
     }
+
+
 }

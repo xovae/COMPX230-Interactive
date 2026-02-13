@@ -27,7 +27,7 @@
             <div class="col">
                 @if (UIComponents.Blockly && MainInstructions == null)
                 {
-                    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)" maxInstances="@maxInstances" Snippet="@Snippet"/>
+                    <Blockly @ref="blocklyComponent" Exported="ExportHandler" Toolbox="@JsonSerializer.Serialize(toolbox)" maxInstances="@maxInstances" startingWorkspace="@startingWorkspace"/>
                 }
                 else if (MainInstructions != null)
                 {
@@ -36,7 +36,7 @@
             </div>
 
             <div class="col d-flex flex-column h-100">
-                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" UIComponents="@UIComponents" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
+                <WSIM @ref="wsimComponent" CompileRequested="CompileHandler" BoardChanged="BoardHandler" BoardCompiled="@BoardCompiledHandler" UIComponents="@UIComponents" WSIMInstructions="@WSIMInstructions" Library="@Library"/>
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@
     public string? maxInstances { get; set; }
 
     [Parameter]
-    public string? Snippet { get; set; }
+    public string? startingWorkspace { get; set; }
 
     [Parameter]
     required public UIComponents UIComponents { get; set; }
@@ -67,6 +67,9 @@
 
     [Parameter]
     public EventCallback BoardChanged { get; set; }
+
+    [Parameter]
+    public EventCallback BoardCompiled { get; set; }
 
     [Parameter]
     public string[]? Library { get; set; }
@@ -87,5 +90,10 @@
     async Task BoardHandler()
     {
         await BoardChanged.InvokeAsync();
+    }
+
+    async Task BoardCompiledHandler()
+    {
+        await BoardCompiled.InvokeAsync();
     }
 }

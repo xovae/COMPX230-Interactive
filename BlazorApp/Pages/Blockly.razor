@@ -26,13 +26,13 @@
     public string? maxInstances { get; set; }
 
     [Parameter]
-    public string? Snippet { get; set; }
+    public string? startingWorkspace { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JSRuntime.InvokeVoidAsync("initBlockly", Toolbox, maxInstances, Snippet);
+            await JSRuntime.InvokeVoidAsync("initBlockly", Toolbox, maxInstances, startingWorkspace);
             await JSRuntime.InvokeVoidAsync("initUpdate");
             await JSRuntime.InvokeVoidAsync("initBlocklyTheme");
             StateHasChanged();

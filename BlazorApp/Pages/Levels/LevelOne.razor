@@ -4,15 +4,15 @@
 
 @inject IJSRuntime JSRuntime
 
-<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" Snippet="@snippet" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
+<Level @ref="levelComponent" Title="Level One" BoardChanged="CheckBoard" Toolbox="@toolbox" maxInstances="@maxInstances" startingWorkspace="@startingWorkspace" UIComponents="@UIComponents" WSIMInstructions="@Instructions"/>
 
 @code {
     public Level? levelComponent;
+    public LevelComponents lc = new LevelComponents();
     required public WSIM WSIM;
-
     required public RexBoard board;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
@@ -21,30 +21,20 @@
                 board = levelComponent.wsimComponent.board;
                 WSIM = levelComponent.wsimComponent;
             }
-            sectionValue = await JSRuntime.InvokeAsync<int>("getSection");
+
+            lc.SetJSRuntime(JSRuntime);
+            await lc.getProgress();
             StateHasChanged();
         }
     }
 
     public UIComponents UIComponents = new UIComponents(Blockly: true, Code: true, SSDs: true, Switches: true, LEDs: true, GPRegisters: true, ParallelRegisters: true);
 
-    public int Section
-    {
-        get { return sectionValue; }
-        set
-        {
-            sectionValue = value;
-            JSRuntime.InvokeVoidAsync("storeSection", sectionValue);
-        }
-    }
-
-    private int sectionValue = 0;
-
     public RenderFragment Instructions =>
     @<div>
         <h1>Welcome!</h1>
         <ul>
-            @if (Section == 0)
+            @if (lc.Section == 0)
             {
                 <li>On the right side of the screen is a display showing the physical components of the WRAMP board.</li>
                 <li>You can click on the switches and buttons to change the values stored in the Parallel Registers tab.</li>
@@ -54,7 +44,7 @@
                 <Checkmark id="checkmarkOne" forInput="inputOne"/>
             }
 
-            @if (Section == 1)
+            @if (lc.Section == 1)
             {
                 <li>That's correct!</li>
                 <li>
@@ -63,12 +53,12 @@
                 </li>
             }
 
-            @if (Section == 2)
+            @if (lc.Section == 2)
             {
                 <li> Now try dragging a jr block from the Branch tab!</li>
             }
 
-            @if (Section == 3)
+            @if (lc.Section == 3)
             {
                 <li> Great work! </li>
                 <li> Next, write some blockly code to light up the LEDs above the switches. </li>
@@ -76,7 +66,7 @@
                 <li> Can you light up all the LEDs at once?</li>
             }
 
-            @if (Section == 4)
+            @if (lc.Section == 4)
             {
                 <li> Now, can you load the value from the switches and store it into the leds?</li>
                 <li> You'll need to use both the lw and sw instructions.</li>
@@ -97,16 +87,16 @@
                 </table>
             }
 
-            @if (Section == 5)
+            @if (lc.Section == 5)
             {
                 <li> Finally, try making the far left SSD count from 1 to 10!</li>
                 <li> You may need to add a loop back to the start to have it continually update.</li>
             }
 
-            @if (Section == 6)
+            @if (lc.Section == 6)
             {
                 <li> Congrats, you did it! </li>
-                LevelCompleted();
+                lc.LevelCompleted();
             }
         </ul>
     </div>;
@@ -116,27 +106,27 @@
         string userInput = e.Value?.ToString() ?? "";
         if (userInput == "73000" || userInput == "00073000" || userInput == "0x73000")
         {
-            if(Section == 0) Section++;
-            CheckObjective(true, "checkmarkOne");
+            if(lc.Section == 0) lc.Section++;
+            lc.CheckObjective(true, "checkmarkOne");
         }
     }
 
     public async void CheckBoard()
     {
-        string code = await GetUserCode();
-        if (Section == 1)
+        string code = await lc.GetUserCode();
+        if (lc.Section == 1)
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 10)))
             {
-                CheckObjective(true, "checkmarkTwo");
-                Section++;
+                lc.CheckObjective(true, "checkmarkTwo");
+                lc.Section++;
             }
         }
-        if (Section == 2)
+        if (lc.Section == 2)
         {
-            if (code.Contains("jr $_")) Section++;
+            if (code.Contains("jr $_")) lc.Section++;
         }
-        if (Section == 3)
+        if (lc.Section == 3)
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295)))
             {
@@ -146,73 +136,48 @@
                     if ((board.CPU.InterruptStatus & (uint)0xF000) == 0x1000 && WSIM.running == false)
                     {
                         board.CPU.InterruptStatus &= 0xEFFF;
-                        Section++;
+                        lc.Section++;
                     }
                 }
                 else
                 {
-                    Section++;
+                    lc.Section++;
                 }
             }
         }
-        if (Section == 4)
+        if (lc.Section == 4)
         {
             WSIM.UIComponents.GPRegisters = false;
-            await UpdateToolbox(newToolbox);
+            await lc.UpdateToolbox(newToolbox);
 
             bool stepOne = WSIM.Verify(new BoardCheck(WRAMPComponents.Switches, 65535));
             bool stepTwo = WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 65535)) || WSIM.Verify(new BoardCheck(WRAMPComponents.LEDs, 4294967295));
             bool returned = board.CPU.PC == 0xFFFFF;
 
-            CheckObjective(stepOne, "checkmarkThree");
-            CheckObjective(stepTwo, "checkmarkFour");
-            CheckObjective(returned, "checkmarkFive");
+            lc.CheckObjective(stepOne, "checkmarkThree");
+            lc.CheckObjective(stepTwo, "checkmarkFour");
+            lc.CheckObjective(returned, "checkmarkFive");
 
             //If the user didn't use a jr $ra, reset all objectives.
             if ((board.CPU.InterruptStatus & 0xF000) == 0x1000)
             {
                 stepOne = stepTwo = returned = false;
-                UncheckAllObjectives();
+                lc.UncheckAllObjectives();
             }
 
             if (stepOne && stepTwo && returned)
             {
-                Section++;
+                lc.Section++;
             }
         }
-        if (Section == 5)
+        if (lc.Section == 5)
         {
             if (WSIM.Verify(new BoardCheck(WRAMPComponents.LeftLeftSSD, 1, 10, 1)))
             {
-                Section++;
+                lc.Section++;
             }
         }
         StateHasChanged();
-    }
-
-    public void CheckObjective(bool goal, string checkmarkID)
-    {
-        JSRuntime.InvokeVoidAsync(goal ? "objectiveCheck" : "objectiveUncheck", checkmarkID);
-    }
-
-    public void UncheckAllObjectives()
-    {
-        JSRuntime.InvokeVoidAsync("objectiveUncheckAll");
-    }
-
-    public void LevelCompleted()
-    {
-        JSRuntime.InvokeVoidAsync("levelCompleted");
-    }
-
-    public async Task<string> GetUserCode()
-    {
-        return await JSRuntime.InvokeAsync<string>("getGeneratedCode");
-    }
-
-    public async Task UpdateToolbox(Toolbox toolbox)
-    {
-        await JSRuntime.InvokeVoidAsync("updateToolbox", JsonSerializer.Serialize(toolbox));
     }
 
     public Toolbox toolbox = new Toolbox{
@@ -283,7 +248,7 @@
 
     public string maxInstances = "{ 'textHead': 1}";
 
-    public string snippet = """
+    public string startingWorkspace = """
     {"blocks":{"languageVersion":0,"blocks":[{"type":"textHead","id":"*4p.gQmetkk+!Wm1!!kx","x":117,"y":21,"fields":{"instruction":".text"},"next":{"block":{"type":"global","id":"(T)!t~zEEwtWUX]]#s?@","fields":{"instruction":".global main"},"next":{"block":{"type":"label","id":"90].4xui,q_T{DPyc5ch","fields":{"label":"main"},"next":{"block":{"type":"arithmeticImmediate","id":"[v;$]DeWKi[D[3[Bou,x","fields":{"instruction":"addi","register1":"$1","register2":"$0","immediate":"65535"},"next":{"block":{"type":"storeWord","id":"U^`Ur(!-VsJ`rKvr%Hb]","fields":{"instruction":"sw","register1":"$1","offset":"par_led","register2":"$0"},"next":{"block":{"type":"jumpRegister","id":"MztpJP^=1XLK+BY.ZFO=","fields":{"instruction":"jr","register":"$ra"}}}}}}}}}}}}]}}
     """;
 }
