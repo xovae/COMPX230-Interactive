@@ -13,7 +13,7 @@ To publish to Github Pages:
   ```
 
 3. Run `dotnet publish -c Release` in COMPX230-Interactive/BlazorApp/
-  a. Ensure you have the .NET 10 SDK or newer installed
+  - Ensure you have the .NET 10 SDK or newer installed
 
 5. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
 
