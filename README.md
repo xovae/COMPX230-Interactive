@@ -15,6 +15,6 @@ To publish to Github Pages:
 3. Run `dotnet publish -c Release` in COMPX230-Interactive/BlazorApp/
   - Ensure you have the .NET 10 SDK or newer installed
 
-5. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
+4. Push the contents of `BlazorApp/bin/Release/net10.0/publish/wwwroot/` to the repo.
 
 See [here](https://xovae.github.io/WRAMP-SIM/) for an example build.
