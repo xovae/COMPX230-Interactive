@@ -118,6 +118,21 @@ window.saveCode = async (Library) =>
     saveFile(code, levelID === '' ? 'sandboxCode.s' : `${levelID}Code.s`);
 }
 
+window.setWsimCode = (code) =>
+{
+    const codeArea = document.getElementById('wsimCode');
+    if (!codeArea) return;
+
+    const safeCode = (code ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+
+    codeArea.innerHTML = safeCode
+        .replaceAll('\n', '<br>')
+        .replaceAll('\t', '&emsp;');
+}
+
 window.saveFile = async (content, name) =>
 {
     let index = name.indexOf('.');
@@ -224,10 +239,39 @@ window.getProgress = (type) =>
     return Number(localStorage.getItem(id)) || 0;
 }
 
+window.getLevelProgress = (levelID, type) =>
+{
+    id = levelID + type;
+    return Number(localStorage.getItem(id)) || 0;
+}
+
+window.storeScopedProgress = (scopeID, type, value) =>
+{
+    id = scopeID + type;
+    localStorage.setItem(id, value);
+}
+
+window.getScopedProgress = (scopeID, type) =>
+{
+    id = scopeID + type;
+    return Number(localStorage.getItem(id)) || 0;
+}
+
 var popover;
+var compilePopoverEnabled = true;
+
+window.setCompilePopoverEnabled = (enabled) =>
+{
+    compilePopoverEnabled = !!enabled;
+}
 
 window.triggerPopover = (error) =>
 {
+    if (!compilePopoverEnabled)
+    {
+        return;
+    }
+
     //Clear any existing popovers
     clearPopovers();
 
@@ -436,6 +480,15 @@ window.updateSign = (instruction) =>
             break;
         case instruction.includes('rem'):
             sign.innerText = '%';
+            break;
+        case instruction.includes('and'):
+            sign.innerText = '&';
+            break;
+        case instruction.includes('xor'):
+            sign.innerText = '^';
+            break;
+        case instruction.includes('or'):
+            sign.innerText = '|';
             break;
         case instruction.includes('sr'):
             sign.innerText = '>>';

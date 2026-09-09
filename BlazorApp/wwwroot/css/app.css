@@ -373,3 +373,110 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+.dim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+}
+
+.spotlight {
+    position: absolute;
+    background: transparent;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.spotlight.spotlight-check {
+    pointer-events: all;
+    cursor: pointer;
+    border: 3px solid yellow;
+    animation: spotlight-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes spotlight-pulse {
+    0%   { border-color: rgba(255, 255, 0, 1); }
+    50%  { border-color: rgba(255, 255, 0, 0.1); }
+    100% { border-color: rgba(255, 255, 0, 1); }
+}
+
+.walkthrough-tooltip {
+    z-index: 10001;
+    position: relative;
+    max-width: 320px;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+input {
+    margin-bottom: 0.5rem;
+}
+
+.walkthrough-close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--bs-body-color);
+    padding: 0;
+    opacity: 0.6;
+}
+
+.walkthrough-close:hover {
+    opacity: 1;
+}
+
+.walkthrough-text {
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.walkthrough-btn {
+    background-color: #1b6ec2;
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.walkthrough-btn:hover {
+    background-color: #1861ac;
+}
+
+.walkthrough-hint {
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.75;
+    align-self: center;
+}
+
+.walkthrough-trigger-btn {
+    background-color: #1b6ec2;
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 0.15rem 0.9rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.walkthrough-trigger-btn:hover {
+    background-color: #1861ac;
+}

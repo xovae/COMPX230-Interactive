@@ -1,0 +1,307 @@
+@inject SpotlightRegistry Registry
+@inject IJSRuntime JS
+@inject HttpClient Http
+@implements IDisposable
+
+<button class="walkthrough-trigger-btn" @onclick="StartTour" disabled="@(!HasTour)">@ButtonText</button>
+
+@if (step >= 0)
+{
+    <div class="overlay">
+
+        <!-- Spotlight highlight -->
+        @if (rect != null)
+        {
+            <div class="spotlight @(CurrentStepHasCheck ? "spotlight-check" : "")"
+                style="
+                    top:@($"{rect.Top - 5}px");
+                    left:@($"{rect.Left - 5}px");
+                    width:@($"{rect.Width + 10}px");
+                    height:@($"{rect.Height + 10}px");
+                "
+                @onclick="OnSpotlightClicked">
+            </div>
+
+            <!-- Tooltip box -->
+                <div class="walkthrough-tooltip"
+                 style="
+                    position: absolute;
+                    top:@($"{TooltipToppx}px");
+                    left:@($"{TooltipLeftpx}px");
+                 ">
+                <button class="walkthrough-close" @onclick="ExitTour" aria-label="Close">&times;</button>
+                <p class="walkthrough-text">@GetText(step)</p>
+
+                <div style="display:flex; gap:8px;">
+                    @if (!CurrentStepHasCheck)
+                    {
+                        <button class="walkthrough-btn" @onclick="Next">@(step >= activeTour.Count - 1 ? "Done" : "Next")</button>
+                    }
+                    else
+                    {
+                        <span class="walkthrough-hint">Click the highlighted element to continue</span>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string ButtonText { get; set; } = "Walkthrough";
+
+    [Parameter]
+    public string TourKey { get; set; } = "introductionTour";
+
+    private int step = -1;
+
+    private Dictionary<string, List<TourStep>> tours = new Dictionary<string, List<TourStep>>();
+    private List<TourStep> activeTour = new List<TourStep>();
+    private Dictionary<int, bool> collapseShownAtTourStart = new Dictionary<int, bool>();
+    private DotNetObjectReference<GuidedWalkthrough>? escCallbackReference;
+
+    private Rect? rect;
+
+    public class TourStep
+    {
+        public string ElementKey { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string? Check { get; set; }
+    }
+
+    public class Rect
+    {
+        public double Top { get; set; }
+        public double Left { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public double ViewportWidth { get; set; }
+        public double ViewportHeight { get; set; }
+    }
+
+    // -------------------------
+    // LIFECYCLE
+    // -------------------------
+    protected override async Task OnInitializedAsync()
+    {
+        escCallbackReference = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("walkthroughRegisterEsc", escCallbackReference);
+        await LoadTours();
+        SetActiveTour();
+    }
+
+    protected override void OnParametersSet()
+    {
+        SetActiveTour();
+    }
+
+    public void Dispose()
+    {
+        JS.InvokeVoidAsync("walkthroughUnregisterEsc");
+        escCallbackReference?.Dispose();
+    }
+
+    [JSInvokable]
+    public async Task EscPressed() => await ExitTour();
+
+    // -------------------------
+    // START TOUR
+    // -------------------------
+    private async Task StartTour()
+    {
+        if (!HasTour)
+        {
+            return;
+        }
+
+        collapseShownAtTourStart.Clear();
+        for (int i = 0; i < activeTour.Count; i++)
+        {
+            var tourStep = activeTour[i];
+            if (tourStep.Check == "collapse" && Registry.TryGet(tourStep.ElementKey, out var collapseTrigger))
+            {
+                collapseShownAtTourStart[i] = await JS.InvokeAsync<bool>("isCollapseShown", collapseTrigger);
+            }
+        }
+
+        step = 0;
+
+        // small delay helps ensure layout is ready
+        await Task.Delay(50);
+
+        await MoveSpotlight();
+    }
+
+    // -------------------------
+    // MOVE SPOTLIGHT
+    // -------------------------
+    private async Task MoveSpotlight()
+    {
+        if (step < 0 || step >= activeTour.Count)
+        {
+            rect = null;
+            return;
+        }
+
+        var key = activeTour[step].ElementKey;
+
+        // Components may register spotlight refs slightly after first paint.
+        for (var attempt = 0; attempt < 10; attempt++)
+        {
+            if (Registry.TryGet(key, out var element))
+            {
+                rect = await JS.InvokeAsync<Rect?>("getRect", element);
+                break;
+            }
+
+            await Task.Delay(30);
+        }
+
+        StateHasChanged();
+    }
+
+    // -------------------------
+    // NEXT STEP
+    // -------------------------
+    private async Task Next()
+    {
+        step++;
+
+        if (step >= activeTour.Count)
+        {
+            await ExitTour();
+            return;
+        }
+
+        await MoveSpotlight();
+    }
+
+    // -------------------------
+    // EXIT TOUR
+    // -------------------------
+    private Task ExitTour()
+    {
+        step = -1;
+        rect = null;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    // -------------------------
+    // TOOLTIP TEXT
+    // -------------------------
+    private string GetText(int step)
+    {
+        if (step < 0 || step >= activeTour.Count)
+        {
+            return string.Empty;
+        }
+
+        return activeTour[step].Description;
+    }
+
+    private bool HasTour => activeTour.Count > 0;
+
+    private bool CurrentStepHasCheck =>
+        step >= 0 && step < activeTour.Count && activeTour[step].Check != null;
+
+    // -------------------------
+    // SPOTLIGHT CLICK
+    // -------------------------
+    private async Task OnSpotlightClicked()
+    {
+        if (!CurrentStepHasCheck)
+        {
+            return;
+        }
+
+        var currentStep = activeTour[step];
+
+        if (currentStep.Check == "tab" && Registry.TryGet(currentStep.ElementKey, out var tabElement))
+        {
+            await JS.InvokeVoidAsync("activateTab", tabElement);
+        }
+        else if (currentStep.Check == "collapse" && Registry.TryGet(currentStep.ElementKey, out var collapseElement))
+        {
+            if (!collapseShownAtTourStart.TryGetValue(step, out var wasShownAtStart) || !wasShownAtStart)
+            {
+                await JS.InvokeVoidAsync("showCollapse", collapseElement);
+            }
+        }
+
+        await Next();
+    }
+
+    private async Task LoadTours()
+    {
+        var loadedTours = await Http.GetFromJsonAsync<Dictionary<string, List<TourStep>>>("data/guidedTours.json");
+        tours = loadedTours ?? new Dictionary<string, List<TourStep>>();
+    }
+
+    private void SetActiveTour()
+    {
+        if (!tours.TryGetValue(TourKey, out var selectedTour) || selectedTour == null)
+        {
+            activeTour = new List<TourStep>();
+            return;
+        }
+
+        activeTour = selectedTour;
+    }
+
+    // -------------------------
+    // TOOLTIP POSITIONING
+    // -------------------------
+    private const double TooltipEstimatedWidth = 320;
+    private const double TooltipEstimatedHeight = 110;
+    private const double Gap = 12;
+
+    private enum Side { Below, Above, Right, Left }
+
+    private Side GetBestSide()
+    {
+        if (rect == null) return Side.Below;
+        double spaceBelow = rect.ViewportHeight - (rect.Top + rect.Height);
+        double spaceAbove = rect.Top;
+        double spaceRight = rect.ViewportWidth - (rect.Left + rect.Width);
+
+        if (spaceBelow >= TooltipEstimatedHeight + Gap) return Side.Below;
+        if (spaceAbove >= TooltipEstimatedHeight + Gap) return Side.Above;
+        if (spaceRight >= TooltipEstimatedWidth + Gap) return Side.Right;
+        return Side.Left;
+    }
+
+    private static double Clamp(double value, double min, double max) =>
+        Math.Max(min, Math.Min(value, max));
+
+    private double TooltipToppx
+    {
+        get
+        {
+            if (rect == null) return 0;
+            return GetBestSide() switch
+            {
+                Side.Below => Clamp(rect.Top + rect.Height + Gap, 0, rect.ViewportHeight - TooltipEstimatedHeight),
+                Side.Above => Clamp(rect.Top - TooltipEstimatedHeight - Gap, 0, rect.ViewportHeight - TooltipEstimatedHeight),
+                _ => Clamp(rect.Top, 0, rect.ViewportHeight - TooltipEstimatedHeight)
+            };
+        }
+    }
+
+    private double TooltipLeftpx
+    {
+        get
+        {
+            if (rect == null) return 0;
+            return GetBestSide() switch
+            {
+                Side.Right => rect.Left + rect.Width + Gap,
+                Side.Left => Clamp(rect.Left - TooltipEstimatedWidth - Gap, 0, rect.ViewportWidth - TooltipEstimatedWidth),
+                _ => Clamp(rect.Left, 0, rect.ViewportWidth - TooltipEstimatedWidth)
+            };
+        }
+    }
+}

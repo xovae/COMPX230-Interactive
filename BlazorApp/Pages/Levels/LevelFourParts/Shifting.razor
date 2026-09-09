@@ -1,0 +1,185 @@
+@using RexSimulator.Hardware
+@inject IJSRuntime JSRuntime
+
+<section>
+    <h2>Shifting</h2>
+    <h3>Step One <label class="inputCheckmark" id="checkmarkOne"><i class="bi bi-check-lg"></i></label></h3>
+    <p>First task: load the current switch value into register <code>$1</code>.</p>
+    <p>Tip: <strong>Make sure at least one switch is on</strong>, then run or step your code and confirm <code>$1</code> updates.</p>
+
+    @if (Section >= 1)
+    {
+        <h3>Step Two <label class="inputCheckmark" id="checkmarkTwo"><i class="bi bi-check-lg"></i></label></h3>
+        <p>Store double the switch value in register <code>$2</code> (after setting <code>$1</code>).</p>
+        <p>Tip: Arithmetic insructions are not allowed in this level. Check for instructions in the "logic" category instead.</p>
+    }
+
+    @if (Section >= 2)
+    {
+        <p>Nice work, both shifting tasks are complete.</p>
+        <button class="btn btn-primary" @onclick="NextSection">Next Section</button>
+    }
+</section>
+
+@if (Section < 2)
+{
+    <button class="btn btn-danger skip-level-button" type="button" @onclick="SkipLevelAsync">Skip Level</button>
+}
+
+@code {
+    public static readonly LevelGroupPart GroupPart = new("shifting", "Shifting", ProgressScopeId);
+
+    public const string ProgressScopeId = "levelFourShifting";
+    public const string BlocklyStorageKey = "levelFourShiftingBlockly";
+
+    public static UIComponents Components { get; } = new(
+        Blockly: true,
+        Code: true,
+        Switches: true,
+        LEDs: true,
+        GPRegisters: true,
+        ParallelRegisters: true,
+        Visualiser: true);
+
+    public static Toolbox Toolbox { get; } = new()
+    {
+        contents = new List<Category>() {
+            new Category {
+                name = "Sections",
+                categorystyle = "sectionCategory",
+                contents = new List<Block>() {
+                    new Block { type = "textHead" },
+                    new Block { type = "global" }
+                }
+            },
+            new Category {
+                name = "Branch",
+                categorystyle = "branchCategory",
+                contents = new List<Block>() {
+                    new Block { type = "label" },
+                    new Block { type = "jumpRegister" },
+                    new Block { type = "jump" }
+                }
+            },
+            new Category {
+                name = "Memory",
+                categorystyle = "memoryCategory",
+                contents = new List<Block>() {
+                    new Block { type = "storeWord" },
+                    new Block { type = "loadWord" }
+                }
+            },
+            new Category {
+                name = "Logic",
+                categorystyle = "logicCategory",
+                contents = new List<Block>() {
+                    new Block { type = "bitwise" },
+                    new Block { type = "bitwiseImmediate" },
+                    new Block { type = "shift" },
+                    new Block { type = "shiftImmediate" },
+                }
+            },
+        }
+    };
+
+    public static string StartingWorkspace { get; } = """
+    {"blocks":{"languageVersion":0,"blocks":[{"type":"textHead","id":"3X;D%#OW7i/C5Y`#lxV=","x":103,"y":56,"fields":{"instruction":".text"},"next":{"block":{"type":"global","id":"Ob+QV2P-Bfx5]-[OBWs[","fields":{"instruction":".global main"},"next":{"block":{"type":"label","id":"5[{_!6Q9!c/j+g44.{5h","fields":{"label":"main"},"next":{"block":{"type":"jumpRegister","id":"3[hkavo[E!#|I|AnROCV","fields":{"instruction":"jr","register":"$ra"}}}}}}}}]}}
+    """;
+
+    public static string? MaxInstances { get; } = "{ 'textHead': 1}";
+
+    public static string[][]? Library => null;
+
+    private bool shiftingStepOneComplete;
+    private bool shiftingStepTwoComplete;
+
+    [Parameter]
+    public int Section { get; set; }
+
+    [Parameter]
+    public EventCallback NextSection { get; set; }
+
+    [Parameter]
+    public Func<BoardCheck, bool>? VerifyBoard { get; set; }
+
+    [Parameter]
+    public RexBoard? Board { get; set; }
+
+    [Parameter]
+    public LevelComponents? LevelComponents { get; set; }
+
+    [Parameter]
+    public EventCallback<(int Section, bool shiftingStepOneComplete, bool shiftingStepTwoComplete, bool TriggerLevelCompleted)> ProgressChanged { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        shiftingStepOneComplete = Section >= 1 || shiftingStepOneComplete;
+        shiftingStepTwoComplete = Section >= 2 || shiftingStepTwoComplete;
+    }
+
+    public void ApplyChecklistSelection(ChecklistStepStatus status, ref int section)
+    {
+        if (status == ChecklistStepStatus.Complete)
+        {
+            section = 2;
+            shiftingStepOneComplete = true;
+            shiftingStepTwoComplete = true;
+            return;
+        }
+
+        section = shiftingStepOneComplete ? 1 : 0;
+    }
+
+    public Task HandleBoardChanged()
+    {
+        if (VerifyBoard == null || Board == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        uint switchValue = Board.Parallel.Switches;
+        bool regOneMatchesSwitches = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, switchValue, 1));
+        bool regTwoIsDoubleSwitches = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, switchValue * 2, 2));
+
+        bool shiftingStepOneNow = switchValue != 0 && regOneMatchesSwitches;
+        bool shiftingStepTwoNow = switchValue != 0 && shiftingStepOneNow && regTwoIsDoubleSwitches;
+
+        shiftingStepOneComplete = shiftingStepOneComplete || shiftingStepOneNow;
+        shiftingStepTwoComplete = shiftingStepTwoComplete || shiftingStepTwoNow;
+
+        if (shiftingStepOneComplete && Section == 0)
+        {
+            Section = 1;
+        }
+        if (shiftingStepTwoComplete && Section == 1)
+        {
+            Section = 2;
+        }
+
+        return ProgressChanged.InvokeAsync((Section, shiftingStepOneComplete, shiftingStepTwoComplete, false));
+    }
+
+    private async Task SkipLevelAsync()
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to skip this level?");
+        if (!confirmed)
+        {
+            return;
+        }
+
+        Section = 2;
+        shiftingStepOneComplete = true;
+        shiftingStepTwoComplete = true;
+
+        await ProgressChanged.InvokeAsync((Section, shiftingStepOneComplete, shiftingStepTwoComplete, true));
+    }
+}
+
+<style>
+.skip-level-button {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 1050;
+}
+</style>

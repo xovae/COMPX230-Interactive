@@ -1,0 +1,355 @@
+@page "/levelFour"
+@using RexSimulator.Hardware
+@using BlazorApp.Pages.Levels.LevelFourParts
+@inject IJSRuntime JSRuntime
+@inject ChecklistStateStore ChecklistState
+@implements IDisposable
+
+<Level @ref="levelComponent" Title="Bitwise" BoardChanged="HandleBoardChanged" UIComponents="@CurrentComponents" Toolbox="@CurrentToolbox" WSIMInstructions="@Instructions" MainInstructions=null startingWorkspace="@CurrentStartingWorkspace" maxInstances="@CurrentMaxInstances" Library="@CurrentLibrary" />
+
+@code {
+    public Level? levelComponent;
+    public LevelComponents lc = new();
+    public WSIM? WSIM;
+    public RexBoard? board;
+
+    private Shifting? shiftingPartRef;
+    private Masking? maskingPartRef;
+    private Capitalization? capitalizationPartRef;
+    private LevelGroupGateway gateway = default!;
+
+    private UIComponents CurrentComponents => gateway.CurrentPartIndex switch
+    {
+        0 => Shifting.Components,
+        1 => Masking.Components,
+        _ => Capitalization.Components
+    };
+    private Toolbox CurrentToolbox => gateway.CurrentPartIndex switch
+    {
+        0 => Shifting.Toolbox,
+        1 => Masking.Toolbox,
+        _ => Capitalization.Toolbox
+    };
+    private string CurrentStartingWorkspace => gateway.CurrentPartIndex switch
+    {
+        0 => Shifting.StartingWorkspace,
+        1 => Masking.StartingWorkspace,
+        _ => Capitalization.StartingWorkspace
+    };
+    private string? CurrentMaxInstances => gateway.CurrentPartIndex switch
+    {
+        0 => Shifting.MaxInstances,
+        1 => Masking.MaxInstances,
+        _ => Capitalization.MaxInstances
+    };
+    private string[][]? CurrentLibrary => gateway.CurrentPartIndex switch
+    {
+        0 => Shifting.Library,
+        1 => Masking.Library,
+        _ => Capitalization.Library
+    };
+
+    protected override void OnInitialized()
+    {
+        gateway = new LevelGroupGateway("levelFour", new[] { Shifting.GroupPart, Masking.GroupPart, Capitalization.GroupPart });
+        ChecklistState.SectionSelectionRequested += HandleSectionSelectionRequested;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        if (levelComponent != null && levelComponent.wsimComponent != null)
+        {
+            board = levelComponent.wsimComponent.board;
+            WSIM = levelComponent.wsimComponent;
+        }
+
+        lc.SetJSRuntime(JSRuntime);
+        await MigrateLegacyProgressIfNeeded();
+        await gateway.InitializeAsync(JSRuntime, ChecklistState);
+        await SyncChecklistStateFromStoredProgress();
+        await ApplyCurrentPartConfig();
+        await HandleBoardChanged();
+        StateHasChanged();
+    }
+
+    private async Task SyncChecklistStateFromStoredProgress()
+    {
+        int shiftingSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Shifting.ProgressScopeId, "Section");
+        int maskingSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Masking.ProgressScopeId, "Section");
+        int capitalizationSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Capitalization.ProgressScopeId, "Section");
+
+        ChecklistStepStatus shiftingStatus = shiftingSection >= 2
+            ? ChecklistStepStatus.Complete
+            : ChecklistStepStatus.Started;
+
+        bool maskingUnlockedOrVisited = maskingSection > 0 || shiftingSection >= 2 || gateway.CurrentPartIndex >= 1;
+        ChecklistStepStatus maskingStatus = maskingSection >= 4
+            ? ChecklistStepStatus.Complete
+            : (maskingUnlockedOrVisited ? ChecklistStepStatus.Started : ChecklistStepStatus.Incomplete);
+
+        bool capitalizationUnlockedOrVisited = capitalizationSection > 0 || maskingSection >= 4 || gateway.CurrentPartIndex >= 2;
+        ChecklistStepStatus capitalizationStatus = capitalizationSection >= 2
+            ? ChecklistStepStatus.Complete
+            : (capitalizationUnlockedOrVisited ? ChecklistStepStatus.Started : ChecklistStepStatus.Incomplete);
+
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 0, shiftingStatus);
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 1, maskingStatus);
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 2, capitalizationStatus);
+    }
+
+    private async Task MigrateLegacyProgressIfNeeded()
+    {
+        int currentPartIndex = await JSRuntime.InvokeAsync<int>("getScopedProgress", gateway.LevelId, LevelGroupGateway.ActivePartProgressType);
+        int shiftingSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Shifting.ProgressScopeId, "Section");
+        int maskingSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Masking.ProgressScopeId, "Section");
+        int capitalizationSection = await JSRuntime.InvokeAsync<int>("getScopedProgress", Capitalization.ProgressScopeId, "Section");
+
+        // If scoped progress already exists, do not overwrite it.
+        if (currentPartIndex != 0 || shiftingSection != 0 || maskingSection != 0 || capitalizationSection != 0)
+        {
+            return;
+        }
+
+        @* int legacyPhase = await JSRuntime.InvokeAsync<int>("getLevelProgress", "levelFour", "Phase");
+        int legacySection = await JSRuntime.InvokeAsync<int>("getLevelProgress", "levelFour", "Section");
+
+        if (legacyPhase > 0)
+        {
+            await JSRuntime.InvokeVoidAsync("storeScopedProgress", gateway.LevelId, LevelGroupGateway.ActivePartProgressType, legacyPhase);
+        }
+
+        if (legacySection > 0)
+        {
+            // Map legacy phases to new parts: 1 -> Shifting, 2 -> Capitalization (Masking didn't exist in legacy)
+            string targetScope = legacyPhase == 1 ? Shifting.ProgressScopeId : Capitalization.ProgressScopeId;
+            await JSRuntime.InvokeVoidAsync("storeScopedProgress", targetScope, "Section", legacySection);
+        } *@
+    }
+
+    private void HandleSectionSelectionRequested(string levelId, int stepIndex, ChecklistStepStatus status)
+    {
+        if (!string.Equals(levelId, gateway.LevelId, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await ApplyChecklistSectionSelection(stepIndex, status);
+        });
+    }
+
+    private async Task ApplyChecklistSectionSelection(int stepIndex, ChecklistStepStatus status)
+    {
+        if (!gateway.IsValidIndex(stepIndex))
+        {
+            return;
+        }
+
+        await gateway.SelectPartAsync(stepIndex, JSRuntime, ChecklistState);
+        await ApplyCurrentPartConfig();
+
+        lc.Section = GetSectionFromChecklistSelection(status);
+
+        StateHasChanged();
+        await Task.Yield();
+        await HandleBoardChanged();
+        StateHasChanged();
+    }
+
+    private async Task ApplyCurrentPartConfig()
+    {
+        if (gateway.CurrentPartIndex == 0)
+        {
+            lc.SetProgressScope(Shifting.ProgressScopeId);
+            await lc.getProgress();
+            await lc.UpdateToolbox(Shifting.Toolbox);
+            await JSRuntime.InvokeVoidAsync("loadSavedOrPresetWorkspace", Shifting.BlocklyStorageKey, Shifting.StartingWorkspace);
+        }
+        else if (gateway.CurrentPartIndex == 1)
+        {
+            lc.SetProgressScope(Masking.ProgressScopeId);
+            await lc.getProgress();
+            await lc.UpdateToolbox(Masking.Toolbox);
+            await JSRuntime.InvokeVoidAsync("loadSavedOrPresetWorkspace", Masking.BlocklyStorageKey, Masking.StartingWorkspace);
+        }
+        else
+        {
+            lc.SetProgressScope(Capitalization.ProgressScopeId);
+            await lc.getProgress();
+            await lc.UpdateToolbox(Capitalization.Toolbox);
+            await JSRuntime.InvokeVoidAsync("loadSavedOrPresetWorkspace", Capitalization.BlocklyStorageKey, Capitalization.StartingWorkspace);
+        }
+
+        ChecklistState.SetSelectedStepIndex(gateway.LevelId, gateway.CurrentPartIndex);
+        SyncChecklistState();
+    }
+
+    public async Task HandleBoardChanged()
+    {
+        if (levelComponent == null || levelComponent.wsimComponent == null || WSIM == null || board == null)
+        {
+            return;
+        }
+
+        if (gateway.CurrentPartIndex == 0)
+        {
+            if (shiftingPartRef != null)
+            {
+                await shiftingPartRef.HandleBoardChanged();
+            }
+        }
+        else if (gateway.CurrentPartIndex == 1)
+        {
+            if (maskingPartRef != null)
+            {
+                await maskingPartRef.HandleBoardChanged();
+            }
+        }
+        else
+        {
+            if (capitalizationPartRef != null)
+            {
+                await capitalizationPartRef.HandleBoardChanged();
+            }
+        }
+    }
+
+    private Task HandlePartProgressChanged((int Section, bool StepOneComplete, bool StepTwoComplete, bool TriggerLevelCompleted) progress)
+    {
+        lc.Section = progress.Section;
+
+        if (progress.TriggerLevelCompleted)
+        {
+            lc.LevelCompleted();
+        }
+
+        SyncChecklistState();
+        UpdateObjectiveCheckmarks(progress.StepOneComplete, progress.StepTwoComplete);
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    private bool VerifyBoard(BoardCheck check)
+    {
+        return WSIM?.Verify(check) ?? false;
+    }
+
+    private int GetSectionFromChecklistSelection(ChecklistStepStatus status)
+    {
+        if (status == ChecklistStepStatus.Complete)
+        {
+            return gateway.CurrentPartIndex switch
+            {
+                0 => 2,
+                1 => 4,
+                _ => 2
+            };
+        }
+
+        return gateway.CurrentPartIndex switch
+        {
+            0 => Math.Clamp(lc.Section, 0, 1),
+            1 => Math.Clamp(lc.Section, 0, 2),
+            _ => Math.Clamp(lc.Section, 0, 1)
+        };
+    }
+
+    private void UpdateObjectiveCheckmarks(bool stepOneComplete, bool stepTwoComplete)
+    {
+        if (gateway.CurrentPartIndex == 0)
+        {
+            lc.CheckObjective(stepOneComplete, "checkmarkOne");
+            lc.CheckObjective(stepTwoComplete, "checkmarkTwo");
+        }
+        else if (gateway.CurrentPartIndex == 1)
+        {
+            lc.CheckObjective(stepOneComplete, "checkmarkThree");
+            lc.CheckObjective(stepTwoComplete, "checkmarkFour");
+        }
+        else
+        {
+            lc.CheckObjective(stepOneComplete, "checkmarkFive");
+            lc.CheckObjective(stepTwoComplete, "checkmarkSix");
+        }
+    }
+
+    private void SyncChecklistState()
+    {
+        if (gateway.CurrentPartIndex == 0)
+        {
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 0, lc.Section >= 2 ? ChecklistStepStatus.Complete : ChecklistStepStatus.Started);
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 1, ChecklistStepStatus.Incomplete);
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 2, ChecklistStepStatus.Incomplete);
+            ChecklistState.SetSelectedStepIndex(gateway.LevelId, 0);
+            return;
+        }
+
+        if (gateway.CurrentPartIndex == 1)
+        {
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 0, ChecklistStepStatus.Complete);
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 1, lc.Section >= 4 ? ChecklistStepStatus.Complete : ChecklistStepStatus.Started);
+            gateway.SetPartStatusWithoutDowngrade(ChecklistState, 2, ChecklistStepStatus.Incomplete);
+            ChecklistState.SetSelectedStepIndex(gateway.LevelId, 1);
+            return;
+        }
+
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 0, ChecklistStepStatus.Complete);
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 1, ChecklistStepStatus.Complete);
+        gateway.SetPartStatusWithoutDowngrade(ChecklistState, 2, lc.Section >= 2 ? ChecklistStepStatus.Complete : ChecklistStepStatus.Started);
+        ChecklistState.SetSelectedStepIndex(gateway.LevelId, 2);
+    }
+
+    public async Task NextSection()
+    {
+        // From Shifting to Masking
+        if (gateway.CurrentPartIndex == 0 && lc.Section >= 2)
+        {
+            await gateway.SelectPartAsync(1, JSRuntime, ChecklistState);
+            lc.UncheckAllObjectives();
+            await ApplyCurrentPartConfig();
+            StateHasChanged();
+            await Task.Yield();
+            await HandleBoardChanged();
+            StateHasChanged();
+        }
+        // From Masking to Capitalization
+        else if (gateway.CurrentPartIndex == 1 && lc.Section >= 4)
+        {
+            await gateway.SelectPartAsync(2, JSRuntime, ChecklistState);
+            lc.UncheckAllObjectives();
+            await ApplyCurrentPartConfig();
+            StateHasChanged();
+            await Task.Yield();
+            await HandleBoardChanged();
+            StateHasChanged();
+        }
+    }
+
+    public RenderFragment Instructions =>
+    @<div>
+        @if (gateway.CurrentPartIndex == 0)
+        {
+            <Shifting @ref="shiftingPartRef" Section="@lc.Section" NextSection="NextSection" VerifyBoard="VerifyBoard" Board="board" LevelComponents="lc" ProgressChanged="HandlePartProgressChanged" />
+        }
+        else if (gateway.CurrentPartIndex == 1)
+        {
+            <Masking @ref="maskingPartRef" Section="@lc.Section" NextSection="NextSection" VerifyBoard="VerifyBoard" Board="board" LevelComponents="lc" ProgressChanged="HandlePartProgressChanged" />
+        }
+        else
+        {
+            <Capitalization @ref="capitalizationPartRef" Section="@lc.Section" VerifyBoard="VerifyBoard" Board="board" LevelComponents="lc" ProgressChanged="HandlePartProgressChanged" />
+        }
+    </div>;
+
+    public void Dispose()
+    {
+        ChecklistState.SectionSelectionRequested -= HandleSectionSelectionRequested;
+    }
+}

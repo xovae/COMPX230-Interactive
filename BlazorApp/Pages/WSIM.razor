@@ -1,25 +1,28 @@
 @using RexSimulator.Hardware
+@using System.Globalization
 @using System.Text
 @using System.Text.RegularExpressions
+@using System.Linq
 @using RexSimulator.Hardware.Rex
 @using RexSimulator.Hardware.Wramp
 
 @inject IJSRuntime JSRuntime
+@inject SpotlightRegistry SpotlightRegistry
 @implements IDisposable
 
 <div class="mb-2">
     <h2>Controls</h2>
 
     <div class="btn-group me-2" role="group" aria-label="Code Controls">
-        <button type="button" id="compileButton" class="btn btn-warning" @onclick="OnCompileClicked" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="compilePopover">Compile</button>
-        <button type="button" class="btn btn-info" @onclick="saveCode">Download Code</button>
+        <button type="button" id="compileButton" class="btn btn-warning" @onclick="OnCompileClicked" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-custom-class="compilePopover" @ref="compileButtonRef">Compile</button>
+        <button type="button" class="btn btn-info" @onclick="saveCode" @ref="downloadCodeButtonRef">Download Code</button>
     </div>
 
-    <div class="btn-group" role="group" aria-label="WRAMP Controls">
-        <button type="button" class="btn btn-warning" @onclick="Undo" disabled="@(pcStates.Count == 0)">&lt;-- Undo</button>
-        <button type="button" class="btn btn-success" @onclick="Run" disabled="@(!firstCompilation)" hidden="@running">Run</button>
-        <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)">Pause</button>
-        <button type="button" class="btn btn-info" @onclick="Step" disabled="@(!firstCompilation || running || (board.CPU.InterruptStatus & (uint)0xF000) != 0)">Step --&gt;</button>
+    <div class="btn-group" role="group" aria-label="WRAMP Controls" hidden="@(!firstCompilation)">
+        <button type="button" class="btn btn-warning" @onclick="Undo" disabled="@(pcStates.Count == 0)" @ref="undoButtonRef">&lt;-- Undo</button>
+        <button type="button" class="btn btn-success" @onclick="Run" hidden="@running" @ref="runButtonRef">Run</button>
+        <button type="button" class="btn btn-success" @onclick="Pause" hidden="@(!running)" @ref="pauseButtonRef">Pause</button>
+        <button type="button" class="btn btn-info" @onclick="Step" disabled="@(running || (board.CPU.InterruptStatus & (uint)0xF000) != 0)" @ref="stepButtonRef">Step --&gt;</button>
     </div>
 </div>
 
@@ -29,7 +32,7 @@
         <div class="accordion my-2">
             <div class="accordion-item">
                 <h2 class="accordion-header">
-                    <button class="accordion-button collapsed text-end" type="button" data-bs-toggle="collapse" data-bs-target="#physicalComponents" aria-expanded="false" aria-controls="physicalComponents">
+                    <button class="accordion-button collapsed text-end" type="button" data-bs-toggle="collapse" data-bs-target="#physicalComponents" aria-expanded="false" aria-controls="physicalComponents" @ref="physicalComponentsTabRef">
                         Physical Components
                     </button>
                 </h2>
@@ -100,50 +103,50 @@
         @if (WSIMInstructions != null)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true">Instructions</button>
+                <button class="nav-link active" id="instructions-tab" data-bs-toggle="tab" data-bs-target="#instructions-tab-pane" type="button" role="tab" aria-controls="instructions-tab-pane" aria-selected="true" @ref="instructionsTabRef">Instructions</button>
             </li>
         }
         @if (UIComponents.Code)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false">Code</button>
+                <button class="nav-link" id="code-tab" data-bs-toggle="tab" data-bs-target="#code-tab-pane" type="button" role="tab" aria-controls="code-tab-pane" aria-selected="false" @ref="codeTabRef">Code</button>
             </li>
         }
         @if (UIComponents.GPRegisters)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false">GP Registers</button>
+                <button class="nav-link" id="gp-tab" data-bs-toggle="tab" data-bs-target="#gp-tab-pane" type="button" role="tab" aria-controls="gp-tab-pane" aria-selected="false" @ref="gpTabRef">GP Registers</button>
             </li>
         }
         @if (UIComponents.SPRegisters)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="sp-tab" data-bs-toggle="tab" data-bs-target="#sp-tab-pane" type="button" role="tab"
+                <button class="nav-link" id="sp-tab" data-bs-toggle="tab" data-bs-target="#sp-tab-pane" type="button" role="tab" @ref="spTabRef"
                 aria-controls="sp-tab-pane" aria-selected="false">SP Registers</button>
             </li>
         }
         @if (UIComponents.RAM)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false">RAM</button>
+                <button class="nav-link" id="ram-tab" data-bs-toggle="tab" data-bs-target="#ram-tab-pane" type="button" role="tab" aria-controls="ram-tab-pane" aria-selected="false" @ref="ramTabRef">RAM</button>
             </li>
         }
         @if (UIComponents.ParallelRegisters)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false">Parallel Registers</button>
+                <button class="nav-link" id="parallel-tab" data-bs-toggle="tab" data-bs-target="#parallel-tab-pane" type="button" role="tab" aria-controls="parallel-tab-pane" aria-selected="false" @ref="parallelTabRef">Parallel Registers</button>
             </li>
         }
         @if (UIComponents.SerialPort)
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false">Serial Port</button>
+                <button class="nav-link" id="serial-tab" data-bs-toggle="tab" data-bs-target="#serial-tab-pane" type="button" role="tab" aria-controls="serial-tab-pane" aria-selected="false" @ref="serialTabRef">Serial Port</button>
             </li>
         }
-        @if (Library != null && Library[0] != "libraryName.s")
+        @if (DisplayLibraryEntries.Any())
         {
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false">@Library[0]</button>
+                <button class="nav-link" id="library-tab" data-bs-toggle="tab" data-bs-target="#library-tab-pane" type="button" role="tab" aria-controls="library-tab-pane" aria-selected="false" @ref="libraryTabRef">@LibraryTabTitle</button>
             </li>
         }
         <li class="nav-item ms-auto" role="presentation" @onclick="quack">
@@ -194,10 +197,10 @@
                 <p>@((MarkupString)(board.Serial1.serialText.Replace("\n", "<br>")))</p>
             </div>
         }
-        @if (Library != null && Library[0] != "libraryName.s")
+        @if (DisplayLibraryEntries.Any())
         {
             <div class="tab-pane fade" id="library-tab-pane" role="tabpanel" aria-labelledby="library-tab" tabindex="0">
-                <pre>@((MarkupString)Library[1])</pre>
+                <pre>@((MarkupString)LibraryTabContent)</pre>
             </div>
         }
     </div>
@@ -220,7 +223,70 @@
     public RenderFragment? WSIMInstructions { get; set; }
 
     [Parameter]
-    public string[]? Library { get; set; }
+    public string[][]? Library { get; set; }
+
+    private const string BlocklyLibraryTag = "$Blockly";
+    private const string HiddenLibraryName = "libraryName.s";
+
+    private IEnumerable<string[]> OrderedLibraryEntries =>
+        Library?.Where(entry => entry != null && entry.Length > 0) ?? Enumerable.Empty<string[]>();
+
+    private IEnumerable<string[]> DisplayLibraryEntries =>
+        OrderedLibraryEntries.Where(entry =>
+            !string.Equals(entry[0], HiddenLibraryName, StringComparison.Ordinal));
+
+    private string LibraryTabTitle
+    {
+        get
+        {
+            List<string[]> displayEntries = DisplayLibraryEntries.ToList();
+            if (displayEntries.Count == 1 && !string.Equals(displayEntries[0][0], BlocklyLibraryTag, StringComparison.Ordinal))
+            {
+                return displayEntries[0][0];
+            }
+            return "Library";
+        }
+    }
+
+    private string LibraryTabContent => string.Join("\n\n", DisplayLibraryEntries.Select(entry =>
+    {
+        string name = entry[0];
+        if (string.Equals(name, BlocklyLibraryTag, StringComparison.Ordinal))
+        {
+            return "\n### YOUR BLOCKLY CODE WILL BE INSERTED HERE ###\n";
+        }
+
+        string content = entry.Length > 1 ? entry[1] : string.Empty;
+        return $"{content}";
+    }));
+
+    private string CombinedNonBlocklyLibraryCode => string.Join("\n", OrderedLibraryEntries
+        .Where(entry => !string.Equals(entry[0], BlocklyLibraryTag, StringComparison.Ordinal))
+        .Select(entry => entry.Length > 1 ? entry[1] : string.Empty));
+
+    private static bool HasRequiredProgramEntrypoint(string code)
+    {
+        bool hasTextSegment = Regex.IsMatch(code, @"(?m)^\s*\.text\b");
+        bool hasGlobalMain = Regex.IsMatch(code, @"(?m)^\s*\.global\s+main\b");
+        bool hasMainLabel = Regex.IsMatch(code, @"(?m)^\s*main\s*:");
+        return hasTextSegment && hasGlobalMain && hasMainLabel;
+    }
+
+    private ElementReference compileButtonRef;
+    private ElementReference downloadCodeButtonRef;
+    private ElementReference undoButtonRef;
+    private ElementReference runButtonRef;
+    private ElementReference pauseButtonRef;
+    private ElementReference stepButtonRef;
+    private ElementReference instructionsTabRef;
+    private ElementReference codeTabRef;
+    private ElementReference gpTabRef;
+    private ElementReference spTabRef;
+    private ElementReference ramTabRef;
+    private ElementReference parallelTabRef;
+    private ElementReference serialTabRef;
+    private ElementReference libraryTabRef;
+    private ElementReference physicalComponentsTabRef;
 
     public enum ExceptionSource { GPF = 0x1000, SYSCALL = 0x2000, BREAK = 0x4000, ARITH = 0x8000 }
 
@@ -258,6 +324,8 @@
     uint finalAddress = 50;
 
     public string[]? codeStatements;
+    private int blocklyInstructionStartPc;
+    private int blocklyInstructionCount;
     IR ir = new IR();
     bool instructionsLoaded = false;
     public bool running = false;
@@ -269,8 +337,29 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
+
+        // Always re-register tab refs so they stay current when UIComponents changes
+        // between renders (e.g. LevelFour phase transition adding new tabs).
+        if (WSIMInstructions != null) SpotlightRegistry.Register("instructionsTab", instructionsTabRef);
+        if (UIComponents.Code) SpotlightRegistry.Register("codeTab", codeTabRef);
+        if (UIComponents.GPRegisters) SpotlightRegistry.Register("gpRegisters", gpTabRef);
+        if (UIComponents.SPRegisters) SpotlightRegistry.Register("spRegisters", spTabRef);
+        if (UIComponents.RAM) SpotlightRegistry.Register("ramTab", ramTabRef);
+        if (UIComponents.ParallelRegisters) SpotlightRegistry.Register("parallelRegisters", parallelTabRef);
+        if (UIComponents.SerialPort) SpotlightRegistry.Register("serialPort", serialTabRef);
+        if (DisplayLibraryEntries.Any()) SpotlightRegistry.Register("libraryTab", libraryTabRef);
+        if (UIComponents.LEDs || UIComponents.SSDs || UIComponents.Switches) SpotlightRegistry.Register("physicalComponentsTab", physicalComponentsTabRef);
+
         if (firstRender)
         {
+            SpotlightRegistry.Register("compileButton", compileButtonRef);
+            SpotlightRegistry.Register("downloadCodeButton", downloadCodeButtonRef);
+            SpotlightRegistry.Register("undoButton", undoButtonRef);
+            SpotlightRegistry.Register("runButton", runButtonRef);
+            SpotlightRegistry.Register("pauseButton", pauseButtonRef);
+            SpotlightRegistry.Register("stepButton", stepButtonRef);
+
             //Load SSDs on page load
             updateSSDs();
 
@@ -321,50 +410,71 @@
 
         //Reset board
         Reset();
+        await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
 
         byte[] codeBytes;
+        string combinedCode;
         string codeWithEQUs = args.code + "\n" + EQUString;
-
-        @* Get executable lines only for displaying in the Visualiser component *@
-        string codeRegex = @"([a-zA-Z0-9]+:|.text|.global main|.data|.bss)\n?";
-        string filteredCode = Regex.Replace(args.code, codeRegex, String.Empty);
-        codeStatements = filteredCode.Split("\n");
+        blocklyInstructionStartPc = 0;
+        blocklyInstructionCount = GetExecutableInstructionLines(args.code).Count;
 
         if (Library != null)
         {
             string htmlTags = @"<table>|</table>|<tr>|</tr>|<td>|</td>\n";
-            string nonCodeTags = @".text|.data|.bss|.global main";
-            string labelPattern = @"^[a-zA-Z_][a-zA-Z0-9_.]*:";
 
-            @* Add the library code onto any user code and the EQU lines *@
-            string libraryCode = Regex.Replace(Library[1], htmlTags, String.Empty);
-            string combinedCode = codeWithEQUs + "\n" + libraryCode;
-            codeBytes = Encoding.UTF8.GetBytes(combinedCode);
+            bool insertedBlocklyCode = false;
+            List<string> combinedParts = new List<string>();
 
-            //Get the labels from the library code
-            List<string> libraryLines = libraryCode.Split('\n').ToList();
-            List<string> labelLines = new List<string>();
-            for (int i = 0; i < libraryLines.Count - 1; i++)
+            foreach (string[] entry in OrderedLibraryEntries)
             {
-                if (!Regex.IsMatch(libraryLines[i], nonCodeTags) && libraryLines[i] != String.Empty)
+                string name = entry[0];
+
+                if (string.Equals(name, BlocklyLibraryTag, StringComparison.Ordinal))
                 {
-                    if (!Regex.IsMatch(libraryLines[i], labelPattern))
-                    {
-                        labelLines.Add(String.Empty);
-                    }
-                    else
-                    {
-                        if (labelLines.Count > 1) labelLines.RemoveAt(labelLines.Count - 1);
-                        labelLines.Add(libraryLines[i].Substring(0, libraryLines[i].IndexOf(':')));
-                    }
+                    combinedParts.Add(codeWithEQUs);
+                    insertedBlocklyCode = true;
+                    continue;
                 }
+
+                string content = entry.Length > 1 ? entry[1] : string.Empty;
+                string cleanedContent = Regex.Replace(content, htmlTags, String.Empty);
+                if (!insertedBlocklyCode)
+                {
+                    blocklyInstructionStartPc += GetExecutableInstructionLines(cleanedContent).Count;
+                }
+
+                combinedParts.Add(cleanedContent);
             }
-            labels.AddRange(labelLines);
+
+            // Preserve previous default behavior when no explicit $Blockly tag is provided.
+            if (!insertedBlocklyCode)
+            {
+                combinedParts.Insert(0, codeWithEQUs);
+                blocklyInstructionStartPc = 0;
+            }
+
+            combinedCode = string.Join("\n", combinedParts);
         }
         else
         {
-            codeBytes = Encoding.UTF8.GetBytes(codeWithEQUs);
+            combinedCode = codeWithEQUs;
         }
+
+        labels = BuildMemoryLabels(combinedCode);
+
+        codeStatements = GetExecutableInstructionLines(combinedCode).ToArray();
+
+        // Show the exact merged source that will be validated and assembled.
+        await JSRuntime.InvokeVoidAsync("setWsimCode", combinedCode);
+
+        if (!HasRequiredProgramEntrypoint(combinedCode))
+        {
+            await JSRuntime.InvokeVoidAsync("triggerPopover", "You must declare a .text segment with global main, and a label for main!");
+            labels.Clear();
+            return;
+        }
+
+        codeBytes = Encoding.UTF8.GetBytes(combinedCode);
 
         try
         {
@@ -379,9 +489,15 @@
             {
                 instructionsLoaded = true;
                 firstCompilation = true;
+                await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
                 codeCompiled = true;
-                if (UIComponents.Blockly) await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[0]);
-                ir.Instruction = board.RAM.mMemory[0];
+                if (UIComponents.Blockly)
+                {
+                    int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                    await JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
+                }
+
+                ir.Instruction = board.RAM.mMemory[board.CPU.PC];
             }
             StateHasChanged();
         }
@@ -505,14 +621,8 @@
                         //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
                         if (UIComponents.Blockly)
                         {
-                            try
-                            {
-                                await JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
-                            }
-                            catch
-                            {
-                                await JSRuntime.InvokeVoidAsync("highlightBlock", null);
-                            }
+                            int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                            await JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
                         }
 
                         //Update SSDs & LEDs
@@ -751,11 +861,8 @@
             //Highlight previous block (try catch used to account for library code which is un-highlightable due to not being in the Blockly workspace)
             if (UIComponents.Blockly)
             {
-                try
-                {
-                    JSRuntime.InvokeVoidAsync("highlightBlock", blockIDs[board.CPU.PC]);
-                }
-                catch {}
+                int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
             }
 
             //Remove restored states from list or decrement number of repeats
@@ -913,6 +1020,254 @@
         }
     }
 
+    private static List<string> GetExecutableInstructionLines(string source)
+    {
+        List<string> executableLines = new List<string>();
+        string[] lines = source.Replace("\r", string.Empty).Split('\n');
+
+        // Treat code as text by default so Blockly snippets without explicit .text are still parsed.
+        bool inTextSegment = true;
+
+        foreach (string rawLine in lines)
+        {
+            string line = rawLine;
+            int commentIndex = line.IndexOf('#');
+            if (commentIndex >= 0)
+            {
+                line = line[..commentIndex];
+            }
+
+            string trimmed = line.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
+            {
+                continue;
+            }
+
+            if (trimmed.StartsWith(".", StringComparison.Ordinal))
+            {
+                if (Regex.IsMatch(trimmed, @"^\.text\b", RegexOptions.IgnoreCase))
+                {
+                    inTextSegment = true;
+                }
+                else if (Regex.IsMatch(trimmed, @"^\.(data|bss)\b", RegexOptions.IgnoreCase))
+                {
+                    inTextSegment = false;
+                }
+
+                continue;
+            }
+
+            if (!inTextSegment)
+            {
+                continue;
+            }
+
+            int colonIndex = trimmed.IndexOf(':');
+            if (colonIndex >= 0)
+            {
+                trimmed = trimmed[(colonIndex + 1)..].Trim();
+                if (string.IsNullOrWhiteSpace(trimmed))
+                {
+                    continue;
+                }
+            }
+
+            executableLines.Add(trimmed);
+        }
+
+        return executableLines;
+    }
+
+    private enum Segment
+    {
+        Text,
+        Data,
+        Bss
+    }
+
+    private static List<string> BuildMemoryLabels(string source)
+    {
+        Dictionary<Segment, List<string>> labelsBySegment = new Dictionary<Segment, List<string>>
+        {
+            [Segment.Text] = new List<string>(),
+            [Segment.Data] = new List<string>(),
+            [Segment.Bss] = new List<string>()
+        };
+
+        Segment currentSegment = Segment.Text;
+        string? pendingLabel = null;
+
+        string[] lines = source.Replace("\r", string.Empty).Split('\n');
+        foreach (string rawLine in lines)
+        {
+            string line = rawLine;
+            int commentIndex = line.IndexOf('#');
+            if (commentIndex >= 0)
+            {
+                line = line[..commentIndex];
+            }
+
+            string trimmed = line.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed))
+            {
+                continue;
+            }
+
+            if (Regex.IsMatch(trimmed, @"^\.text\b", RegexOptions.IgnoreCase))
+            {
+                currentSegment = Segment.Text;
+                continue;
+            }
+
+            if (Regex.IsMatch(trimmed, @"^\.data\b", RegexOptions.IgnoreCase))
+            {
+                currentSegment = Segment.Data;
+                continue;
+            }
+
+            if (Regex.IsMatch(trimmed, @"^\.bss\b", RegexOptions.IgnoreCase))
+            {
+                currentSegment = Segment.Bss;
+                continue;
+            }
+
+            Match labelMatch = Regex.Match(trimmed, @"^([a-zA-Z_][a-zA-Z0-9_.]*):\s*(.*)$");
+            if (labelMatch.Success)
+            {
+                string label = labelMatch.Groups[1].Value;
+                string remainder = labelMatch.Groups[2].Value.Trim();
+
+                if (string.IsNullOrWhiteSpace(remainder))
+                {
+                    pendingLabel = label;
+                    continue;
+                }
+
+                pendingLabel = label;
+                trimmed = remainder;
+            }
+
+            int wordsProduced = GetWordsProducedForLine(trimmed, currentSegment);
+            if (wordsProduced <= 0)
+            {
+                continue;
+            }
+
+            List<string> segmentLabels = labelsBySegment[currentSegment];
+            for (int i = 0; i < wordsProduced; i++)
+            {
+                if (i == 0 && pendingLabel != null)
+                {
+                    segmentLabels.Add(pendingLabel);
+                    pendingLabel = null;
+                }
+                else
+                {
+                    segmentLabels.Add(string.Empty);
+                }
+            }
+        }
+
+        return labelsBySegment[Segment.Text]
+            .Concat(labelsBySegment[Segment.Data])
+            .Concat(labelsBySegment[Segment.Bss])
+            .ToList();
+    }
+
+    private static int GetWordsProducedForLine(string trimmedLine, Segment segment)
+    {
+        if (string.IsNullOrWhiteSpace(trimmedLine))
+        {
+            return 0;
+        }
+
+        if (trimmedLine.StartsWith(".global", StringComparison.OrdinalIgnoreCase)
+            || trimmedLine.StartsWith(".equ", StringComparison.OrdinalIgnoreCase))
+        {
+            return 0;
+        }
+
+        if (segment == Segment.Text)
+        {
+            return trimmedLine.StartsWith(".", StringComparison.Ordinal) ? 0 : 1;
+        }
+
+        if (Regex.IsMatch(trimmedLine, @"^\.word\b", RegexOptions.IgnoreCase))
+        {
+            string operands = Regex.Replace(trimmedLine, @"^\.word\s+", string.Empty, RegexOptions.IgnoreCase);
+            return operands.Split(',', StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        if (Regex.IsMatch(trimmedLine, @"^\.space\b", RegexOptions.IgnoreCase))
+        {
+            Match valueMatch = Regex.Match(trimmedLine, @"^\.space\s+([^\s,]+)", RegexOptions.IgnoreCase);
+            if (!valueMatch.Success)
+            {
+                return 0;
+            }
+
+            if (TryParseAssemblyNumber(valueMatch.Groups[1].Value, out int spaceWords))
+            {
+                return Math.Max(spaceWords, 0);
+            }
+
+            return 0;
+        }
+
+        Match asciizMatch = Regex.Match(trimmedLine, @"^\.asciiz\s+""(.*)""$", RegexOptions.IgnoreCase);
+        if (asciizMatch.Success)
+        {
+            return asciizMatch.Groups[1].Value.Length + 1;
+        }
+
+        Match asciiMatch = Regex.Match(trimmedLine, @"^\.ascii\s+""(.*)""$", RegexOptions.IgnoreCase);
+        if (asciiMatch.Success)
+        {
+            return asciiMatch.Groups[1].Value.Length;
+        }
+
+        return trimmedLine.StartsWith(".", StringComparison.Ordinal) ? 0 : 1;
+    }
+
+    private static bool TryParseAssemblyNumber(string token, out int value)
+    {
+        value = 0;
+        string cleaned = token.Trim();
+
+        if (cleaned.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+        {
+            return int.TryParse(cleaned[2..], NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out value);
+        }
+
+        return int.TryParse(cleaned, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
+    }
+
+    private int? GetBlocklyBlockIndexForPc(uint programCounter)
+    {
+        if (blockIDs == null || blockIDs.Length == 0)
+        {
+            return null;
+        }
+
+        int relativePc = (int)programCounter - blocklyInstructionStartPc;
+        if (relativePc < 0)
+        {
+            return null;
+        }
+
+        if (relativePc >= blocklyInstructionCount)
+        {
+            return null;
+        }
+
+        if (relativePc >= blockIDs.Length)
+        {
+            return null;
+        }
+
+        return relativePc;
+    }
+
     void quack()
     {
         JSRuntime.InvokeVoidAsync("quacker");
@@ -920,7 +1275,7 @@
 
     void saveCode()
     {
-        JSRuntime.InvokeVoidAsync("saveCode", Library?[1]);
+        JSRuntime.InvokeVoidAsync("saveCode", CombinedNonBlocklyLibraryCode);
     }
 
     [JSInvokable]
