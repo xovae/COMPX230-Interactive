@@ -21,16 +21,18 @@
     @if (Section >= 2)
     {
         <h3>Question Three <label class="inputCheckmark" id="checkmarkThree"><i class="bi bi-check-lg"></i></label></h3>
-        <p><b>Turn on all switches</b>, then load the switch value into register <code>$1</code> and using masking to store the bottom 8 bits into <code>$2</code>.</p>
+        <p>Click <button class="walkthrough-trigger-btn" @onclick="SetSwitchesForBonus">Here</button> to turn on every second switch (after next compile).</p>
+        <p>Load the switch value into register <code>$1</code> and use masking to store the bottom 8 bits into <code>$2</code>.</p>
         <p>Tip: Use an AND immediate instruction to apply the mask to <code>$1</code> and store the result in <code>$2</code>.</p>
-        <p>Expected with all switches on: <code>$2 = 255</code>.</p>
+        <p>You can use the Visualiser above to see how your bitwise operations are changing the value of the registers while stepping through the code</p>
     }
 
     @if (Section >= 3)
     {
         <h3>Question Four <label class="inputCheckmark" id="checkmarkFour"><i class="bi bi-check-lg"></i></label></h3>
-        <p>Mask the value in $1 to ensure bits 12-15 are set. <b>Other bits must be unaffected.</b> Store the result in $3.</p>
-        <p>Tip: The mask for bits 12-15 is 0xF000 (1111 0000 0000 0000 in binary).</p>
+        <p>Take the value in $1 and set the bits 12-15 to 1. <b>Other bits must be unaffected.</b> Store the result in $3.</p>
+        <p>Tip: The hexidecimal value of the bits 12-15 is 0xF000 (1111 0000 0000 0000 in binary).</p>
+        <p>You can change to a different bitwise instruction by clicking on the name and selecting a different option from the dropdown menu.</p>
     }
 
     @if (Section >= 4)
@@ -42,7 +44,7 @@
     @if (Section >= 4)
     {
         <h3>Bonus Task <label class="inputCheckmark" id="checkmarkFive"><i class="bi bi-check-lg"></i></label></h3>
-        <p>Click <button class="walkthrough-trigger-btn" @onclick="SetSwitchesForBonus">Here</button> to turn on every second switch. Store the inverse value of the switches into $4.</p>
+        <p>Store the inverse value of the switches into $4.</p>
     }
 
     @if (Section >= 4 && bonusStepComplete)
@@ -185,14 +187,18 @@
         // Check blockly tasks if we've passed the questions
         if (Section >= 2)
         {
-            uint maskedValueBits1215 = switchValue | 0xF000;
+            uint maskedBottom = switchValue ^ 0x00FF;
+            uint setBits1215 = switchValue | 0xF000;
+            uint switchesFlipped = switchValue ^ 0xFFFF;
 
-            bool allSwitchesOn = switchValue == 0xFFFF;
-            bool regTwoIs255 = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, 255, 2));
-            bool regThreeIsMaskedBits1215 = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, maskedValueBits1215, 3));
+            bool allSecondSwitchesSwitch = switchValue == 0x5555;
+            bool regTwoMasked = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, maskedBottom, 2));
+            bool regThreeSet1215 = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, setBits1215, 3));
+            bool regFourFlipped = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, switchesFlipped, 4));
+            
 
-            bool maskingStepOneNow = allSwitchesOn && regTwoIs255;
-            bool maskingStepTwoNow = (blocklyStepOneComplete || maskingStepOneNow) && regThreeIsMaskedBits1215;
+            bool maskingStepOneNow = allSecondSwitchesSwitch && regTwoMasked;
+            bool maskingStepTwoNow = (blocklyStepOneComplete || maskingStepOneNow) && regThreeSet1215;
 
             blocklyStepOneComplete = blocklyStepOneComplete || maskingStepOneNow;
             blocklyStepTwoComplete = blocklyStepTwoComplete || maskingStepTwoNow;
@@ -205,7 +211,7 @@
             {
                 Section = 4;
             }
-            if (Section >= 4 && Board.Parallel.Switches == 0x5555 && VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, 0xAAAA, 4)))
+            if (Section >= 4 && regFourFlipped)
             {
                 bonusStepComplete = true;
             }
