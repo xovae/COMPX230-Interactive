@@ -187,7 +187,8 @@
         // Check blockly tasks if we've passed the questions
         if (Section >= 2)
         {
-            uint maskedBottom = switchValue ^ 0x00FF;
+            uint maskedBottom = switchValue & 0x00FF;
+            
             uint setBits1215 = switchValue | 0xF000;
             uint switchesFlipped = switchValue ^ 0xFFFF;
 
