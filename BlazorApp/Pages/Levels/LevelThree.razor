@@ -20,12 +20,19 @@
             case 0:
                 @BlockOne;
                 break;
+            case 1:
+                @BlockTwo;
+                break;
+            case 2:
+                @BlockThree;
+                break;
         }
 
         <button class="btn btn-primary" @onclick="lc.PrevBlock" disabled="@(lc.Block == 0)">Prev</button>
-        <button class="btn btn-primary" @onclick="lc.NextBlock" disabled="@(lc.Block == 100)">Next</button>
+        <button class="btn btn-primary" @onclick="lc.NextBlock" disabled="@(lc.Block == 2)">Next</button>
     </div>;
 
+    // Block One: Infinite loop
     public RenderFragment BlockOne => @<div>
         <p>Can you create an infinite loop, constantly incrementing the value of $1 from 0 upwards?</p>
         <span>e.g.<code>  while(true) reg1++;</code></span>
@@ -48,12 +55,86 @@
         </table>
     </div>;
 
+    // Block Two: Countdown
+    public RenderFragment BlockTwo => @<div>
+        <p>Change your loop to count down from 10 to 0</p>
+        <p>Your loop should stop once $1 reaches 0</p>
+        <p>Tip: you can add extra labels to indicate the start and end of the loop</p>
+        <span>e.g.<code> reg1 = 10; while(reg1 != 0) reg1--;</code></span>
+        <br />
+        <br />
+
+        <table class="table objectiveTable text-center">
+            <tr>
+                <td>Branch when EQual to Zero instruction present</td>
+                <td><Checkmark id="checkmarkBEQZ"/></td>
+            </tr>
+            <tr>
+                <td>Decrease $1 from 10 down to 0</td>
+                <td><Checkmark id="checkmarkCountdown"/></td>
+            </tr>
+            <tr>
+                <td>The code finishes with $1 as 0</td>
+                <td><Checkmark id="checkmarkReturned"/></td>
+            </tr>
+        </table>
+
+        @if( lc.Section >= 2) {
+            <br />
+            <p>Great work! No more getting stuck in an infinite loop! </p>
+        }
+    </div>;
+
+    // Block Three: Conditional instruction
+    public RenderFragment BlockThree => @<div>
+        <p>Change your loop to count down from 10 to 5</p>
+        <p>There is not a dedicated instruction that branches when a register reaches exactly 5</p>
+        <p>Instead you can use the instructions in the conditional block</p>
+        <p>Tip: Hover over the instructions to get a description</p>
+        <span>e.g.</span>
+        <code> reg1 = 10; while(reg1 &gt; 5) { reg1--; }</code>
+        <br />
+        <br />
+
+        <table class="table objectiveTable text-center">
+            <tr>
+                <td>Decrease $1 from 10 down to 5</td>
+                <td><Checkmark id="checkmarkCountdown2"/></td>
+            </tr>
+            <tr>
+                <td>The code finishes with $1 as 5</td>
+                <td><Checkmark id="checkmarkReturned2"/></td>
+            </tr>
+        </table>
+
+        @if( lc.Section >= 3) {
+            <br />
+            <p>Excellent! You have written a conditional while loop!</p>
+            <p>This same pattern can be used to write any while loop you want</p>
+        }
+    </div>;
+
+
     public string maxInstances = "{ 'global': 1}";
 
     public string startingWorkspace = """
     {"blocks":{"languageVersion":0,"blocks":[{"type":"textHead","id":"j.+Uj-+zg/uMGN]AFqv,","x":131,"y":47,"fields":{"instruction":".text"},"next":{"block":{"type":"global","id":"i0m/ymZEQ1!Cy`cL%Yui","fields":{"instruction":".global main"},"next":{"block":{"type":"label","id":"{5F--BdF]Y0ecZz@a6MV","fields":{"label":"main"},"next":{"block":{"type":"jumpRegister","id":"Kw#Onn.I7f)gzK]_*utL","fields":{"instruction":"jr","register":"$ra"}}}}}}}}]}}
     """;
 
+
+    // Flags for each step, for each block
+    bool step1 = false;
+    bool step2 = false;
+    bool step3 = false;
+
+    bool stepbeqz = false;
+    bool stepcountdown = false;
+    bool stepReturned = false;
+
+    bool stepcountdown2 = false;
+    bool stepReturned2 = false;
+
+    // Some steps need to be reset each time the board is compiled
     public async void BoardCompiled()
     {
         if (lc.Section == 0)
@@ -62,15 +143,17 @@
         }
         if (lc.Section == 1)
         {
-            Random rand = new Random();
-            board.CPU.mGpRegisters[7] = (uint)rand.Next(-32767, 32767);
+            stepcountdown = false;
+            stepReturned = false;
         }
-
+        if (lc.Section == 2)
+        {
+            stepcountdown2 = false;
+            stepReturned2 = false;
+        }
     }
 
-    bool step1 = false;
-    bool step2 = false;
-    bool step3 = false;
+   
 
     /// <summary>
     /// This method is called on any changes to the WRAMP board, or the Blockly workspace. The state of the board can be accessed via the variable board or using
@@ -79,32 +162,96 @@
     /// <returns></returns>
     public async void CheckBoard()
     {
+        CheckBlockOne();    // infinite loop
+        CheckBlockTwo();    // count down to 0
+        CheckBlockThree();  // count down to 5
+    }
+
+    private async void CheckBlockOne() {
         string userCode = await lc.GetUserCode();
 
-        if (lc.Section == 0)
+        step1 = userCode.Contains("j ");
+        if(WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 0, 10, 1)))
         {
-            step1 = userCode.Contains("j ");
-            if(WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 0, 10, 1)))
-            {
-                step2 = true;
-            }
-            step3 = WSIM.running;
-
-            lc.CheckObjective(step1, "checkmarkOne");
-            lc.CheckObjective(step2, "checkmarkTwo");
-            lc.CheckObjective(step3, "checkmarkThree");
-
-            if (step1 && step2 && step3 && lc.Section == 0)
-            {
-                lc.Section = 1;
-                lc.Block = 1;
-            }
+            step2 = true;
         }
+        step3 = WSIM.running;
+
+        // Turn on the checkmarks for each step
+        lc.CheckObjective(step1, "checkmarkOne");
+        lc.CheckObjective(step2, "checkmarkTwo");
+        lc.CheckObjective(step3, "checkmarkThree");
+
+        // If all steps have been completed (and not already working on a later part)
+        if (step1 && step2 && step3 && lc.Section == 0)
+        {
+            // Go to next section
+            lc.Section = 1;
+        }
+        
+        // If a later section has been completed, turn on all checkmarks.
         if (lc.Section > 0)
         {
             lc.CheckObjective(true, "checkmarkOne");
             lc.CheckObjective(true, "checkmarkTwo");
             lc.CheckObjective(true, "checkmarkThree");
+        }
+    }
+
+    private async void CheckBlockTwo() {
+        string userCode = await lc.GetUserCode();
+
+        
+            stepbeqz = userCode.Contains("beqz ");
+            if(WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 10, 0, 1)))
+            {
+                stepcountdown = true;
+            }
+            stepReturned = (board.CPU.PC > 20) && WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 0, 1));
+            
+            //Console.WriteLine("$pc: " + board.CPU.PC);
+
+            lc.CheckObjective(stepbeqz, "checkmarkBEQZ");
+            lc.CheckObjective(stepcountdown, "checkmarkCountdown");
+            lc.CheckObjective(stepReturned, "checkmarkReturned");
+
+            if (stepbeqz && stepcountdown && stepReturned && lc.Section < 2)
+            {
+                lc.Section = 2;
+            }
+        
+        if (lc.Section > 1)
+        {
+            lc.CheckObjective(true, "checkmarkBEQZ");
+            lc.CheckObjective(true, "checkmarkCountdown");
+            lc.CheckObjective(true, "checkmarkReturned");
+        }
+    }
+
+    private async void CheckBlockThree() {
+        string userCode = await lc.GetUserCode();
+
+
+            if(WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 10, 5, 1)))
+            {
+                stepcountdown2 = true;
+            }
+            stepReturned2 = (board.CPU.PC > 20) && WSIM.Verify(new BoardCheck(WRAMPComponents.GPRegisters, 5, 1));
+            
+
+            lc.CheckObjective(stepcountdown, "checkmarkCountdown2");
+            lc.CheckObjective(stepReturned, "checkmarkReturned2");
+
+            if (stepcountdown2 && stepReturned2 && lc.Section < 3)
+            {
+                lc.Section = 3;
+                lc.LevelCompleted();
+            }
+        
+        if (lc.Section > 2)
+        {
+            lc.CheckObjective(true, "checkmarkCountdown2");
+            lc.CheckObjective(true, "checkmarkReturned2");
         }
     }
 

@@ -55,8 +55,8 @@ public class LevelComponents
 
     public void NextBlock()
     {
-        if (Block < 1)
-            Block++;
+       
+        Block++;
         //InvokeBoardChanged is invoked to trigger any UI updates caused by CheckBoard()
         JSRuntime?.InvokeVoidAsync("InvokeBoardChanged");
     }
