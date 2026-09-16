@@ -188,7 +188,7 @@
         if (Section >= 2)
         {
             uint maskedBottom = switchValue & 0x00FF;
-            
+
             uint setBits1215 = switchValue | 0xF000;
             uint switchesFlipped = switchValue ^ 0xFFFF;
 
@@ -196,7 +196,7 @@
             bool regTwoMasked = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, maskedBottom, 2));
             bool regThreeSet1215 = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, setBits1215, 3));
             bool regFourFlipped = VerifyBoard(new BoardCheck(WRAMPComponents.GPRegisters, switchesFlipped, 4));
-            
+
 
             bool maskingStepOneNow = allSecondSwitchesSwitch && regTwoMasked;
             bool maskingStepTwoNow = (blocklyStepOneComplete || maskingStepOneNow) && regThreeSet1215;
@@ -284,12 +284,3 @@
     [Inject]
     private IJSRuntime JSRuntime { get; set; } = null!;
 }
-
-<style>
-.skip-level-button {
-    position: fixed;
-    right: 1.25rem;
-    bottom: 1.25rem;
-    z-index: 1050;
-}
-</style>

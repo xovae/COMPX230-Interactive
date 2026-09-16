@@ -324,13 +324,12 @@
     uint finalAddress = 50;
 
     public string[]? codeStatements;
-    private int blocklyInstructionStartPc;
+    private int blocklyInstructionStartPC;
     private int blocklyInstructionCount;
     IR ir = new IR();
     bool instructionsLoaded = false;
     public bool running = false;
     public bool firstCompilation = false;
-    public bool codeCompiled = false;
 
     private DotNetObjectReference<WSIM>? dotNetReference;
     private CancellationTokenSource? cts;
@@ -410,12 +409,18 @@
 
         //Reset board
         Reset();
-        await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
+
+        // Prevents 'Code has been changed, compile first' from popping up when switching tabs
+        if (!firstCompilation)
+        {
+            firstCompilation = true;
+            await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
+        }
 
         byte[] codeBytes;
         string combinedCode;
         string codeWithEQUs = args.code + "\n" + EQUString;
-        blocklyInstructionStartPc = 0;
+        blocklyInstructionStartPC = 0;
         blocklyInstructionCount = GetExecutableInstructionLines(args.code).Count;
 
         if (Library != null)
@@ -440,7 +445,7 @@
                 string cleanedContent = Regex.Replace(content, htmlTags, String.Empty);
                 if (!insertedBlocklyCode)
                 {
-                    blocklyInstructionStartPc += GetExecutableInstructionLines(cleanedContent).Count;
+                    blocklyInstructionStartPC += GetExecutableInstructionLines(cleanedContent).Count;
                 }
 
                 combinedParts.Add(cleanedContent);
@@ -450,7 +455,7 @@
             if (!insertedBlocklyCode)
             {
                 combinedParts.Insert(0, codeWithEQUs);
-                blocklyInstructionStartPc = 0;
+                blocklyInstructionStartPC = 0;
             }
 
             combinedCode = string.Join("\n", combinedParts);
@@ -460,12 +465,12 @@
             combinedCode = codeWithEQUs;
         }
 
-        labels = BuildMemoryLabels(combinedCode);
+        @* labels = BuildMemoryLabels(combinedCode); *@
 
         codeStatements = GetExecutableInstructionLines(combinedCode).ToArray();
 
         // Show the exact merged source that will be validated and assembled.
-        await JSRuntime.InvokeVoidAsync("setWsimCode", combinedCode);
+        @* await JSRuntime.InvokeVoidAsync("setWsimCode", combinedCode); *@
 
         if (!HasRequiredProgramEntrypoint(combinedCode))
         {
@@ -488,12 +493,9 @@
             if (finalAddress != 0)
             {
                 instructionsLoaded = true;
-                firstCompilation = true;
-                await JSRuntime.InvokeVoidAsync("setCompilePopoverEnabled", firstCompilation);
-                codeCompiled = true;
                 if (UIComponents.Blockly)
                 {
-                    int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                    int? currentBlockIndex = GetBlocklyBlockIndexForPC(board.CPU.PC);
                     await JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
                 }
 
@@ -513,8 +515,6 @@
         board.Reset();
         board.Parallel.Switches = switches;
         running = false;
-        firstCompilation = false;
-        codeCompiled = false;
 
         //Remove any stored states
         memoryStates.Clear();
@@ -621,7 +621,7 @@
                         //Highlight next block to be executed (try catch used to account for library code which is un-highlightable)
                         if (UIComponents.Blockly)
                         {
-                            int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                            int? currentBlockIndex = GetBlocklyBlockIndexForPC(board.CPU.PC);
                             await JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
                         }
 
@@ -861,7 +861,7 @@
             //Highlight previous block (try catch used to account for library code which is un-highlightable due to not being in the Blockly workspace)
             if (UIComponents.Blockly)
             {
-                int? currentBlockIndex = GetBlocklyBlockIndexForPc(board.CPU.PC);
+                int? currentBlockIndex = GetBlocklyBlockIndexForPC(board.CPU.PC);
                 JSRuntime.InvokeVoidAsync("highlightBlock", currentBlockIndex.HasValue ? blockIDs[currentBlockIndex.Value] : null);
             }
 
@@ -1242,30 +1242,30 @@
         return int.TryParse(cleaned, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
     }
 
-    private int? GetBlocklyBlockIndexForPc(uint programCounter)
+    private int? GetBlocklyBlockIndexForPC(uint programCounter)
     {
         if (blockIDs == null || blockIDs.Length == 0)
         {
             return null;
         }
 
-        int relativePc = (int)programCounter - blocklyInstructionStartPc;
-        if (relativePc < 0)
+        int relativePC = (int)programCounter - blocklyInstructionStartPC;
+        if (relativePC < 0)
         {
             return null;
         }
 
-        if (relativePc >= blocklyInstructionCount)
+        if (relativePC >= blocklyInstructionCount)
         {
             return null;
         }
 
-        if (relativePc >= blockIDs.Length)
+        if (relativePC >= blockIDs.Length)
         {
             return null;
         }
 
-        return relativePc;
+        return relativePC;
     }
 
     void quack()

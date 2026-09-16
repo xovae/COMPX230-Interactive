@@ -54,12 +54,18 @@
         await JSRuntime.InvokeVoidAsync("updateCode", "Compile");
         string highlightBlockPattern = @"highlightBlock\('([^']+)'\)\n\t";
         string intRegex = @"[0-9]+";
+        string wordRegex = @"([0-9]+, )+";
+        string nonCodeRegex = @".text|.data|.bss|.global main";
 
         //Remove highlightBlock() from any lines that aren't WRAMP instructions
         code = Regex.Replace(code, highlightBlockPattern + @"\.text", ".text");
         code = Regex.Replace(code, highlightBlockPattern + @"\.data", ".data");
         code = Regex.Replace(code, highlightBlockPattern + @"\.bss", ".bss");
         code = Regex.Replace(code, highlightBlockPattern + @"\.global main", ".global main");
+        code = Regex.Replace(code, highlightBlockPattern + @"(\.asciiz? .+)", "$2");
+        code = Regex.Replace(code, highlightBlockPattern + @"(\.word .+)", "$2");
+        code = Regex.Replace(code, highlightBlockPattern + @"(\.space .+)", "$2");
+        code = Regex.Replace(code, highlightBlockPattern + @"(\.equ .+)", "$2");
 
         //Removes highlightBlock() from labels
         code = Regex.Replace(code, highlightBlockPattern + @"LABEL([a-zA-Z0-9_.]+):", "$2:");
@@ -115,7 +121,7 @@
             {
                 int length = lines[i].Length - ".asciiz".Length - 3;
                 string str = lines[i].Substring(".asciiz".Length + 2, length);
-                for (int i2 = 0; i2 < str.Length + 1; i2++)
+                for (int i2 = 0; i2 < str.Length; i2++)
                 {
                     labels.Add("");
                 }
@@ -128,9 +134,17 @@
                     labels.Add("");
                 }
             }
+            else if (lines[i].Contains(".word"))
+            {
+                int words = Regex.Match(lines[i], wordRegex).ToString().Split(",").Count();
+                for (int i2 = 0; i2 < words; i2++)
+                {
+                    labels.Add("");
+                }
+            }
             else
             {
-                if (lines[i] != ".text" && lines[i] != ".data" && lines[i] != ".bss" && lines[i] != ".global main")
+                if (!Regex.IsMatch(lines[i], nonCodeRegex))
                 {
                     labels.Add("");
                 }

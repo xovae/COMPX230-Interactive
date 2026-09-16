@@ -2,7 +2,7 @@
 @inject ChecklistStateStore ChecklistState
 @implements IDisposable
 
-<div class="col-auto" @ref="levelSelectRef">
+<div class="col-auto border border-primary-subtle border-start-0 border-2" @ref="levelSelectRef">
     <button class="btn btn-primary my-2" type="button" data-bs-toggle="collapse" data-bs-target="#levelSelect" aria-expanded="true" aria-controls="levelSelect">
         ☰
     </button>
@@ -17,7 +17,7 @@
             <LevelNavItem href="levelFour" name="Bitwise" Steps='@GetLevelSteps("levelFour")' LevelId="levelFour" SelectedStepIndex='@GetSelectedStepIndex("levelFour")' />
             <LevelNavItem href="levelFive" name="Memory" Steps='@GetLevelSteps("levelFive")' LevelId="levelFive" SelectedStepIndex='@GetSelectedStepIndex("levelFive")' />
 
-            <button class="btn btn-danger float-end my-2 ms-4" @onclick="ResetLevels" data-bs-toggle="modal" data-bs-target="#deleteModal" @ref="resetLevelButtonRef"> 
+            <button class="btn btn-danger float-end my-2 ms-4" @onclick="ResetLevels" data-bs-toggle="modal" data-bs-target="#deleteModal" @ref="resetLevelButtonRef">
                 Reset Level Progress
             </button>
         </ul>
@@ -81,87 +81,6 @@
 
     public void ResetLevels()
     {
-        _ = JSRuntime.InvokeVoidAsync("resetLevels");
-        @* ChecklistState.ResetToDefaults(); *@
+        JSRuntime.InvokeVoidAsync("resetLevels");
     }
 }
-
-<style>
-.checklist-dropdown {
-    padding: 0.5rem 0;
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.checklist {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-}
-
-.checklist-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s;
-}
-
-.checklist-item-button {
-    width: 100%;
-    border: 0;
-    text-align: left;
-    background: transparent;
-}
-
-.checklist-item-button:hover {
-    background-color: rgba(108, 117, 125, 0.18);
-}
-
-.checklist-item.incomplete {
-    color: var(--bs-body-color);
-}
-
-.checklist-indicator {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.checklist-indicator.complete {
-    background-color: #28a745;
-    border: 2px solid #28a745;
-}
-
-.checklist-indicator.complete .checkmark {
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.checklist-indicator.started {
-    background-color: #6c757d;
-    border: 2px solid #6c757d;
-}
-
-.checklist-indicator.incomplete {
-    background-color: transparent;
-    border: 2px solid var(--bs-secondary);
-    opacity: 0.6;
-}
-
-.checklist-item.selected {
-    background-color: rgba(108, 117, 125, 0.22);
-}
-
-.checklist-label {
-    font-size: 0.95rem;
-}
-</style>
